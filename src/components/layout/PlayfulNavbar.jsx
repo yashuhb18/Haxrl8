@@ -145,6 +145,7 @@ export default function PlayfulNavbar() {
               <img
                 src={mitMysoreBanner}
                 alt="Maharaja Institute of Technology Mysore"
+                className="institutional-banner-img"
                 style={{
                   height: 'clamp(38px, 4.5vw, 52px)',
                   width: 'auto',
@@ -172,6 +173,7 @@ export default function PlayfulNavbar() {
               <img
                 src={emitersSeal}
                 alt="EMITERS - Department of ECE"
+                className="institutional-seal-img"
                 style={{
                   width: 'clamp(44px, 5vw, 56px)',
                   height: 'clamp(44px, 5vw, 56px)',
@@ -456,7 +458,19 @@ export default function PlayfulNavbar() {
             display: none !important;
           }
           .institutional-top-masthead {
-            padding: 4px 0 !important;
+            padding: 6px 0 !important;
+          }
+          .institutional-top-masthead > div {
+            padding: 4px 14px !important;
+            gap: 12px !important;
+          }
+          .institutional-banner-img {
+            height: 32px !important;
+            max-width: calc(100vw - 78px) !important;
+          }
+          .institutional-seal-img {
+            width: 36px !important;
+            height: 36px !important;
           }
         }
       `}</style>

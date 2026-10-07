@@ -211,6 +211,7 @@ export default function AuthPage() {
          ───────────────────────────────────────────────────────────── */}
       {!confirmedLeader ? (
         <motion.div
+          className="auth-gate-card"
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -276,6 +277,7 @@ export default function AuthPage() {
 
           {/* 2 Big Choice Cards */}
           <div
+            className="auth-gate-choices"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
@@ -424,6 +426,7 @@ export default function AuthPage() {
            (Faithfully matching the exact uploaded image media_1791355147030.jpg)
            ───────────────────────────────────────────────────────────── */
         <motion.div
+          className="auth-login-card"
           initial={{ opacity: 0, scale: 0.96, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -443,6 +446,7 @@ export default function AuthPage() {
         >
           {/* ── LEFT PANEL: THE AMONG US 3D WORKSPACE ARTWORK ── */}
           <div
+            className="auth-hero-panel"
             style={{
               position: 'relative',
               width: '100%',
@@ -471,6 +475,7 @@ export default function AuthPage() {
 
           {/* ── RIGHT PANEL: CLEAN LOGIN / SIGNUP FORM ── */}
           <div
+            className="auth-form-panel"
             style={{
               backgroundColor: '#ffffff',
               padding: '44px 40px',
@@ -1028,12 +1033,41 @@ export default function AuthPage() {
         * { box-sizing: border-box; }
         input::placeholder { color: #9ca3af; }
         @media (max-width: 820px) {
-          div[style*="grid-template-columns: 1.05fr 1fr"] {
+          .auth-login-card {
             grid-template-columns: 1fr !important;
+            border-radius: 20px !important;
+            min-height: auto !important;
           }
-          div[style*="grid-template-columns: 1.05fr 1fr"] > div:first-child {
-            min-height: 260px !important;
-            max-height: 300px !important;
+          .auth-hero-panel {
+            min-height: 160px !important;
+            height: 170px !important;
+            max-height: 180px !important;
+          }
+          .auth-form-panel {
+            padding: 28px 22px !important;
+          }
+          .auth-gate-card {
+            padding: 28px 18px !important;
+            border-radius: 22px !important;
+          }
+          .auth-gate-choices {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .auth-hero-panel {
+            min-height: 130px !important;
+            height: 140px !important;
+          }
+          .auth-form-panel {
+            padding: 20px 16px !important;
+          }
+          .auth-form-panel h1 {
+            font-size: 26px !important;
+          }
+          .auth-form-panel input {
+            font-size: 16px !important;
           }
         }
       `}</style>

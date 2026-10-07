@@ -495,7 +495,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
 
     return (
       <div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+        <div className="team-member-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
           {/* Personal Details */}
           <div>
             <label style={styles.label}>Full Name</label>
@@ -614,7 +614,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
     return (
       <div style={{ maxWidth: 800, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
         {/* Wizard Header / Progress Bar */}
-        <div style={styles.card}>
+        <div className="team-wizard-card" style={styles.card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', marginBottom: 20 }}>
             <div style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', width: '100%', height: 4, background: '#f1e7db', borderRadius: 10, zIndex: 0 }}></div>
             <div style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', height: 4, background: 'linear-gradient(90deg, #0284c7, #06b6d4)', borderRadius: 10, zIndex: 0, transition: 'width 0.3s ease', width: `${(currentStep / (totalSteps - 1)) * 100}%` }}></div>
@@ -623,7 +623,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
               const isActive = idx === currentStep;
               const isPast = idx < currentStep;
               return (
-                <div key={idx} style={{
+                <div key={idx} className="team-step-circle" style={{
                   position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: '50%', fontWeight: 900, fontSize: 13, border: '2.5px solid', transition: 'all 0.3s ease',
                   background: isPast ? '#16a34a' : isActive ? '#0284c7' : '#ffffff',
                   borderColor: isPast ? '#16a34a' : isActive ? '#0284c7' : '#cbd5e1',
@@ -643,7 +643,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         </div>
 
         {/* Wizard Content */}
-        <div style={styles.card}>
+        <div className="team-wizard-card" style={styles.card}>
 
           {/* Step 1: Team Setup */}
           {currentStep === 0 && (
@@ -689,8 +689,8 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           {currentStep === 1 && (
             <div style={{ minHeight: 300 }}>
               <div style={{ marginBottom: 24 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 900, color: '#ffffff', margin: '0 0 4px 0' }}>Your Credentials (Team Captain)</h3>
-                <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>Provide your academic information and communication channels.</p>
+                <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: '0 0 4px 0' }}>Your Credentials (Team Captain)</h3>
+                <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Provide your academic information and communication channels.</p>
               </div>
               {renderMemberFields(formData.leader, true, null)}
             </div>
@@ -700,8 +700,8 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           {currentStep > 1 && (
             <div style={{ minHeight: 300 }}>
               <div style={{ marginBottom: 24 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 900, color: '#ffffff', margin: '0 0 4px 0' }}>Crewmate {currentStep - 1} Credentials</h3>
-                <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>Provide credentials for crewmate {currentStep} of {formData.teamSize}.</p>
+                <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: '0 0 4px 0' }}>Crewmate {currentStep - 1} Credentials</h3>
+                <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Provide credentials for crewmate {currentStep} of {formData.teamSize}.</p>
               </div>
               {renderMemberFields(formData.teammates[currentStep - 2], false, currentStep - 2)}
             </div>
@@ -793,7 +793,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         </div>
       </div>
 
-      <div className="dash-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, alignItems: 'stretch' }}>
+      <div className="dash-grid-2 team-summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'stretch' }}>
 
         {/* Left Column: Team Members */}
         <div style={{ ...styles.card, height: '100%' }}>
@@ -968,6 +968,27 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         )}
         */}
       </AnimatePresence>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .team-wizard-card {
+            padding: 18px 14px !important;
+          }
+          .team-member-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+          .team-summary-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .team-step-circle {
+            width: 30px !important;
+            height: 30px !important;
+            font-size: 11px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

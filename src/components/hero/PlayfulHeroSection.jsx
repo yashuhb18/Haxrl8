@@ -82,6 +82,7 @@ export default function PlayfulHeroSection() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }} className="hero-left-content">
             {/* Headline Area: Chalkboard Signpost + Extracted HAXLR8 3.0 Official Logotype */}
             <div
+              className="hero-headline-row"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -346,8 +347,21 @@ export default function PlayfulHeroSection() {
           .hero-left-content {
             align-items: center !important;
           }
+          .hero-headline-row {
+            justify-content: center !important;
+          }
           .hero-hide-mobile {
             display: none !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .hero-chalkboard-wrapper {
+            transform: scale(0.85);
+            transform-origin: center;
+            margin: -6px 0;
+          }
+          .hero-headline-row {
+            gap: 10px !important;
           }
         }
       `}</style>

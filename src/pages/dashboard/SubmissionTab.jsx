@@ -374,7 +374,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
             <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>Project Information</h3>
             <Field label="Project Title" value={form.title} onChange={set('title')} placeholder="e.g., Autonomous Crop Telemetry System" error={fieldErrors.title} />
             
-            <div className="dash-grid-2" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 16 }}>
+            <div className="dash-grid-2 submission-track-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }} ref={sdgRef}>
                 <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Domain / Track</label>
                 <div style={{ position: 'relative', minWidth: 0 }}>
@@ -454,7 +454,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>Review Submission Deck</h3>
             {[['Project Title', form.title], ['Domain / Track', Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg], ['Category', form.category === 'Other' ? form.category_other : form.category], ['Presentation PDF', form.pdf ? form.pdf.name : 'Ready for upload']].map(([k, v]) => (
-              <div key={k} style={{ display: 'flex', gap: 14, padding: '12px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+              <div key={k} className="submission-review-row" style={{ display: 'flex', gap: 14, padding: '12px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
                 <span style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', minWidth: 130, flexShrink: 0, textTransform: 'uppercase' }}>{k}</span>
                 <span style={{ fontSize: 13.5, color: '#0f172a', wordBreak: 'break-word', fontWeight: 700 }}>{v || '-'}</span>
               </div>
@@ -501,6 +501,19 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
           </motion.div>
         )}
       </AnimatePresence>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .submission-track-grid {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+          }
+          .submission-review-row {
+            flex-direction: column !important;
+            gap: 4px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

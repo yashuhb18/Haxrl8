@@ -122,7 +122,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
       <EventTimeline steps={TIMELINE_STEPS} currentStepIndex={currentStepIndex} />
 
       {/* Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+      <div className="dash-overview-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
         
         {/* Rulebook Card */}
         <div
@@ -178,7 +178,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
       </div>
 
       {/* Main Grid: Comms, Readiness, Milestones */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
+      <div className="dash-overview-main" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
         
         {/* Starship Comms */}
         <div style={card({ display: 'flex', flexDirection: 'column' })}>
@@ -217,7 +217,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
               <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', margin: 0 }}>Mission Readiness</h3>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flex: 1 }}>
+          <div className="readiness-container" style={{ display: 'flex', alignItems: 'center', gap: 24, flex: 1 }}>
             {/* Circular Gauge */}
             <div style={{ position: 'relative', width: 120, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg viewBox="0 0 36 36" style={{ position: 'absolute', width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
@@ -387,7 +387,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
               </ul>
             </div>
             <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'flex-end', background: '#fafafa' }}>
-              <button onClick={() => setShowRulebook(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#ff3b69', color: '#fff', border: 'none', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
+              <button onClick={() => setShowRulebook(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#0284c7', color: '#fff', border: 'none', fontWeight: 800, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)' }}>
                 Close Protocol Window
               </button>
             </div>
@@ -395,6 +395,23 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
         </div>
       )}
 
+      <style>{`
+        @media (max-width: 640px) {
+          .dash-overview-stats {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+          .dash-overview-main {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+          }
+          .readiness-container {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 18px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

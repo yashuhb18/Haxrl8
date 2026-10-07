@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { LayoutDashboard, Users, FileUp, BookOpen, Bell } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import DomainWheel from '../../components/ui/DomainWheel';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
@@ -10,11 +11,11 @@ export { DomainWheel };
 export const SDGWheel = DomainWheel;
 
 const NAV = [
-  { id:'overview',     icon:'⊞',   label:'Overview'      },
-  { id:'team',         icon:'◎',   label:'My Team'       },
-  { id:'submission',   icon:'↑',   label:'Submission'    },
-  { id:'resources',    icon:'≡',   label:'Resources'     },
-  { id:'announcements',icon:'⚑',   label:'Announcements' },
+  { id:'overview',     icon: LayoutDashboard, label:'Overview',      shortLabel:'Overview' },
+  { id:'team',         icon: Users,           label:'My Team',       shortLabel:'Team'     },
+  { id:'submission',   icon: FileUp,          label:'Submission',    shortLabel:'Submit'   },
+  { id:'resources',    icon: BookOpen,        label:'Resources',     shortLabel:'Guides'   },
+  { id:'announcements',icon: Bell,            label:'Announcements', shortLabel:'Alerts'   },
 ];
 
 export default function DashboardLayout({ activeTab, setActiveTab, children, hasTeam, announcements, user }) {
@@ -42,6 +43,7 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
         <nav style={{ flex:1, padding:'16px 10px', display:'flex', flexDirection:'column', gap:6 }}>
           {NAV.map(item => {
             const active = activeTab === item.id;
+            const Icon = item.icon;
             return (
               <button
                 key={item.id}
@@ -64,7 +66,9 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
                 onMouseEnter={e => { if(!active) e.currentTarget.style.background='#f0f9ff'; }}
                 onMouseLeave={e => { if(!active) e.currentTarget.style.background='transparent'; }}
               >
-                <span style={{ fontSize:18, flexShrink:0, color: active ? '#0284c7' : '#94a3b8', fontWeight:900 }}>{item.icon}</span>
+                <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color: active ? '#0284c7' : '#94a3b8' }}>
+                  <Icon size={19} strokeWidth={active ? 2.5 : 2} />
+                </span>
                 {!collapsed && (
                   <span style={{ fontSize:13.5, fontWeight: active ? 800 : 600, color: active ? '#0284c7' : '#475569', whiteSpace:'nowrap', letterSpacing:'0.01em' }}>
                     {item.label}
@@ -219,27 +223,18 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
       <nav className="dash-bottom-nav">
         {NAV.map(item => {
           const active = activeTab === item.id;
+          const Icon = item.icon;
           return (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)} 
-              style={{ 
-                display:'flex', alignItems:'center', justifyContent:'center', gap:6, 
-                background: active ? '#e0f2fe' : 'transparent', 
-                border: active ? '1.5px solid #7dd3fc' : 'none', outline:'none', 
-                padding: active ? '10px 16px' : '10px 0', 
-                borderRadius: '100px',
-                flex: active ? '0 0 auto' : '1 1 0', 
-                cursor:'pointer',
-                transition: 'all 0.25s',
-                minWidth: 0,
-                overflow: 'hidden'
-              }}
+              className={`dash-bottom-tab ${active ? 'active' : ''}`}
+              aria-label={item.label}
             >
-              <span style={{ fontSize: active ? 18 : 20, color: active ? '#0284c7' : '#94a3b8', fontWeight: active ? 900 : 500, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
-              {active && (
-                <span style={{ fontSize:13, color: '#0284c7', fontWeight: 800, whiteSpace: 'nowrap' }}>{item.label}</span>
-              )}
+              <div className="dash-bottom-tab-icon">
+                <Icon size={20} strokeWidth={active ? 2.6 : 2} />
+              </div>
+              <span className="dash-bottom-tab-label">{item.shortLabel}</span>
             </button>
           );
         })}
@@ -316,22 +311,62 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
         @media (max-width: 768px) {
           .dash-sidebar { display: none !important; }
           .dash-bottom-nav { 
-            display: flex; position: fixed; bottom: 0; left: 0; right: 0; 
+            display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; 
             background: #ffffff; border-top: 2px solid #fed7aa; z-index: 50; 
-            justify-content: space-between; align-items: center; 
-            padding: 8px 12px;
-            padding-bottom: calc(8px + env(safe-area-inset-bottom));
-            gap: 4px;
-            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+            justify-content: space-around; align-items: center; 
+            padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+            gap: 2px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.07);
           }
-          .dash-main-wrapper { padding-bottom: calc(68px + env(safe-area-inset-bottom)) !important; }
-          .dash-header { padding: 18px 16px 22px !important; min-height: 70px !important; height: auto !important; flex-direction: column; align-items: flex-start !important; justify-content: center; gap: 4px; }
+          .dash-bottom-tab {
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 6px 2px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #64748b;
+            min-width: 0;
+            transition: all 0.2s ease;
+          }
+          .dash-bottom-tab.active {
+            color: #0284c7;
+            background: #e0f2fe;
+          }
+          .dash-bottom-tab-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .dash-bottom-tab-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+          }
+          .dash-main-wrapper { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important; }
+          .dash-header { 
+            padding: 0 16px !important; 
+            min-height: 60px !important; 
+            height: 60px !important; 
+            flex-direction: row !important; 
+            align-items: center !important; 
+            justify-content: space-between !important; 
+          }
           .dash-subtitle { display: none !important; }
-          .dash-header-right { position: absolute; right: 16px; top: 18px; }
-          .dash-content { padding: 16px !important; }
+          .dash-content { padding: 14px 12px !important; }
           .dash-grid-2 { grid-template-columns: 1fr !important; }
           .dash-grid-4 { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
-          .dash-card { padding: 16px !important; }
+          .dash-card { padding: 16px 14px !important; }
           .dash-hide-mobile { display: none !important; }
         }
       `}</style>
