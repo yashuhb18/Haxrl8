@@ -78,7 +78,7 @@ export function generateWelcomeEmailHtml({ leaderName, teamName, teamId, crewCou
         <strong>🗓️ Mission Flight Milestones:</strong><br>
         • Oct 28: Registration &amp; Idea Submission Lock<br>
         • Nov 02: Shortlisted Squads Announced<br>
-        • Nov 06–07: 24-Hour Offline Finale at MIT Mysore Campus (₹30,000 Bounty Pool)
+        • Nov 06–07: 24-Hour Offline Finale at MIT Mysore Campus (₹33,333 Bounty Pool)
       </div>
 
       <div style="text-align: center;">

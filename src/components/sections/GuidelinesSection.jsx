@@ -100,7 +100,7 @@ const guidelinesPart1 = [
   },
   {
     id: '02', title: 'Register Online',
-    description: 'Registration opens Oct 08 and closes Oct 28. Submit your idea paper before the deadline.',
+    description: 'Registration opens Oct 09 and closes Oct 28. Submit your idea paper before the deadline.',
     icon: UserPlus
   },
   {

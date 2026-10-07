@@ -5,22 +5,61 @@ import { supabase } from '../lib/supabaseClient';
 import { sanitizeInput, isValidEmail } from '../lib/security';
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound, playEmergencyMeetingSound, playTaskCompleteSound } from '../components/amongus/AmongUsSound';
-import { Mail, Lock, Eye, EyeOff, User, ArrowLeft, ShieldAlert, Sparkles, CheckCircle2, ChevronRight, AlertTriangle } from 'lucide-react';
+import { 
+  Mail, Lock, Eye, EyeOff, User, ArrowLeft, ShieldAlert, Sparkles, 
+  CheckCircle2, ChevronRight, AlertTriangle, Sprout, HeartPulse, Building2,
+  Check
+} from 'lucide-react';
 import amongusLoginHero from '../assets/auth/amongus_login_hero.png';
 import { sendParticipantWelcomeEmail } from '../lib/emailService';
+
+// The 3 Official Innovation Domains for HAXLR8 3.0
+const DOMAIN_OPTIONS = [
+  {
+    id: 'Agriculture',
+    title: 'Agriculture',
+    tagline: 'AgriTech & Smart Farming',
+    icon: Sprout,
+    color: '#15803d',
+    bg: '#f0fdf4',
+    border: '#86efac',
+    activeBg: '#dcfce7',
+  },
+  {
+    id: 'Healthcare',
+    title: 'Healthcare',
+    tagline: 'MedTech & AI Diagnostics',
+    icon: HeartPulse,
+    color: '#be123c',
+    bg: '#fff1f2',
+    border: '#fecdd3',
+    activeBg: '#ffe4e6',
+  },
+  {
+    id: 'Smart City',
+    title: 'Smart City',
+    tagline: 'Urban Mobility & IoT',
+    icon: Building2,
+    color: '#0369a1',
+    bg: '#e0f2fe',
+    border: '#7dd3fc',
+    activeBg: '#bae6fd',
+  },
+];
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Mode: 'login' or 'signup'
-  const isInitialLogin = location.pathname === '/login';
-  const [mode, setMode] = useState('login'); // Default to login as shown in image
-  
-  // Leader Confirmation Gate State: automatically true if navigating to /login or already confirmed
-  const [confirmedLeader, setConfirmedLeader] = useState(() => {
-    return localStorage.getItem('haxlr8_leader_confirmed') === 'true' || location.pathname === '/login';
+  // Mode: 'login' or 'signup' — auto-detect from /register or /login route
+  const [mode, setMode] = useState(() => {
+    return location.pathname === '/register' ? 'signup' : 'login';
   });
+
+  // Selected Innovation Domain for registration
+  const [selectedDomain, setSelectedDomain] = useState('Agriculture');
+
+  // Impostor modal for non-leader crewmates
   const [showImpostorModal, setShowImpostorModal] = useState(false);
 
   // Form Fields
@@ -43,16 +82,12 @@ export default function AuthPage() {
     });
   }, [navigate]);
 
-  const handleLeaderSelect = (isLeader) => {
-    if (isLeader) {
-      playTaskCompleteSound();
-      setConfirmedLeader(true);
-      setShowImpostorModal(false);
-      localStorage.setItem('haxlr8_leader_confirmed', 'true');
-    } else {
-      playEmergencyMeetingSound();
-      setShowImpostorModal(true);
-    }
+  // Keep route synced with tab switcher
+  const switchMode = (newMode) => {
+    setMode(newMode);
+    setErrorMsg('');
+    setSuccessMsg('');
+    playCrewmatePopSound();
   };
 
   const handleAuth = async (e) => {
@@ -87,7 +122,12 @@ export default function AuthPage() {
           const signUpRes = await supabase.auth.signUp({
             email: cleanEmail,
             password,
-            options: { data: { full_name: cleanEmail.split('@')[0] } }
+            options: { 
+              data: { 
+                full_name: cleanEmail.split('@')[0],
+                domain: selectedDomain 
+              } 
+            }
           });
           if (signUpRes.error) throw signUpRes.error;
         }
@@ -95,6 +135,7 @@ export default function AuthPage() {
         playTaskCompleteSound();
         navigate('/dashboard');
       } else {
+        // Sign Up / Register
         if (!cleanName) {
           setErrorMsg('Please enter your full name as Team Leader.');
           setLoading(false);
@@ -104,15 +145,24 @@ export default function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
-          options: { data: { full_name: cleanName } }
+          options: {
+            data: {
+              full_name: cleanName,
+              domain: selectedDomain,
+            }
+          }
         });
         if (error) throw error;
 
-        // Automated Welcome Email from haxlr8ecemitm@gmail.com
+        localStorage.setItem('haxlr8_leader_domain', selectedDomain);
+        localStorage.setItem('haxlr8_leader_confirmed', 'true');
+
+        // Automated Welcome Email
         sendParticipantWelcomeEmail({
           recipientEmail: cleanEmail,
           leaderName: cleanName,
-          teamName: 'Your New Squad'
+          teamName: 'Your New Squad',
+          domain: selectedDomain,
         }).catch(e => console.warn('Welcome email error:', e));
 
         playTaskCompleteSound();
@@ -135,7 +185,7 @@ export default function AuthPage() {
       });
       if (res?.error) {
         if (res.error.message?.includes('provider is not enabled') || res.error.message?.includes('validation_failed') || res.error.message?.includes('Unsupported provider')) {
-          setErrorMsg('Google login is not enabled in your Supabase project yet. Please enable Google under Supabase Authentication ➔ Providers ➔ Google, or sign in using Email & Password below.');
+          setErrorMsg('Google login is pending provider configuration. Please sign in using Email & Password below or use Quick Demo.');
         } else {
           setErrorMsg(res.error.message || 'Google authentication encountered an issue.');
         }
@@ -145,7 +195,6 @@ export default function AuthPage() {
         window.location.href = res.data.url;
         return;
       }
-      // If session was set locally or already authenticated
       navigate('/dashboard');
     } catch (e) {
       setErrorMsg(e.message || 'Google authentication encountered an issue.');
@@ -158,422 +207,332 @@ export default function AuthPage() {
     setEmail('yashuhb18@gmail.com');
     setPassword('leader123');
     setName('Squad Commander Yash');
+    setSelectedDomain('Agriculture');
     playCrewmatePopSound();
   };
 
   return (
     <div
+      className="auth-page-root"
       style={{
         minHeight: '100vh',
-        backgroundColor: '#f5ebe0',
-        backgroundImage: 'radial-gradient(circle at 50% 25%, #faf3eb 0%, #f4ece1 55%, #eae0d2 100%)',
+        backgroundColor: '#f6ede3',
+        backgroundImage: 'radial-gradient(circle at 50% 15%, #faf4ed 0%, #f4eae0 55%, #eae0d4 100%)',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '32px 20px',
-        fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+        padding: '24px 16px',
+        fontFamily: "'Fredoka', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
         position: 'relative',
         overflowX: 'hidden',
+        boxSizing: 'border-box',
       }}
     >
-      {/* Return to Home pill */}
-      <button
-        onClick={() => navigate('/')}
+      {/* ── TOP NAV HEADER BAR ── */}
+      <header
+        className="auth-top-nav"
         style={{
-          position: 'fixed',
-          top: '24px',
-          left: '24px',
+          width: '100%',
+          maxWidth: '1020px',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
-          background: '#ffffff',
-          border: '1.5px solid #e5e7eb',
-          borderRadius: '9999px',
-          padding: '8px 18px',
-          cursor: 'pointer',
-          fontSize: '13px',
-          fontWeight: 700,
-          color: '#374151',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
-          transition: 'all 0.2s',
-          zIndex: 100,
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+          zIndex: 20,
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#a8262a'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
       >
-        <ArrowLeft size={16} />
-        <span>Return to Home</span>
-      </button>
-
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION A: PRE-LOGIN LEADER CONFIRMATION GATE
-          (Shown before accessing the login form)
-         ───────────────────────────────────────────────────────────── */}
-      {!confirmedLeader ? (
-        <motion.div
-          className="auth-gate-card"
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        <button
+          onClick={() => navigate('/')}
+          className="auth-home-btn"
           style={{
-            width: '100%',
-            maxWidth: '680px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
             background: '#ffffff',
-            borderRadius: '28px',
-            padding: '40px 36px',
-            boxShadow: '0 20px 50px rgba(70, 50, 30, 0.1), 0 2px 10px rgba(0,0,0,0.03)',
-            border: '1.5px solid #f1e7db',
-            textAlign: 'center',
-            position: 'relative',
-            zIndex: 10,
+            border: '1.5px solid #e5e7eb',
+            borderRadius: '9999px',
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: 800,
+            color: '#1e293b',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            transition: 'all 0.2s',
           }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#a8262a'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.transform = 'translateY(0)'; }}
         >
-          {/* Top Pill */}
+          <ArrowLeft size={16} />
+          <span>Home</span>
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '6px',
               backgroundColor: '#fee2e2',
+              border: '1px solid #fecaca',
               color: '#a8262a',
-              padding: '6px 16px',
+              padding: '6px 14px',
               borderRadius: '9999px',
-              fontSize: '12px',
+              fontSize: '11.5px',
               fontWeight: 800,
-              letterSpacing: '0.06em',
+              letterSpacing: '0.04em',
               textTransform: 'uppercase',
-              marginBottom: '18px',
             }}
           >
-            <ShieldAlert size={15} />
-            <span>Identity & Flight Role Verification</span>
+            <span>👑 Leader Portal</span>
           </div>
+        </div>
+      </header>
 
-          <h2
-            style={{
-              fontSize: 'clamp(1.6rem, 3.2vw, 2.2rem)',
-              fontWeight: 900,
-              color: '#0f172a',
-              margin: '0 0 10px',
-              lineHeight: 1.2,
-            }}
-          >
-            Are you the designated <span style={{ color: '#a8262a' }}>Team Leader</span>?
-          </h2>
-
-          <p
-            style={{
-              fontSize: '14.5px',
-              color: '#64748b',
-              lineHeight: 1.6,
-              maxWidth: '540px',
-              margin: '0 auto 32px',
-              fontWeight: 500,
-            }}
-          >
-            Per HAXLR8 3.0 protocol, <strong>only 1 member per squad (the Team Leader)</strong> registers and logs in. Squad members are enrolled directly from the Leader’s flight deck!
-          </p>
-
-          {/* 2 Big Choice Cards */}
-          <div
-            className="auth-gate-choices"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '20px',
-              marginBottom: '28px',
-            }}
-          >
-            {/* OPTION 1: YES - TEAM LEADER */}
-            <motion.div
-              whileHover={{ y: -4, borderColor: '#16a34a' }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleLeaderSelect(true)}
-              style={{
-                cursor: 'pointer',
-                background: '#f0fdf4',
-                border: '2px solid #bbf7d0',
-                borderRadius: '20px',
-                padding: '24px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                boxShadow: '0 4px 16px rgba(22, 163, 74, 0.08)',
-                transition: 'border-color 0.2s',
-              }}
-            >
-              <div style={{ marginBottom: 12 }}>
-                <AmongUsCrewmate color="red" hat="crown" size={72} interactive={false} />
-              </div>
-              <div
-                style={{
-                  background: '#dcfce7',
-                  color: '#15803d',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  padding: '3px 10px',
-                  borderRadius: '100px',
-                  marginBottom: '8px',
-                }}
-              >
-                👑 SQUAD COMMANDER
-              </div>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#14532d', margin: '0 0 6px' }}>
-                YES, I AM THE LEADER
-              </h3>
-              <p style={{ fontSize: '12.5px', color: '#166534', margin: '0 0 16px', lineHeight: 1.4, opacity: 0.9 }}>
-                I will assemble 3–4 crewmates, submit idea abstracts, and manage our squad.
-              </p>
-              <button
-                type="button"
-                style={{
-                  marginTop: 'auto',
-                  width: '100%',
-                  padding: '11px',
-                  borderRadius: '12px',
-                  background: '#16a34a',
-                  color: '#fff',
-                  border: 'none',
-                  fontWeight: 800,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                }}
-              >
-                <span>Confirm & Enter Login</span>
-                <ChevronRight size={16} />
-              </button>
-            </motion.div>
-
-            {/* OPTION 2: NO - SQUAD MEMBER (THE IMPOSTOR!) */}
-            <motion.div
-              whileHover={{ y: -4, borderColor: '#ef4444' }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleLeaderSelect(false)}
-              style={{
-                cursor: 'pointer',
-                background: '#fef2f2',
-                border: '2px solid #fecaca',
-                borderRadius: '20px',
-                padding: '24px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                boxShadow: '0 4px 16px rgba(239, 68, 68, 0.08)',
-                transition: 'border-color 0.2s',
-              }}
-            >
-              <div style={{ marginBottom: 12 }}>
-                <AmongUsCrewmate color="blue" hat="none" size={72} interactive={false} />
-              </div>
-              <div
-                style={{
-                  background: '#fee2e2',
-                  color: '#b91c1c',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  padding: '3px 10px',
-                  borderRadius: '100px',
-                  marginBottom: '8px',
-                }}
-              >
-                🚨 SQUAD MEMBER / IMPOSTOR
-              </div>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#991b1b', margin: '0 0 6px' }}>
-                NO, I'M A SQUAD MEMBER
-              </h3>
-              <p style={{ fontSize: '12.5px', color: '#7f1d1d', margin: '0 0 16px', lineHeight: 1.4, opacity: 0.9 }}>
-                I am a team member, specialist coder, or looking to tag along for the sprint.
-              </p>
-              <button
-                type="button"
-                style={{
-                  marginTop: 'auto',
-                  width: '100%',
-                  padding: '11px',
-                  borderRadius: '12px',
-                  background: '#dc2626',
-                  color: '#fff',
-                  border: 'none',
-                  fontWeight: 800,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                }}
-              >
-                <span>I'm a Member / Impostor</span>
-                <AlertTriangle size={15} />
-              </button>
-            </motion.div>
-          </div>
-
-          <div style={{ fontSize: '12.5px', color: '#94a3b8', fontWeight: 600 }}>
-            ✦ Tip: If you don’t have a team yet, click "YES" to register and become the leader of your new squad!
-          </div>
-        </motion.div>
-      ) : (
-        /* ─────────────────────────────────────────────────────────────
-           SECTION B: THE LOGIN / SIGNUP CARD
-           (Faithfully matching the exact uploaded image media_1791355147030.jpg)
-           ───────────────────────────────────────────────────────────── */
-        <motion.div
-          className="auth-login-card"
-          initial={{ opacity: 0, scale: 0.96, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      {/* ── MAIN AUTH CONTAINER CARD ── */}
+      <motion.div
+        className="auth-main-card"
+        initial={{ opacity: 0, scale: 0.98, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          width: '100%',
+          maxWidth: '1020px',
+          backgroundColor: '#ffffff',
+          borderRadius: '28px',
+          boxShadow: '0 24px 60px rgba(70, 50, 30, 0.12), 0 4px 16px rgba(0,0,0,0.04)',
+          display: 'grid',
+          gridTemplateColumns: '1.05fr 1.15fr',
+          minHeight: '620px',
+          overflow: 'hidden',
+          position: 'relative',
+          zIndex: 10,
+          border: '1.5px solid #f1e7db',
+        }}
+      >
+        {/* ══ LEFT PANEL: AMONG US ARTWORK (Desktop Only) ══ */}
+        <div
+          className="auth-desktop-hero-panel"
           style={{
-            width: '100%',
-            maxWidth: '960px',
-            backgroundColor: '#ffffff',
-            borderRadius: '28px',
-            boxShadow: '0 24px 60px rgba(70, 50, 30, 0.12), 0 4px 16px rgba(0,0,0,0.04)',
-            display: 'grid',
-            gridTemplateColumns: '1.05fr 1fr',
-            minHeight: '580px',
-            overflow: 'hidden',
             position: 'relative',
-            zIndex: 10,
+            width: '100%',
+            height: '100%',
+            minHeight: '520px',
+            backgroundColor: '#e7d8c5',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
           }}
         >
-          {/* ── LEFT PANEL: THE AMONG US 3D WORKSPACE ARTWORK ── */}
-          <div
-            className="auth-hero-panel"
+          <img
+            src={amongusLoginHero}
+            alt="HAXLR8 3.0 Among Us Team Scene"
             style={{
-              position: 'relative',
+              position: 'absolute',
+              inset: 0,
               width: '100%',
               height: '100%',
-              minHeight: '440px',
-              backgroundColor: '#e7d8c5',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              display: 'block',
             }}
-          >
-            <img
-              src={amongusLoginHero}
-              alt="HAXLR8 3.0 Among Us Team Scene"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center',
-                display: 'block',
-                transform: 'scale(1.03)', // Seamless edge clip
-              }}
-            />
-          </div>
+          />
 
-          {/* ── RIGHT PANEL: CLEAN LOGIN / SIGNUP FORM ── */}
+          {/* Floating Top Badge */}
           <div
-            className="auth-form-panel"
             style={{
-              backgroundColor: '#ffffff',
-              padding: '44px 40px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
+              position: 'relative',
+              zIndex: 2,
+              padding: '24px 28px',
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 100%)',
             }}
           >
-            {/* Leader Badge + Change Role Option */}
             <div
               style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(255,255,255,0.95)',
+                padding: '6px 14px',
+                borderRadius: '100px',
+                fontSize: '12px',
+                fontWeight: 900,
+                color: '#a8262a',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              }}
+            >
+              <span>HAXLR8 3.0 • FLIGHT TERMINAL</span>
+            </div>
+          </div>
+
+          {/* Floating Bottom Card */}
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 2,
+              padding: '24px 28px',
+              background: 'linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%)',
+              color: '#ffffff',
+            }}
+          >
+            <div style={{ fontSize: '12px', fontWeight: 800, color: '#facc15', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '4px' }}>
+              ✦ 3 Official Domains
+            </div>
+            <div style={{ fontSize: '15px', fontWeight: 800, lineHeight: 1.3 }}>
+              Agriculture • Healthcare • Smart City
+            </div>
+            <div style={{ fontSize: '12px', opacity: 0.85, marginTop: '4px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              Only Team Leader registers. Assemble your 3–4 crewmates inside!
+            </div>
+          </div>
+        </div>
+
+        {/* ══ RIGHT PANEL: AUTH FORM & MOBILE HERO ══ */}
+        <div
+          className="auth-form-panel"
+          style={{
+            backgroundColor: '#ffffff',
+            padding: '36px 36px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+          }}
+        >
+          {/* ── MOBILE EXCLUSIVE HERO HEADER ── */}
+          <div className="auth-mobile-header" style={{ display: 'none', textAlign: 'center', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+              <AmongUsCrewmate 
+                color={mode === 'signup' ? 'yellow' : 'red'} 
+                hat={mode === 'signup' ? 'crown' : 'cap'} 
+                size={58} 
+                interactive={false} 
+              />
+            </div>
+            <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
+              HAXLR8 3.0 Flight Deck
+            </h2>
+            <p style={{ fontSize: '12.5px', color: '#64748b', margin: 0, fontWeight: 600 }}>
+              {mode === 'signup' 
+                ? 'Register squad leader across 3 innovation domains' 
+                : 'Login to access your squad command deck'}
+            </p>
+          </div>
+
+          {/* ── MODE SWITCHER TABS (Login vs Register) ── */}
+          <div
+            className="auth-mode-tabs"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              background: '#f1f5f9',
+              borderRadius: '16px',
+              padding: '4px',
+              marginBottom: '24px',
+              position: 'relative',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => switchMode('login')}
+              style={{
+                padding: '11px',
+                borderRadius: '12px',
+                border: 'none',
+                background: mode === 'login' ? '#ffffff' : 'transparent',
+                color: mode === 'login' ? '#0f172a' : '#64748b',
+                fontWeight: mode === 'login' ? 900 : 700,
+                fontSize: '14px',
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '16px',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: mode === 'login' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                transition: 'all 0.2s',
               }}
             >
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  padding: '3px 10px',
-                  borderRadius: '100px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  letterSpacing: '0.04em',
-                }}
-              >
-                <span>👑 Verified Team Leader</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setConfirmedLeader(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#94a3b8',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  padding: 0,
-                  textDecoration: 'underline',
-                }}
-              >
-                Change Role
-              </button>
-            </div>
+              <span>🔑 Sign In</span>
+            </button>
 
-            {/* Title & Subtitle */}
+            <button
+              type="button"
+              onClick={() => switchMode('signup')}
+              style={{
+                padding: '11px',
+                borderRadius: '12px',
+                border: 'none',
+                background: mode === 'signup' ? '#ffffff' : 'transparent',
+                color: mode === 'signup' ? '#a8262a' : '#64748b',
+                fontWeight: mode === 'signup' ? 900 : 700,
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: mode === 'signup' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                transition: 'all 0.2s',
+              }}
+            >
+              <span>🚀 Squad Register</span>
+            </button>
+          </div>
+
+          {/* Title on Desktop */}
+          <div className="auth-desktop-title-row" style={{ marginBottom: '20px' }}>
             <h1
               style={{
-                fontSize: '32px',
-                fontWeight: 800,
-                color: '#111827',
+                fontSize: '28px',
+                fontWeight: 900,
+                color: '#0f172a',
                 margin: '0 0 6px',
                 lineHeight: 1.2,
-                letterSpacing: '-0.02em',
               }}
             >
-              {mode === 'login' ? 'Welcome Back!' : 'Create Account'}
+              {mode === 'login' ? 'Welcome Back!' : 'Create Squad Account'}
             </h1>
             <p
               style={{
-                fontSize: '14px',
-                color: '#6b7280',
-                margin: '0 0 28px',
+                fontSize: '13.5px',
+                color: '#64748b',
+                margin: 0,
                 fontWeight: 500,
-                lineHeight: 1.4,
               }}
             >
               {mode === 'login'
-                ? 'Login to continue your journey with HAXLR8 3.0'
-                : 'Register as Team Leader to unlock squad controls'}
+                ? 'Sign in to access your flight deck and team controls'
+                : 'Register as Team Leader (Only 1 leader registers per squad)'}
             </p>
+          </div>
 
-            {/* Form */}
-            <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Full Name (Sign Up only) */}
-              {mode === 'signup' && (
+          {/* Form */}
+          <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {/* Full Name (Sign Up only) */}
+            {mode === 'signup' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Team Leader Full Name
+                </label>
                 <div
+                  className="auth-input-wrapper"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
                     padding: '0 16px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    border: '1.5px solid #e5e7eb',
+                    height: '50px',
+                    borderRadius: '14px',
+                    border: '1.5px solid #cbd5e1',
                     backgroundColor: '#fafafa',
+                    transition: 'all 0.2s',
                   }}
                 >
-                  <User size={18} color="#9ca3af" style={{ flexShrink: 0 }} />
+                  <User size={18} color="#94a3b8" style={{ flexShrink: 0 }} />
                   <input
                     type="text"
-                    placeholder="Enter your full name"
+                    required
+                    placeholder="e.g., Yashwanth B."
                     value={name}
                     onChange={e => setName(e.target.value)}
                     style={{
@@ -581,32 +540,40 @@ export default function AuthPage() {
                       outline: 'none',
                       background: 'transparent',
                       width: '100%',
-                      fontSize: '14px',
-                      color: '#111827',
+                      fontSize: '15px',
+                      color: '#0f172a',
                       fontFamily: 'inherit',
+                      fontWeight: 600,
                     }}
                   />
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Email */}
+            {/* Email */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 800, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {mode === 'signup' ? 'Leader Email Address' : 'Email Address'}
+              </label>
               <div
+                className="auth-input-wrapper"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
                   padding: '0 16px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  border: '1.5px solid #e5e7eb',
+                  height: '50px',
+                  borderRadius: '14px',
+                  border: '1.5px solid #cbd5e1',
                   backgroundColor: '#fafafa',
-                  transition: 'border-color 0.2s',
+                  transition: 'all 0.2s',
                 }}
               >
-                <Mail size={18} color="#9ca3af" style={{ flexShrink: 0 }} />
+                <Mail size={18} color="#94a3b8" style={{ flexShrink: 0 }} />
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  required
+                  placeholder="leader@college.edu"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   style={{
@@ -614,31 +581,58 @@ export default function AuthPage() {
                     outline: 'none',
                     background: 'transparent',
                     width: '100%',
-                    fontSize: '14px',
-                    color: '#111827',
+                    fontSize: '15px',
+                    color: '#0f172a',
                     fontFamily: 'inherit',
+                    fontWeight: 600,
                   }}
                 />
               </div>
+            </div>
 
-              {/* Password */}
+            {/* Password */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Password
+                </label>
+                {mode === 'login' && (
+                  <button
+                    type="button"
+                    onClick={() => alert('Password reset link sent to your email address!')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      fontSize: '12px',
+                      color: '#a8262a',
+                      cursor: 'pointer',
+                      padding: 0,
+                      fontWeight: 700,
+                    }}
+                  >
+                    Forgot Password?
+                  </button>
+                )}
+              </div>
               <div
+                className="auth-input-wrapper"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
                   padding: '0 16px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  border: '1.5px solid #e5e7eb',
+                  height: '50px',
+                  borderRadius: '14px',
+                  border: '1.5px solid #cbd5e1',
                   backgroundColor: '#fafafa',
-                  transition: 'border-color 0.2s',
+                  transition: 'all 0.2s',
                 }}
               >
-                <Lock size={18} color="#9ca3af" style={{ flexShrink: 0 }} />
+                <Lock size={18} color="#94a3b8" style={{ flexShrink: 0 }} />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
+                  required
+                  placeholder="At least 6 characters"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   style={{
@@ -646,9 +640,10 @@ export default function AuthPage() {
                     outline: 'none',
                     background: 'transparent',
                     width: '100%',
-                    fontSize: '14px',
-                    color: '#111827',
+                    fontSize: '15px',
+                    color: '#0f172a',
                     fontFamily: 'inherit',
+                    fontWeight: 600,
                   }}
                 />
                 <button
@@ -659,7 +654,7 @@ export default function AuthPage() {
                     border: 'none',
                     padding: 0,
                     cursor: 'pointer',
-                    color: '#9ca3af',
+                    color: '#94a3b8',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -668,205 +663,257 @@ export default function AuthPage() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-
-              {/* Forgot Password link */}
-              {mode === 'login' && (
-                <div style={{ textAlign: 'right', marginTop: '-4px' }}>
-                  <button
-                    type="button"
-                    onClick={() => alert('Password reset link sent to registered email address (or use Quick Demo login below)!')}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      fontSize: '12px',
-                      color: '#6b7280',
-                      cursor: 'pointer',
-                      padding: 0,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-              )}
-
-              {/* Error / Success Feedback */}
-              {errorMsg && (
-                <div
-                  style={{
-                    backgroundColor: '#fef2f2',
-                    border: '1px solid #fecaca',
-                    color: '#b91c1c',
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                  }}
-                >
-                  ⚠️ {errorMsg}
-                </div>
-              )}
-
-              {successMsg && (
-                <div
-                  style={{
-                    backgroundColor: '#f0fdf4',
-                    border: '1px solid #bbf7d0',
-                    color: '#15803d',
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                  }}
-                >
-                  ✓ {successMsg}
-                </div>
-              )}
-
-              {/* Main Brick/Crimson Red Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  height: '48px',
-                  backgroundColor: '#a8262a', // Exact brick crimson from reference image
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.75 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 14px rgba(168, 38, 42, 0.28)',
-                  transition: 'background-color 0.2s, transform 0.1s',
-                  marginTop: '4px',
-                }}
-                onMouseEnter={e => { if (!loading) e.currentTarget.style.backgroundColor = '#932024'; }}
-                onMouseLeave={e => { if (!loading) e.currentTarget.style.backgroundColor = '#a8262a'; }}
-              >
-                <span>{loading ? 'Logging in...' : (mode === 'login' ? 'Login →' : 'Create Squad Account →')}</span>
-              </button>
-            </form>
-
-            {/* Divider "OR" */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                margin: '20px 0',
-                gap: '12px',
-              }}
-            >
-              <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }} />
-              <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 700, letterSpacing: '0.04em' }}>
-                OR
-              </span>
-              <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }} />
             </div>
 
-            {/* Continue with Google */}
+            {/* ── INNOVATION DOMAIN SELECTION (Sign Up Only) ── */}
+            {mode === 'signup' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 900, color: '#a8262a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Select Innovation Domain *
+                  </label>
+                  <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>3 Official Domains</span>
+                </div>
+
+                <div
+                  className="auth-domain-selector-grid"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '8px',
+                  }}
+                >
+                  {DOMAIN_OPTIONS.map((domain) => {
+                    const isSelected = selectedDomain === domain.id;
+                    const IconComponent = domain.icon;
+                    return (
+                      <div
+                        key={domain.id}
+                        onClick={() => { setSelectedDomain(domain.id); playCrewmatePopSound(); }}
+                        style={{
+                          cursor: 'pointer',
+                          padding: '10px 8px',
+                          borderRadius: '12px',
+                          border: isSelected ? `2.5px solid ${domain.color}` : '1.5px solid #e2e8f0',
+                          backgroundColor: isSelected ? domain.activeBg : '#f8fafc',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          textAlign: 'center',
+                          gap: '6px',
+                          transition: 'all 0.15s ease',
+                          position: 'relative',
+                          boxShadow: isSelected ? `0 4px 12px ${domain.border}` : 'none',
+                        }}
+                      >
+                        {isSelected && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '4px',
+                              right: '4px',
+                              width: '16px',
+                              height: '16px',
+                              borderRadius: '50%',
+                              backgroundColor: domain.color,
+                              color: '#fff',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Check size={11} strokeWidth={3} />
+                          </div>
+                        )}
+                        <div
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '8px',
+                            backgroundColor: domain.bg,
+                            color: domain.color,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <IconComponent size={18} strokeWidth={2.4} />
+                        </div>
+                        <span style={{ fontSize: '12.5px', fontWeight: 800, color: isSelected ? domain.color : '#1e293b' }}>
+                          {domain.title}
+                        </span>
+                        <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, lineHeight: 1.1 }}>
+                          {domain.tagline}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Error / Success Feedback */}
+            {errorMsg && (
+              <div
+                style={{
+                  backgroundColor: '#fef2f2',
+                  border: '1.5px solid #fecaca',
+                  color: '#b91c1c',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {successMsg && (
+              <div
+                style={{
+                  backgroundColor: '#f0fdf4',
+                  border: '1.5px solid #bbf7d0',
+                  color: '#15803d',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
+                <span>{successMsg}</span>
+              </div>
+            )}
+
+            {/* Main Action Crimson Button */}
             <button
-              type="button"
-              onClick={handleGoogleAuth}
+              type="submit"
+              disabled={loading}
+              className="auth-submit-btn"
               style={{
-                height: '48px',
-                backgroundColor: '#ffffff',
-                border: '1.5px solid #e5e7eb',
-                borderRadius: '12px',
+                height: '50px',
+                backgroundColor: '#a8262a',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '14px',
+                fontSize: '15.5px',
+                fontWeight: 800,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.75 : 1,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '10px',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: '#1f2937',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s, border-color 0.2s',
+                gap: '8px',
+                boxShadow: '0 6px 18px rgba(168, 38, 42, 0.28)',
+                transition: 'background-color 0.2s, transform 0.1s',
+                marginTop: '6px',
               }}
-              onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#f9fafb'; }}
-              onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
+              onMouseEnter={e => { if (!loading) e.currentTarget.style.backgroundColor = '#932024'; }}
+              onMouseLeave={e => { if (!loading) e.currentTarget.style.backgroundColor = '#a8262a'; }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              <span>Continue with Google</span>
+              <span>{loading ? 'Processing...' : (mode === 'login' ? 'Login to Flight Deck →' : 'Register Squad Leader →')}</span>
             </button>
+          </form>
 
-            {/* Bottom Toggle Text */}
-            <div style={{ textAlign: 'center', marginTop: '22px', fontSize: '13.5px', color: '#6b7280' }}>
-              {mode === 'login' ? (
-                <>
-                  Don't have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setMode('signup'); setErrorMsg(''); }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#a8262a',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      padding: 0,
-                    }}
-                  >
-                    Sign up
-                  </button>
-                </>
-              ) : (
-                <>
-                  Already have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setMode('login'); setErrorMsg(''); }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#a8262a',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      padding: 0,
-                    }}
-                  >
-                    Log in
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Quick Demo Autofill Pill */}
-            <div style={{ textAlign: 'center', marginTop: '16px' }}>
-              <button
-                type="button"
-                onClick={fillQuickDemo}
-                style={{
-                  background: '#f8fafc',
-                  border: '1px dashed #cbd5e1',
-                  borderRadius: '100px',
-                  padding: '4px 12px',
-                  fontSize: '11px',
-                  color: '#64748b',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                }}
-              >
-                ⚡ 1-Click Fill Demo Credentials
-              </button>
-            </div>
+          {/* Divider "OR" */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: '18px 0',
+              gap: '12px',
+            }}
+          >
+            <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
+            <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 800, letterSpacing: '0.04em' }}>
+              OR
+            </span>
+            <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
           </div>
-        </motion.div>
-      )}
+
+          {/* Continue with Google */}
+          <button
+            type="button"
+            onClick={handleGoogleAuth}
+            style={{
+              height: '48px',
+              backgroundColor: '#ffffff',
+              border: '1.5px solid #cbd5e1',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              fontSize: '14px',
+              fontWeight: 700,
+              color: '#1e293b',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#f8fafc'; }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            <span>Continue with Google</span>
+          </button>
+
+          {/* Quick Demo Autofill Pill */}
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <button
+              type="button"
+              onClick={fillQuickDemo}
+              style={{
+                background: '#f8fafc',
+                border: '1.5px dashed #cbd5e1',
+                borderRadius: '100px',
+                padding: '5px 14px',
+                fontSize: '11.5px',
+                color: '#64748b',
+                cursor: 'pointer',
+                fontWeight: 700,
+              }}
+            >
+              ⚡ 1-Click Fill Demo Credentials
+            </button>
+          </div>
+
+          {/* Impostor / Squad Member Help Pill */}
+          <div style={{ textAlign: 'center', marginTop: '14px' }}>
+            <button
+              type="button"
+              onClick={() => { playEmergencyMeetingSound(); setShowImpostorModal(true); }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#94a3b8',
+                fontSize: '11.5px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+              }}
+            >
+              Not a Team Leader? See how Squad Members join →
+            </button>
+          </div>
+        </div>
+      </motion.div>
 
       {/* ─────────────────────────────────────────────────────────────
           IMPOSTOR EMERGENCY MEETING MODAL
-          (Triggers when someone clicks "NO, I'M A SQUAD MEMBER")
-         ───────────────────────────────────────────────────────────── */}
+          ───────────────────────────────────────────────────────────── */}
       <AnimatePresence>
         {showImpostorModal && (
           <motion.div
@@ -882,46 +929,45 @@ export default function AuthPage() {
               alignItems: 'center',
               justifyContent: 'center',
               padding: '20px',
-              zIndex: 999,
+              zIndex: 9999,
             }}
           >
             <motion.div
-              initial={{ scale: 0.85, y: 20 }}
+              initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.85, y: 20 }}
+              exit={{ scale: 0.9, y: 20 }}
               transition={{ type: 'spring', damping: 22, stiffness: 300 }}
               style={{
                 width: '100%',
-                maxWidth: '520px',
+                maxWidth: '480px',
                 backgroundColor: '#ffffff',
                 borderRadius: '26px',
-                padding: '36px 30px',
+                padding: '32px 24px',
                 textAlign: 'center',
                 boxShadow: '0 25px 60px rgba(220, 38, 38, 0.35)',
                 border: '3px solid #ef4444',
                 position: 'relative',
               }}
             >
-              {/* Flashing Siren / Alarm Icon */}
+              {/* Siren Icon */}
               <div
                 style={{
-                  width: '64px',
-                  height: '64px',
+                  width: '60px',
+                  height: '60px',
                   borderRadius: '50%',
                   backgroundColor: '#fee2e2',
                   color: '#dc2626',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  margin: '0 auto 16px',
+                  margin: '0 auto 14px',
                   border: '2px solid #fca5a5',
-                  boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)',
+                  boxShadow: '0 0 20px rgba(239, 68, 68, 0.25)',
                 }}
               >
-                <AlertTriangle size={32} />
+                <AlertTriangle size={28} />
               </div>
 
-              {/* Title */}
               <div
                 style={{
                   fontSize: '11px',
@@ -937,90 +983,67 @@ export default function AuthPage() {
 
               <h3
                 style={{
-                  fontSize: '24px',
+                  fontSize: '22px',
                   fontWeight: 900,
                   color: '#0f172a',
-                  margin: '0 0 14px',
+                  margin: '0 0 12px',
                 }}
               >
-                There is 1 Impostor Among Us!
+                Crewmate Notice!
               </h3>
 
               <p
                 style={{
-                  fontSize: '14px',
+                  fontSize: '13.5px',
                   color: '#475569',
                   lineHeight: 1.6,
-                  margin: '0 0 24px',
+                  margin: '0 0 20px',
                   fontWeight: 500,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
-                Don't worry, crewmate! <strong>As a squad member, you do NOT need an account</strong>.
-                Your Team Leader will enter your full name, college ID, and email directly when assembling the squad in their dashboard.
+                Don't worry, crewmate! <strong>Squad members do NOT need to register a separate account</strong>.
+                Your Team Leader will enter your full name, college ID, and email directly when assembling the squad in their flight deck!
               </p>
 
-              {/* Action Buttons */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => {
                     playTaskCompleteSound();
-                    setConfirmedLeader(true);
                     setShowImpostorModal(false);
+                    switchMode('signup');
                   }}
                   style={{
-                    padding: '13px',
+                    padding: '12px',
                     borderRadius: '12px',
                     backgroundColor: '#a8262a',
                     color: '#ffffff',
                     border: 'none',
                     fontWeight: 800,
-                    fontSize: '14px',
+                    fontSize: '13.5px',
                     cursor: 'pointer',
                     boxShadow: '0 4px 14px rgba(168, 38, 42, 0.25)',
                   }}
                 >
-                  👑 Never Mind, I'll Be The Team Leader!
+                  👑 I Want To Be The Team Leader!
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowImpostorModal(false);
-                    navigate('/');
-                  }}
+                  onClick={() => setShowImpostorModal(false)}
                   style={{
-                    padding: '13px',
+                    padding: '12px',
                     borderRadius: '12px',
                     backgroundColor: '#f1f5f9',
                     color: '#334155',
                     border: '1px solid #cbd5e1',
                     fontWeight: 700,
-                    fontSize: '14px',
+                    fontSize: '13.5px',
                     cursor: 'pointer',
                   }}
                 >
-                  🏠 Return to Homepage
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowImpostorModal(false);
-                    setConfirmedLeader(true);
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#94a3b8',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    marginTop: '4px',
-                    textDecoration: 'underline',
-                  }}
-                >
-                  Bypass security (Enter login anyway)
+                  Got It! Return to Screen
                 </button>
               </div>
             </motion.div>
@@ -1028,46 +1051,53 @@ export default function AuthPage() {
         )}
       </AnimatePresence>
 
-      {/* Responsive CSS */}
+      {/* ── RESPONSIVE STYLES ── */}
       <style>{`
         * { box-sizing: border-box; }
-        input::placeholder { color: #9ca3af; }
-        @media (max-width: 820px) {
-          .auth-login-card {
+        input::placeholder { color: #94a3b8; }
+        
+        .auth-input-wrapper:focus-within {
+          border-color: #a8262a !important;
+          background-color: #ffffff !important;
+          box-shadow: 0 0 0 3px rgba(168, 38, 42, 0.12) !important;
+        }
+
+        @media (max-width: 860px) {
+          .auth-main-card {
             grid-template-columns: 1fr !important;
-            border-radius: 20px !important;
+            border-radius: 24px !important;
             min-height: auto !important;
+            box-shadow: 0 16px 40px rgba(70, 50, 30, 0.1) !important;
           }
-          .auth-hero-panel {
-            min-height: 160px !important;
-            height: 170px !important;
-            max-height: 180px !important;
+          .auth-desktop-hero-panel {
+            display: none !important;
+          }
+          .auth-mobile-header {
+            display: block !important;
+          }
+          .auth-desktop-title-row {
+            display: none !important;
           }
           .auth-form-panel {
-            padding: 28px 22px !important;
+            padding: 24px 20px !important;
           }
-          .auth-gate-card {
-            padding: 28px 18px !important;
-            border-radius: 22px !important;
-          }
-          .auth-gate-choices {
-            grid-template-columns: 1fr !important;
-            gap: 14px !important;
+          .auth-top-nav {
+            margin-bottom: 12px !important;
           }
         }
+
         @media (max-width: 480px) {
-          .auth-hero-panel {
-            min-height: 130px !important;
-            height: 140px !important;
+          .auth-page-root {
+            padding: 16px 12px 28px !important;
           }
           .auth-form-panel {
-            padding: 20px 16px !important;
+            padding: 20px 14px !important;
           }
-          .auth-form-panel h1 {
-            font-size: 26px !important;
+          .auth-domain-selector-grid {
+            gap: 6px !important;
           }
-          .auth-form-panel input {
-            font-size: 16px !important;
+          .auth-domain-selector-grid > div {
+            padding: 8px 4px !important;
           }
         }
       `}</style>

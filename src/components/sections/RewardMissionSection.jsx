@@ -120,7 +120,7 @@ export default function RewardMissionSection() {
                   textShadow: '0 0 20px rgba(251, 191, 36, 0.5)',
                 }}
               >
-                ₹30,000
+                ₹33,333
               </div>
               <div
                 style={{

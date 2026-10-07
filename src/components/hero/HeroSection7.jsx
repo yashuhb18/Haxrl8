@@ -305,11 +305,11 @@ export default function HeroSection7() {
           {/* Divider */}
           <div style={{ width: '1px', height: '36px', background: 'rgba(255, 255, 255, 0.12)', margin: '0 auto' }} className="hero-stats-divider" />
 
-          {/* Stat 3: ₹30,000 PRIZE POOL */}
+          {/* Stat 3: ₹33,333 PRIZE POOL */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px' }}>
             <Award size={26} color="#ef4444" style={{ filter: 'drop-shadow(0 0 8px rgba(239,68,68,0.6))' }} />
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', lineHeight: 1.1 }}>₹30,000</span>
+              <span style={{ fontSize: '24px', fontWeight: 900, color: '#ffffff', lineHeight: 1.1 }}>₹33,333</span>
               <span style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>PRIZE POOL</span>
             </div>
           </div>

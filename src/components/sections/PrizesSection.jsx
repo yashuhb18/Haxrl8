@@ -91,7 +91,7 @@ export const PrizesSection = () => {
             Win more than<br /><span style={{ color: '#38fedc', textShadow: '0 0 25px rgba(56,254,220,0.4)' }}>bragging rights.</span>
           </h2>
           <p style={{ fontSize:"1.05rem", color:"#94a3b8", maxWidth:520, marginTop:14, lineHeight:1.7 }}>
-            Official ₹30,000 Starship Bounty Pool, elite co-pilot credentials, and galactic recognition at Maharaja Institute of Technology Mysore.
+            Official ₹33,333 Starship Bounty Pool, elite co-pilot credentials, and galactic recognition at Maharaja Institute of Technology Mysore.
           </p>
         </motion.div>
 

@@ -104,7 +104,7 @@ export default function LegalPage() {
                   3. Event Rules & Domains
                 </h2>
                 <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <li><strong>Project Scope:</strong> Projects must align with the official domains: <strong>AI / ML</strong>, <strong>Cybersecurity</strong>, <strong>IoT & Embedded Systems</strong>, <strong>Web & App Development</strong>, or <strong>Open Innovation</strong>.</li>
+                  <li><strong>Project Scope:</strong> Projects must align with the official domains: <strong>Agriculture</strong>, <strong>Healthcare</strong>, or <strong>Smart City</strong>.</li>
                   <li><strong>Development Window:</strong> Software application development must occur during the hackathon period. The use of completely pre-built projects is prohibited.</li>
                   <li><strong>Hardware/IoT Exception:</strong> Teams building hardware solutions may procure, assemble, and test physical microcontrollers/sensors beforehand, but software integration and prototype testing must happen during the hackathon.</li>
                   <li><strong>AI Assistance:</strong> Use of modern developer tools and AI coding assistants is permitted to accelerate prototyping.</li>

@@ -213,7 +213,7 @@ export const InternshipTicket = () => {
                 letterSpacing: "-0.03em", transformStyle: "preserve-3d",
               }}
             >
-              Compete for the<br /><span style={{ color: "#38fedc", textShadow: "0 0 25px rgba(56,254,220,0.5)" }}>₹30,000</span> Bounty! 
+              Compete for the<br /><span style={{ color: "#38fedc", textShadow: "0 0 25px rgba(56,254,220,0.5)" }}>₹33,333</span> Bounty! 
             </motion.h3>
 
             {/* Description — pops out */}

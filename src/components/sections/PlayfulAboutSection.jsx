@@ -28,7 +28,7 @@ const STAT_CARDS = [
   {
     icon: Trophy,
     iconColor: '#eab308',
-    value: '₹30,000',
+    value: '₹33,333',
     label: 'Prize Pool',
   },
 ];

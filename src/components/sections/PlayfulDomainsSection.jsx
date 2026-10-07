@@ -1,81 +1,54 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Shield, Cpu, Code2, Lightbulb, ArrowRight, X, CheckCircle2 } from 'lucide-react';
+import { Sprout, HeartPulse, Building2, ArrowRight, X, CheckCircle2 } from 'lucide-react';
 
 const DOMAINS = [
   {
-    id: 'ai-ml',
-    title: 'AI / ML',
-    desc: 'Build intelligent solutions for real world problems.',
-    bg: '#f3e8ff', // Pastel lavender
-    border: '#d8b4fe',
-    textCol: '#6b21a8',
-    icon: Brain,
-    details: [
-      'Computer Vision & Real-time Object Detection',
-      'Generative AI & Autonomous Workflow Agents',
-      'Predictive Analytics for Precision Healthcare & AgTech',
-      'Natural Language Processing & Vernacular Voice AI',
-    ],
-  },
-  {
-    id: 'cybersecurity',
-    title: 'Cybersecurity',
-    desc: 'Create a safer digital future.',
-    bg: '#fef9c3', // Pastel yellow
-    border: '#fde047',
-    textCol: '#854d0e',
-    icon: Shield,
-    details: [
-      'Zero-Trust Network Verification Architectures',
-      'Automated Vulnerability Scanning & Patching Bots',
-      'Decentralized Identity & Privacy Preserving Protocols',
-      'Phishing & Threat Intelligence Feeds with ML',
-    ],
-  },
-  {
-    id: 'iot-embedded',
-    title: 'IoT & Embedded',
-    desc: 'Connect the physical and digital worlds.',
-    bg: '#e0f2fe', // Pastel sky blue
-    border: '#7dd3fc',
-    textCol: '#0369a1',
-    icon: Cpu,
-    details: [
-      'Smart Sensor Networks & Edge Computing',
-      'Automated Precision Farming & Hydroponic Telemetry',
-      'Smart City Traffic & Civic Utility Monitoring',
-      'Low-power Wearable Medical Devices & Alert Systems',
-    ],
-  },
-  {
-    id: 'web-app',
-    title: 'Web & App Dev',
-    desc: 'Innovate on the web and beyond.',
-    bg: '#ffe4e6', // Pastel coral / pink
-    border: '#fda4af',
-    textCol: '#9f1239',
-    icon: Code2,
-    details: [
-      'High-performance Next-gen Web Applications',
-      'Cross-platform Mobile Apps for Real-time Services',
-      'Collaborative Real-time Dashboards & Workspaces',
-      'Accessible Public Service & Disaster Relief Hubs',
-    ],
-  },
-  {
-    id: 'open-innovation',
-    title: 'Open Innovation',
-    desc: 'Any innovative idea under technology.',
-    bg: '#dcfce7', // Pastel mint green
+    id: 'agriculture',
+    title: 'Agriculture',
+    subtitle: 'Smart Farming & AgriTech',
+    desc: 'Deploy IoT sensors, precision irrigation, and AI vision to revolutionize sustainable farming.',
+    bg: '#f0fdf4', // Pastel Emerald
     border: '#86efac',
-    textCol: '#166534',
-    icon: Lightbulb,
+    textCol: '#15803d',
+    icon: Sprout,
     details: [
-      'Breakthrough Ideas in Clean Energy & Sustainability',
-      'Assistive Technologies for Differently Abled',
-      'Fintech & Financial Inclusion Systems',
-      'Any Cross-disciplinary Tech Innovation',
+      'AI Crop Disease Detection & Pest Early Warning',
+      'Smart Precision Irrigation & Soil Nutrient Sensing',
+      'Post-Harvest Cold-Chain Telemetry & Waste Reduction',
+      'Autonomous Farming Drones & Yield Forecasting Models',
+    ],
+  },
+  {
+    id: 'healthcare',
+    title: 'Healthcare',
+    subtitle: 'MedTech & AI Diagnostics',
+    desc: 'Develop life-saving healthcare tools, AI diagnostics, and smart assistive technologies.',
+    bg: '#fff1f2', // Pastel Crimson / Rose
+    border: '#fecdd3',
+    textCol: '#e11d48',
+    icon: HeartPulse,
+    details: [
+      'Low-Cost Point-of-Care Diagnostics with Edge AI',
+      'Remote Patient Telemetry & Critical Vital Monitors',
+      'Emergency Ambulatory Routing & Hospital Bed Coordination',
+      'Assistive Tech & Rehabilitation for Differently Abled',
+    ],
+  },
+  {
+    id: 'smart-city',
+    title: 'Smart City',
+    subtitle: 'Urban Mobility & IoT Infrastructure',
+    desc: 'Engineer connected, resilient, and energy-efficient municipal and transit systems.',
+    bg: '#e0f2fe', // Pastel Tech Sky
+    border: '#7dd3fc',
+    textCol: '#0284c7',
+    icon: Building2,
+    details: [
+      'Intelligent Adaptive Traffic Routing & Green Corridors',
+      'Automated Municipal Waste Segregation & Smart Bin IoT',
+      'Decentralized Renewable Microgrids & Energy Distribution',
+      'Citizen Safety Telemetry & Emergency Disaster Networks',
     ],
   },
 ];
@@ -130,7 +103,7 @@ export default function PlayfulDomainsSection() {
                 margin: 0,
               }}
             >
-              MULTIPLE CHALLENGES. <span style={{ color: '#ea580c' }}>ONE BIGGER MISSION.</span>
+              THREE DOMAINS. <span style={{ color: '#ea580c' }}>ENDLESS POSSIBILITIES.</span>
             </p>
           </div>
 
@@ -157,12 +130,12 @@ export default function PlayfulDomainsSection() {
           </div>
         </div>
 
-        {/* 5 Colorful Rounded Cards Grid */}
+        {/* 3 Colorful Rounded Cards Grid */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '20px',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '24px',
           }}
           className="playful-domains-grid"
         >
@@ -387,17 +360,19 @@ export default function PlayfulDomainsSection() {
       </AnimatePresence>
 
       <style>{`
-        @media (max-width: 1024px) {
+        @media (max-width: 960px) {
           .playful-domains-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+            gap: 18px !important;
           }
         }
 
         @media (max-width: 680px) {
           .playful-domains-grid {
             grid-template-columns: 1fr !important;
-            max-width: 380px !important;
+            max-width: 420px !important;
             margin: 0 auto !important;
+            gap: 16px !important;
           }
         }
       `}</style>

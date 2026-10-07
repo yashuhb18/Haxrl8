@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, ArrowRight, Sparkles, Trophy } from 'lucide-react';
 import HeroCliffIllustration from './HeroCliffIllustration';
 import DomainWheel from '../ui/DomainWheel';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
@@ -195,6 +195,48 @@ export default function PlayfulHeroSection() {
                 marginBottom: '24px',
               }}
             >
+              {/* Registration Starts Badge */}
+              <div
+                className="hero-badge-pill"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(234, 88, 12, 0.08)',
+                  border: '2px solid rgba(234, 88, 12, 0.35)',
+                  borderRadius: '100px',
+                  padding: '8px 18px',
+                  fontSize: '13.5px',
+                  fontWeight: 800,
+                  color: '#c2410c',
+                  boxShadow: '0 4px 12px rgba(234, 88, 12, 0.08)',
+                }}
+              >
+                <Sparkles size={16} color="#ea580c" strokeWidth={2.5} />
+                <span>REGISTRATION STARTS: OCT 9, 2026</span>
+              </div>
+
+              {/* Prize Pool Badge */}
+              <div
+                className="hero-badge-pill"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  border: '2px solid rgba(245, 158, 11, 0.4)',
+                  borderRadius: '100px',
+                  padding: '8px 18px',
+                  fontSize: '13.5px',
+                  fontWeight: 800,
+                  color: '#b45309',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.08)',
+                }}
+              >
+                <Trophy size={16} color="#d97706" strokeWidth={2.5} />
+                <span>₹33,333 PRIZE POOL</span>
+              </div>
+
               {/* Date Badge */}
               <div
                 className="hero-badge-pill"
@@ -206,14 +248,14 @@ export default function PlayfulHeroSection() {
                   border: '2px solid #e2e8f0',
                   borderRadius: '100px',
                   padding: '8px 18px',
-                  fontSize: '14px',
+                  fontSize: '13.5px',
                   fontWeight: 800,
                   color: '#0f172a',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                 }}
               >
-                <Calendar size={17} color="#ff3b69" strokeWidth={2.5} />
-                <span>NOV 6 – 7, 2026</span>
+                <Calendar size={16} color="#ff3b69" strokeWidth={2.5} />
+                <span>FINALE: NOV 6 – 7, 2026</span>
               </div>
 
               {/* Location Badge */}
@@ -227,13 +269,13 @@ export default function PlayfulHeroSection() {
                   border: '2px solid #e2e8f0',
                   borderRadius: '100px',
                   padding: '8px 18px',
-                  fontSize: '14px',
+                  fontSize: '13.5px',
                   fontWeight: 800,
                   color: '#334155',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                 }}
               >
-                <MapPin size={17} color="#0284c7" strokeWidth={2.5} />
+                <MapPin size={16} color="#0284c7" strokeWidth={2.5} />
                 <span>Maharaja Institute of Technology Mysore</span>
               </div>
             </motion.div>

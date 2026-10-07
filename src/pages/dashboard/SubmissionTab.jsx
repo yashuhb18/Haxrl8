@@ -21,11 +21,8 @@ const STEPS = ['Station Guidelines', 'Idea Blueprint', 'Review & Lock In'];
 
 const SDG_OPTIONS = [
   "Agriculture",
-  "Smart City",
   "Healthcare",
-  "Cybersecurity",
-  "AI / Autonomous Agents",
-  "Open Innovation"
+  "Smart City"
 ];
 
 function Field({ label, value, onChange, placeholder, type = 'text', hint, error }) {

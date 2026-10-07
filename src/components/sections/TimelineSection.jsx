@@ -65,7 +65,7 @@ const EVENTS = [
   {
     index: 3, num: "04", day: "06", month: "NOV", year: "2026",
     title: "Docking at Base Station (Grand Finale)",
-    desc: "24-hour intense prototyping at Maharaja Institute of Technology Mysore, jury evaluation, and ₹30,000 bounty ceremony.",
+    desc: "24-hour intense prototyping at Maharaja Institute of Technology Mysore, jury evaluation, and ₹33,333 bounty ceremony.",
     tag: "Main Event (Nov 6–7)", tagColor: "#38fedc",
     tagBg: "rgba(56,254,220,0.15)", tagBorder: "rgba(56,254,220,0.4)",
     Icon: IconTrophy, isFinal: true,

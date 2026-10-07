@@ -151,7 +151,7 @@ export default function SkewCards() {
             Three Shipboard Innovation Sectors
           </h2>
           <p style={{ fontSize: '1.05rem', color: '#94a3b8', lineHeight: 1.75, fontWeight: 400 }}>
-            Choose your sector across <span style={{ color: '#50ef39', fontWeight: 700 }}>Hydroponics</span>, <span style={{ color: '#facc15', fontWeight: 700 }}>Navigation</span>, or <span style={{ color: '#38fedc', fontWeight: 700 }}>MedBay</span>. Assemble your 3–4 member crew and compete for the ₹30,000 bounty at Maharaja Institute of Technology Mysore.
+            Choose your sector across <span style={{ color: '#50ef39', fontWeight: 700 }}>Hydroponics</span>, <span style={{ color: '#facc15', fontWeight: 700 }}>Navigation</span>, or <span style={{ color: '#38fedc', fontWeight: 700 }}>MedBay</span>. Assemble your 3–4 member crew and compete for the ₹33,333 bounty at Maharaja Institute of Technology Mysore.
           </p>
         </div>
 

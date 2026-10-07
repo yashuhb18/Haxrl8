@@ -223,7 +223,7 @@ export default function EmergencyMeetingModal() {
               >
                 <div>
                   <span style={{ color: '#94a3b8', display: 'block', fontSize: '10px', textTransform: 'uppercase' }}>Ship Bounty</span>
-                  <strong style={{ color: '#facc15', fontSize: '16px' }}>₹30,000</strong>
+                  <strong style={{ color: '#facc15', fontSize: '16px' }}>₹33,333</strong>
                 </div>
                 <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.15)' }} />
                 <div>

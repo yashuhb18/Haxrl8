@@ -295,7 +295,7 @@ export default function AboutSection() {
                   3 Core Sectors
                 </h3>
                 <p style={styles.bodyText}>
-                  Your crew must formulate an idea paper and build working solutions in <strong style={{ color: '#50ef39' }}>Hydroponics (Agriculture)</strong>, <strong style={{ color: '#facc15' }}>Navigation (Smart City)</strong>, or <strong style={{ color: '#38fedc' }}>MedBay (Healthcare)</strong>. Inter-college teams of 3–4 members are welcome to compete for the ₹30,000 bounty pool.
+                  Your crew must formulate an idea paper and build working solutions in <strong style={{ color: '#50ef39' }}>Hydroponics (Agriculture)</strong>, <strong style={{ color: '#facc15' }}>Navigation (Smart City)</strong>, or <strong style={{ color: '#38fedc' }}>MedBay (Healthcare)</strong>. Inter-college teams of 3–4 members are welcome to compete for the ₹33,333 bounty pool.
                 </p>
               </motion.div>
             <div

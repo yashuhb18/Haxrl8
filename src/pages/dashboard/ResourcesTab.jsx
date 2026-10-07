@@ -87,9 +87,9 @@ export default function ResourcesTab({ hasTeam, submissions }) {
   }, [showRulebook, showProtocol]);
 
   const EVENTS = [
-    { date: 'Oct 08', event: 'Registration Opens', status: 'done', desc: 'Team registration opens for undergraduate students.', time: 'All day' },
+    { date: 'Oct 09', event: 'Registration Opens', status: 'done', desc: 'Team registration opens for undergraduate students.', time: 'All day' },
     { date: 'Oct 28', event: 'Team Confirmation', status: hasTeam ? 'done' : 'active', desc: 'Form your 3–4 member team and confirm details.', time: '11:59 PM IST' },
-    { date: 'Oct 28', event: 'Idea Submission', status: hasSubmitted ? 'done' : (hasTeam ? 'active' : 'upcoming'), desc: 'Submit your idea paper in AI, Cybersecurity, IoT, Web/App or Open Innovation.', time: '11:59 PM IST' },
+    { date: 'Oct 28', event: 'Idea Submission', status: hasSubmitted ? 'done' : (hasTeam ? 'active' : 'upcoming'), desc: 'Submit your idea paper in Agriculture, Healthcare, or Smart City.', time: '11:59 PM IST' },
     { date: 'Nov 02', event: 'Shortlist Announced', status: hasSubmitted ? 'active' : 'upcoming', desc: 'Top teams notified for offline finale.', time: '12:00 PM IST' },
     { date: 'Nov 06–07', event: 'Grand Finale', status: 'upcoming', desc: '24-hour hackathon finale and prize ceremony at MIT Mysore.', time: '09:00 AM IST' },
   ];

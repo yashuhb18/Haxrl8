@@ -116,7 +116,7 @@ export default function YourMissionSection() {
                 <ShieldCheck size={20} />
               </div>
               <div>
-                <h4 style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: 800, color: '#f8fafc' }}>₹30,000 Bounty Pool</h4>
+                <h4 style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: 800, color: '#f8fafc' }}>₹33,333 Bounty Pool</h4>
                 <p style={{ margin: 0, fontSize: '13.5px', color: '#94a3b8', lineHeight: 1.5 }}>Compete for cash rewards, mentorship from industry veterans, and recognized credentials.</p>
               </div>
             </div>

@@ -127,7 +127,7 @@ export default function EntryVideoPopup() {
                   }}>
                     <div>
                       <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Nov 06–07, 2026 · Maharaja Institute of Technology Mysore</p>
-                      <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>National-level hackathon with ₹30,000 prize pool</p>
+                      <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>National-level hackathon with ₹33,333 prize pool</p>
                     </div>
                     <div style={{ display: 'flex', gap: 10 }}>
                       <a

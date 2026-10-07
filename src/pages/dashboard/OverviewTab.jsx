@@ -7,7 +7,7 @@ import ProblemStatementPDF from '../../assets/PS_example/Hackathon Problem State
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 const TIMELINE_STEPS = [
-  { title: 'Registration', date: 'Oct 08' },
+  { title: 'Registration', date: 'Oct 09' },
   { title: 'Team Lock', date: 'Oct 28' },
   { title: 'Idea Paper', date: 'Oct 28' },
   { title: 'Shortlist', date: 'Nov 02' },

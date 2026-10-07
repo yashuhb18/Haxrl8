@@ -9,14 +9,14 @@ const PRIZES = [
     place: '1st Prize',
     rankEmoji: '🥇',
     title: 'Grand Winners',
-    amount: '₹15,000',
+    amount: '₹18,000',
     color: '#f59e0b',
     cardBg: 'linear-gradient(180deg, #fef3c7 0%, #ffffff 100%)',
     border: '#fde68a',
     badge: 'Champion Crew',
     crewColor: 'yellow',
     crewHat: 'crown',
-    speech: 'Grand Champions! ₹15,000! 👑',
+    speech: 'Grand Champions! ₹18,000! 👑',
     isWinner: true,
   },
   {
@@ -37,14 +37,14 @@ const PRIZES = [
     place: '3rd Prize',
     rankEmoji: '🥉',
     title: 'Second Runners Up',
-    amount: '₹5,000',
+    amount: '₹5,333',
     color: '#f43f5e',
     cardBg: 'linear-gradient(180deg, #ffe4e6 0%, #ffffff 100%)',
     border: '#fecdd3',
     badge: 'Specialist Crew',
     crewColor: 'pink',
     crewHat: 'none',
-    speech: 'Specialist Crew! ₹5,000! 💖',
+    speech: 'Specialist Crew! ₹5,333! 💖',
     isWinner: false,
   },
 ];
@@ -82,7 +82,7 @@ export default function PlayfulPrizesSection() {
             }}
           >
             <Sparkles size={18} color="#d97706" />
-            <span>₹30,000 TOTAL PRIZE POOL</span>
+            <span>₹33,333 TOTAL PRIZE POOL</span>
           </div>
 
           <h2
@@ -148,7 +148,7 @@ export default function PlayfulPrizesSection() {
                 }}
               />
               <div style={{ position: 'absolute', bottom: '10px', right: '-10px' }}>
-                <AmongUsCrewmate color="yellow" hat="crown" size={76} speechText="Claim the ₹30,000 bounty! 👑" />
+                <AmongUsCrewmate color="yellow" hat="crown" size={76} speechText="Claim the ₹33,333 bounty! 👑" />
               </div>
             </div>
 
