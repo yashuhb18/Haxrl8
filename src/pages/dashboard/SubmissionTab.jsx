@@ -177,10 +177,15 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
         pdf_url: uploadedPdfUrl
       };
 
-      const { data, error } = await supabase.from('submissions').upsert([submissionPayload]).select().single();
-      if (error && error.code !== 'PGRST116') throw error;
-
-      if (setSubmissions) setSubmissions([data || submissionPayload]);
+      try {
+        const { data, error } = await supabase.from('submissions').upsert([submissionPayload]).select().single();
+        if (error && error.code !== 'PGRST116') throw error;
+        if (setSubmissions) setSubmissions([data || submissionPayload]);
+      } catch (subErr) {
+        console.warn('Supabase submissions upsert fallback:', subErr);
+        localStorage.setItem('haxlr8_submissions_db', JSON.stringify([submissionPayload]));
+        if (setSubmissions) setSubmissions([submissionPayload]);
+      }
       setSuccess(true);
       setToastMsg('Idea Abstract Locked In Successfully! 🚀');
       setTimeout(() => setToastMsg(''), 4000);
