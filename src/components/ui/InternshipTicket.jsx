@@ -111,40 +111,38 @@ export const InternshipTicket = () => {
           style={{
             transformStyle: "preserve-3d",
             position: "relative",
-            backgroundImage: `url("${currentBg}")`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            backgroundColor: "#0e0e0e",
+            backgroundColor: "#0a101f",
             borderRadius: 20,
+            border: "1.5px solid rgba(56, 254, 220, 0.3)",
             overflow: "hidden",
             boxShadow: hovered
-              ? "0 48px 96px -24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.1)"
-              : "0 20px 60px -15px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.05)",
+              ? "0 48px 96px -24px rgba(0,0,0,0.8), 0 0 40px rgba(56,254,220,0.25)"
+              : "0 20px 60px -15px rgba(0,0,0,0.6), 0 0 20px rgba(56,254,220,0.1)",
             display: "flex",
             fontFamily: "'Plus Jakarta Sans', sans-serif",
-            minHeight: 300,
-            transition: "box-shadow 0.4s ease",
+            minHeight: 320,
+            transition: "box-shadow 0.4s ease, border-color 0.4s ease",
           }}
         >
-          {/* Noise texture */}
+          {/* Cyber grid texture */}
           <div aria-hidden style={{
-            position: "absolute", inset: 0, opacity: 0.05, mixBlendMode: "screen",
+            position: "absolute", inset: 0, opacity: 0.08,
             pointerEvents: "none", zIndex: 1,
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 320 320' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            backgroundImage: `linear-gradient(to right, #38fedc 1px, transparent 1px), linear-gradient(to bottom, #38fedc 1px, transparent 1px)`,
+            backgroundSize: "32px 32px",
           }} />
 
           {/* Cursor spotlight */}
           <div aria-hidden style={{
             position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
             opacity: hovered ? 1 : 0, transition: "opacity 0.4s",
-            background: `radial-gradient(600px circle at ${50 + tilt.x * 2}% ${50 + tilt.y * 2}%, rgba(255,255,255,0.06), transparent 60%)`,
+            background: `radial-gradient(600px circle at ${50 + tilt.x * 2}% ${50 + tilt.y * 2}%, rgba(56,254,220,0.12), transparent 60%)`,
           }} />
 
           {/* Dashed divider — desktop only */}
           <div aria-hidden className="ticket-divider" style={{
             position: "absolute", left: "68%", top: 16, bottom: 16, width: 0,
-            borderLeft: "1.5px dashed rgba(255,255,255,0.18)", zIndex: 5, pointerEvents: "none",
+            borderLeft: "1.5px dashed rgba(56,254,220,0.3)", zIndex: 5, pointerEvents: "none",
           }} />
 
           {/* ── LEFT 68% — main content ── */}
@@ -155,16 +153,16 @@ export const InternshipTicket = () => {
             position: "relative", zIndex: 3,
           }} className="ticket-left">
 
-            {/* Vertical "GRAND PRIZE" label */}
+            {/* Vertical "OFFICIAL PASS" label */}
             <div style={{
               position: "absolute", left: 16, top: "50%",
               transform: "translateY(-50%) rotate(180deg)",
-              writingMode: "vertical-rl", fontSize: "0.6rem", fontWeight: 600,
-              letterSpacing: "0.2em", color: "rgba(0,0,0,0.45)",
+              writingMode: "vertical-rl", fontSize: "0.62rem", fontWeight: 800,
+              letterSpacing: "0.22em", color: "rgba(56,254,220,0.7)",
               textTransform: "uppercase", userSelect: "none",
               display: "flex", alignItems: "center", gap: 6,
             }}>
-              <span>✦</span> GRAND PRIZE <span>✦</span>
+              <span>✦</span> ORBITAL BOUNTY PASS <span>✦</span>
             </div>
 
             {/* Icon — pops out */}
@@ -175,20 +173,16 @@ export const InternshipTicket = () => {
               style={{
                 marginLeft: "clamp(28px,3.5vw,52px)",
                 width: 58, height: 58,
-                background: "rgba(0,0,0,0.04)",
-                borderRadius: 14,
+                background: "rgba(56,254,220,0.1)",
+                borderRadius: 16,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                marginBottom: 24,
-                border: "1px solid rgba(0,0,0,0.1)",
+                marginBottom: 20,
+                border: "1.5px solid rgba(56,254,220,0.35)",
+                boxShadow: "0 0 20px rgba(56,254,220,0.15)",
                 transformStyle: "preserve-3d",
               }}
             >
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
-                stroke="rgba(0,0,0,0.85)" strokeWidth="1.5"
-                strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-              </svg>
+              <span style={{ fontSize: 26 }}>🏆</span>
             </motion.div>
 
             {/* Subtitle — pops out */}
@@ -198,12 +192,13 @@ export const InternshipTicket = () => {
               transition={{ type: "spring", stiffness: 260, damping: 22 }}
               style={{
                 marginLeft: "clamp(28px,3.5vw,52px)",
-                fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.16em",
-                color: "rgba(0,0,0,0.65)", textTransform: "uppercase",
-                marginBottom: 14, transformStyle: "preserve-3d",
+                fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.18em",
+                color: "#38fedc", textTransform: "uppercase",
+                marginBottom: 10, transformStyle: "preserve-3d",
+                fontFamily: "'Press Start 2P', monospace",
               }}
             >
-              IGENIUS AI
+              HAXLR8 3.0 · FLIGHT MANIFEST
             </motion.div>
 
             {/* Heading — pops out most */}
@@ -213,12 +208,12 @@ export const InternshipTicket = () => {
               transition={{ type: "spring", stiffness: 260, damping: 22 }}
               style={{
                 fontSize: "clamp(1.8rem,3.5vw,3rem)", fontWeight: 900,
-                color: "#111", lineHeight: 1.08, margin: "0 0 18px",
+                color: "#f8fafc", lineHeight: 1.08, margin: "0 0 16px",
                 marginLeft: "clamp(28px,3.5vw,52px)",
                 letterSpacing: "-0.03em", transformStyle: "preserve-3d",
               }}
             >
-              Win a Ticket<br />to <span style={{ color: "#59c23a" }}>Singapore!</span> 
+              Compete for the<br /><span style={{ color: "#38fedc", textShadow: "0 0 25px rgba(56,254,220,0.5)" }}>₹30,000</span> Bounty! 
             </motion.h3>
 
             {/* Description — pops out */}
@@ -227,13 +222,13 @@ export const InternshipTicket = () => {
               animate={{ translateZ: z.desc }}
               transition={{ type: "spring", stiffness: 260, damping: 22 }}
               style={{
-                fontSize: "0.83rem", lineHeight: 1.65,
-                color: "rgba(0,0,0,0.65)", maxWidth: 380,
-                margin: "0 0 28px", marginLeft: "clamp(28px,3.5vw,52px)",
+                fontSize: "0.85rem", lineHeight: 1.7,
+                color: "#94a3b8", maxWidth: 420,
+                margin: "0 0 26px", marginLeft: "clamp(28px,3.5vw,52px)",
                 transformStyle: "preserve-3d",
               }}
             >
-              Top three teams will qualify for the Science and Innovation Competition held in Singapore, with all expenses fully covered. Outstanding performers will also receive opportunities for Global internships.
+              Shortlisted crew squads advance to the 24-hour Grand Hackathon on November 6–7 at Maharaja Institute of Technology Mysore Base Station. Build game-changing solutions in Hydroponics, Navigation, and MedBay.
             </motion.p>
 
             {/* CTA — pops out the most */}
@@ -247,22 +242,20 @@ export const InternshipTicket = () => {
                 transformStyle: "preserve-3d",
               }}
             >
-              <a href="/shortlisted" style={{
+              <a href="/register" style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "12px 24px", background: "#59c23a", color: "#000",
-                fontSize: "0.83rem", fontWeight: 700, borderRadius: 9,
-                textDecoration: "none",
-                boxShadow: hovered ? "0 8px 28px rgba(89, 194, 58, 0.25)" : "0 2px 8px rgba(89, 194, 58, 0.1)",
+                padding: "13px 26px", background: "linear-gradient(135deg, #38fedc 0%, #2dd4bf 100%)", color: "#070a13",
+                fontSize: "0.85rem", fontWeight: 800, borderRadius: 10,
+                textDecoration: "none", letterSpacing: "0.04em",
+                boxShadow: hovered ? "0 10px 30px rgba(56,254,220,0.4)" : "0 4px 15px rgba(56,254,220,0.2)",
                 transition: "box-shadow 0.3s, transform 0.2s",
               }}
                 onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
               >
-                View Shortlisted Teams →
+                CLAIM CREW PASS →
               </a>
             </motion.div>
-
-            {/* Wave mesh bg — removed, using BG_ticket.png instead */}
           </div>
 
           {/* ── RIGHT 32% — stub (QR + barcode) — desktop only ── */}
@@ -276,24 +269,26 @@ export const InternshipTicket = () => {
               justifyContent: "space-between",
               padding: "clamp(20px,2.5vw,32px) clamp(16px,2vw,24px)",
               position: "relative", zIndex: 3, gap: 20,
+              background: "rgba(10, 16, 30, 0.6)",
               transformStyle: "preserve-3d",
             }}
           >
             {/* QR + ticket number */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <div style={{ width: 68, height: 68, background: "#fff", padding: 4, borderRadius: 6 }}>
+              <div style={{ width: 68, height: 68, background: "#fff", padding: 4, borderRadius: 8, border: "2px solid #38fedc", boxShadow: "0 0 15px rgba(56,254,220,0.3)" }}>
                 <img
                   src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://www.hackathon2026.in/"
                   alt="QR Code"
+                  style={{ width: "100%", height: "100%", display: "block" }}
                 />
               </div>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 5 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <div style={{ width: 38, height: 9, background: "#8cc63f" }} />
-                  <div style={{ color: "#111", fontSize: "0.58rem", fontWeight: 700, letterSpacing: "0.1em" }}>UD :)</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#38fedc", boxShadow: "0 0 8px #38fedc" }} />
+                  <div style={{ color: "#38fedc", fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.1em" }}>VERIFIED</div>
                 </div>
-                <div style={{ fontFamily: "'Courier New', monospace", fontSize: "0.72rem", color: "rgba(0,0,0,0.5)", letterSpacing: "0.05em" }}>
-                  000000114351
+                <div style={{ fontFamily: "monospace", fontSize: "0.75rem", color: "#64748b", letterSpacing: "0.08em" }}>
+                  SKELD-2026-30K
                 </div>
               </div>
             </div>
@@ -302,15 +297,16 @@ export const InternshipTicket = () => {
             <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-end", flex: 1 }}>
               <div style={{
                 writingMode: "vertical-rl", transform: "rotate(180deg)",
-                display: "flex", flexDirection: "column", gap: 7, alignItems: "center",
-                background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(4px)",
-                padding: "12px 6px", borderRadius: 6,
-                boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+                display: "flex", flexDirection: "column", gap: 8, alignItems: "center",
+                background: "rgba(15, 23, 42, 0.85)", backdropFilter: "blur(8px)",
+                border: "1px solid rgba(56,254,220,0.25)",
+                padding: "14px 8px", borderRadius: 10,
+                boxShadow: "0 4px 15px rgba(0,0,0,0.4)"
               }}>
-                <span style={{ fontSize: "0.88rem", color: "#111", fontWeight: 700, letterSpacing: "0.02em" }}>
-                  <span style={{ color: "#4C9F38" }}>Internship</span> ticket
+                <span style={{ fontSize: "0.85rem", color: "#f8fafc", fontWeight: 800, letterSpacing: "0.06em" }}>
+                  <span style={{ color: "#38fedc" }}>HAXLR8 3.0</span> BOUNTY PASS
                 </span>
-                <span style={{ fontSize: "0.88rem", color: "#111", fontWeight: 700, letterSpacing: "0.02em" }}>30.06 to 21.06 Hs</span>
+                <span style={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: 700, letterSpacing: "0.04em" }}>NOV 06–07 · MIT MYSORE</span>
               </div>
             </div>
           </motion.div>

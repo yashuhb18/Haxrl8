@@ -93,10 +93,11 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', background:'#f5f6fa' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', background:'#fffaf3', fontFamily:"'Fredoka', 'Plus Jakarta Sans', sans-serif" }}>
         <div style={{ textAlign:'center' }}>
-           <div style={{ width:40, height:40, border:'4px solid #e5e7eb', borderTop:'4px solid #4C9F38', borderRadius:'50%', animation:'spin 1s linear infinite', margin:'0 auto 16px' }} />
-           <div style={{ color:'#6b7280', fontSize:14, fontWeight:500 }}>Loading Dashboard...</div>
+           <div style={{ width:48, height:48, border:'4px solid #fed7aa', borderTop:'4px solid #ff3b69', borderRadius:'50%', animation:'spin 0.8s linear infinite', margin:'0 auto 16px' }} />
+           <div style={{ color:'#ff3b69', fontSize:'14px', fontWeight:900, letterSpacing:'0.04em', textTransform:'uppercase' }}>CONNECTING TO FLIGHT DECK...</div>
+           <p style={{ color:'#64748b', fontSize:'12px', marginTop:'6px', fontWeight:600 }}>Syncing mission telemetry & squad credentials</p>
            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
         </div>
       </div>

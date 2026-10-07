@@ -1,460 +1,457 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, FileText, Headphones, Minus, Plus, Send } from 'lucide-react';
-import PPTSection from '../components/sections/PPTSection';
+import { HelpCircle, Search, Plus, Minus, MessageSquare, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
+import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
 
-const faqs = [
+const FAQS = [
   {
-    question: "Where can I view the shortlisted teams?",
-    answer: (
-      <>
-        Registration is now closed. You can view the shortlisted teams for SRCAS Hackathon 3.0 at{" "}
-        <a
-          href="https://www.hackathon2026.in/shortlisted"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline"
-        >
-          https://www.hackathon2026.in/shortlisted
-        </a>
-        .
-      </>
-    ),
+    id: 1,
+    category: 'registration',
+    question: "How do I register for HAXLR8 3.0?",
+    answer: "Only the Team Leader should register! Head to the registration portal to create your team account. Once registered, the Team Leader can add their 3 to 4 team members directly from their dashboard. Team members do not need separate accounts.",
   },
   {
-    question: "Who can participate in the SRCAS Hackathon 3.0?",
-    answer:
-      "The hackathon is open to all students, regardless of skill level. Whether you're a beginner exploring your first project or an experienced developer, you're welcome to participate.",
+    id: 2,
+    category: 'registration',
+    question: "Who can participate in HAXLR8 3.0?",
+    answer: "HAXLR8 3.0 is open to all undergraduate students currently enrolled in recognized colleges or universities across India. Beginners and experienced builders alike are warmly welcome.",
   },
   {
+    id: 3,
+    category: 'registration',
     question: "How many team members do I need?",
-    answer:
-      "Each team must have a minimum of 2 and a maximum of 4 members. Solo participation is not permitted.",
+    answer: "Each team must have 3 to 4 members. Solo participation or 2-member teams are strictly not permitted for HAXLR8 3.0.",
   },
   {
+    id: 4,
+    category: 'registration',
     question: "Can team members be from different colleges?",
-    answer:
-      "No. All team members must belong to the same college. However, students from different departments within the same college are allowed to form a team. Cross-college teams are not permitted for SRCAS Hackathon 3.0.",
+    answer: "Yes! Inter-college teams are officially allowed. You can form a squad with friends from different institutions, colleges, branches, and years.",
   },
   {
-    question: "Who is eligible to participate in the hackathon?",
-    answer:
-      "Any undergraduate or postgraduate student currently enrolled in a recognized institution is eligible to participate. No prior hackathon experience is required.",
+    id: 5,
+    category: 'domains',
+    question: "What are the focus domains for HAXLR8 3.0?",
+    answer: "The hackathon challenges participants to build innovative solutions across 5 key domains: AI / ML, Cybersecurity, IoT & Embedded Systems, Web & App Development, and Open Innovation.",
   },
   {
-    question: "Is there a registration fee?",
-    answer:
-      "No, participation is completely free. We believe innovation should be accessible to everyone.",
+    id: 6,
+    category: 'logistics',
+    question: "What is the prize pool?",
+    answer: "HAXLR8 3.0 features a confirmed cash prize pool of ₹30,000 (1st Prize: ₹15,000, 2nd Prize: ₹10,000, 3rd Prize: ₹5,000), along with official trophies, certificates, and mentorship opportunities.",
   },
   {
-    question: "What should I bring to the SRCAS Hackathon 3.0?",
-    answer:
-      "Please bring your laptop, charger, any hardware required for your project, and lots of creativity. Food, refreshments, Wi-Fi, and a comfortable workspace will be provided by the organizers.",
+    id: 7,
+    category: 'logistics',
+    question: "Where and when will the Grand Hackathon take place?",
+    answer: "The 24-hour offline hackathon finale takes place on November 6–7, 2026, hosted at Maharaja Institute of Technology Mysore, Belavadi, Mandya/Mysuru.",
   },
   {
-    question: "Are we allowed to use AI tools or \"vibe code\" during the hackathon?",
-    answer:
-      "Yes! \"Vibe coding\" (using AI assistants to generate and shape your code) is officially allowed during the 24-hour hackathon. We encourage using modern tools to build faster, as long as the actual development and logic are implemented during the event.",
+    id: 8,
+    category: 'registration',
+    question: "What is the idea paper submission deadline?",
+    answer: "Registration and idea paper submission will close on October 28, 2026. Make sure your team leader submits your abstract before the deadline.",
   },
   {
-    question: "We are building an IoT/Hardware project. Do we have to build the hardware from scratch during the 24 hours?",
-    answer:
-      "No. Hardware teams may procure their required devices, sensors, and microcontrollers and test them before the hackathon begins. However, during the 24-hour hackathon window, you must develop the software application from scratch, integrate it with your hardware, and demonstrate the fully working IoT solution.",
+    id: 9,
+    category: 'domains',
+    question: "Are we allowed to use AI tools or 'vibe code'?",
+    answer: "Yes! 'Vibe coding' and AI coding assistants (GitHub Copilot, Cursor, Gemini, Claude, etc.) are allowed during the 24-hour hackathon. We encourage using modern tools to build faster, as long as the architecture, development, and logic are executed during the event.",
   },
   {
-    question: "Can I start working on my project before the event?",
-    answer:
-      "For software projects, no. All coding must start at the event. For hardware projects, you may procure and test devices beforehand, but software integration must happen during the 24 hours.",
+    id: 10,
+    category: 'domains',
+    question: "We are building an IoT/Hardware project. Do we build hardware from scratch?",
+    answer: "No. Hardware teams may procure their required sensors, microcontrollers, and peripherals and test them beforehand. However, during the 24-hour hackathon window, you must build the software, firmware, and integration logic from scratch.",
   },
   {
+    id: 11,
+    category: 'domains',
+    question: "Can I start working on my software project before the event?",
+    answer: "No. All core software development, database design, and application logic must begin after the countdown starts at the hackathon venue.",
+  },
+  {
+    id: 12,
+    category: 'logistics',
     question: "How are the winners selected?",
-    answer:
-      "Projects will be evaluated by a panel of industry experts based on innovation, technical complexity, practical applicability, impact, and presentation quality.",
+    answer: "Projects are evaluated by a distinguished panel of industry leaders and senior faculty based on Innovation & Originality, Technical Depth, Practical Feasibility, User Experience, and Final Pitch Quality.",
   },
   {
-    question: "Will the hackathon be in person or online?",
-    answer:
-      "The Idea Nation round will be conducted online. Teams shortlisted for the final round must be present on campus to participate in the 24-hour hackathon and final project evaluation.",
+    id: 13,
+    category: 'logistics',
+    question: "Will the hackathon be in-person or online?",
+    answer: "Phase 1 (Idea Paper Submission & Screening) is online. Phase 2 (the 24-hour Grand Finale) is 100% in-person at the campus of Maharaja Institute of Technology Mysore.",
+  },
+  {
+    id: 14,
+    category: 'domains',
+    question: "Is there an Impostor Among Us?",
+    answer: "Only if someone submits plagiarized code or tries to push a pre-built template! Complete your tasks honestly with your 3–4 crewmates and don't get ejected during the final jury review.",
   },
 ];
 
-const FaqItem = ({ faq, isOpen, onClick, index }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 16 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: '-20px' }}
-    transition={{ duration: 0.4, delay: index * 0.05 }}
-    style={{
-      borderBottom: index === faqs.length - 1 ? 'none' : '1px solid #f3f4f6',
-      overflow: 'hidden',
-    }}
-  >
-    <button
-      onClick={onClick}
-      style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '24px 0',
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        textAlign: 'left',
-        outline: 'none',
-        gap: 16,
-      }}
-    >
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-        {isOpen && (
-          <div style={{ width: '3px', height: '24px', background: '#111', borderRadius: '4px', marginTop: '2px' }} />
-        )}
-        <span style={{
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-          fontWeight: 700,
-          color: '#111',
-          fontSize: '1.05rem',
-          letterSpacing: '-0.01em',
-          lineHeight: 1.4,
-          paddingLeft: isOpen ? 0 : '19px'
-        }}>
-          {faq.question}
-        </span>
-      </div>
-      <motion.div
-        animate={{ rotate: isOpen ? 180 : 0 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        style={{
-          flexShrink: 0,
-          width: 28, height: 28,
-          borderRadius: '50%',
-          border: isOpen ? 'none' : '1px solid #e5e7eb',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: isOpen ? '#fff' : '#111',
-          background: isOpen ? '#111' : '#fff',
-        }}
-      >
-        {isOpen ? <Minus size={16} /> : <Plus size={16} />}
-      </motion.div>
-    </button>
-
-    <AnimatePresence initial={false}>
-      {isOpen && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          style={{ overflow: 'hidden' }}
-        >
-          <p style={{
-            padding: '0 48px 24px 19px',
-            color: '#6b7280',
-            lineHeight: 1.7,
-            fontSize: '0.95rem',
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            margin: 0,
-          }}>
-            {faq.answer}
-          </p>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </motion.div>
-);
-
-// CSS-based Laptop & Coffee illustration
-const LaptopGraphic = () => (
-  <div style={{ position: 'relative', marginTop: '40px', width: '100%', height: '220px', marginLeft: '-20px' }}>
-    <motion.div 
-      animate={{ y: [0, -6, 0] }} 
-      transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-      style={{ position: 'absolute', left: '10%', top: '20%' }}
-    >
-      <div style={{ width: '200px', height: '130px', background: '#fff', border: '8px solid #111', borderRadius: '12px 12px 0 0', position: 'relative', overflow: 'hidden', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>
-        <div style={{ position: 'absolute', top: '15px', left: '15px', right: '15px', height: '24px', background: '#f3f4f6', borderRadius: '6px' }} />
-        <div style={{ position: 'absolute', top: '50px', left: '15px', right: '40px', height: '24px', background: '#f3f4f6', borderRadius: '6px' }} />
-        <div style={{ position: 'absolute', top: '85px', left: '15px', right: '70px', height: '24px', background: '#f3f4f6', borderRadius: '6px' }} />
-      </div>
-      <div style={{ width: '240px', height: '18px', background: '#e5e7eb', marginLeft: '-20px', borderRadius: '0 0 12px 12px', position: 'relative', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}>
-         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '50px', height: '5px', background: '#9ca3af', borderRadius: '0 0 4px 4px' }} />
-      </div>
-    </motion.div>
-
-    <motion.div style={{ position: 'absolute', bottom: '0%', left: '0%', zIndex: 2 }}>
-      <div style={{ width: '45px', height: '50px', background: '#fff', borderRadius: '4px 4px 12px 12px', boxShadow: '0 8px 16px rgba(0,0,0,0.08)', border: '1px solid #f3f4f6', position: 'relative' }}>
-        <div style={{ position: 'absolute', top: '12px', right: '-12px', width: '16px', height: '24px', border: '5px solid #fff', borderRadius: '8px', zIndex: -1, boxShadow: 'inset 0 0 0 1px #f3f4f6, 0 8px 16px rgba(0,0,0,0.08)' }} />
-        <div style={{ position: 'absolute', top: '5px', left: '5px', right: '5px', height: '8px', background: '#111', borderRadius: '50%' }} />
-      </div>
-    </motion.div>
-
-    <motion.div 
-      animate={{ scale: [1, 1.05, 1], rotate: [0, 2, 0] }} 
-      transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-      style={{ position: 'absolute', top: '35%', right: '5%', background: '#111', borderRadius: '16px 16px 16px 4px', padding: '14px', display: 'flex', gap: '5px', boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}
-    >
-      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }} />
-      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }} />
-      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff' }} />
-    </motion.div>
-  </div>
-);
-
 export default function FaqSection() {
-  const [openIndex, setOpenIndex] = useState(0);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [openId, setOpenId] = useState(1);
+
+  const filtered = FAQS.filter(faq => {
+    const matchesCat = activeCategory === 'all' || faq.category === activeCategory;
+    const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
+
+  const toggleAccordion = (id) => {
+    playCrewmatePopSound();
+    setOpenId(openId === id ? null : id);
+  };
 
   return (
-    <section id="faq" style={{
-      position: 'relative',
-      backgroundColor: '#fdfdfd',
-      overflow: 'hidden',
-      fontFamily: "'Plus Jakarta Sans', sans-serif",
-    }}>
-      {/* Subtle dot grid */}
-      <div aria-hidden style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: 'radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
-      }} />
-
-      <div style={{
-        maxWidth: 1200,
-        margin: '0 auto',
-        padding: '100px 48px 0',
+    <div
+      style={{
+        backgroundColor: '#fffaf3',
+        color: '#0f172a',
+        minHeight: '100vh',
+        fontFamily: "'Fredoka', 'Plus Jakarta Sans', sans-serif",
+        paddingTop: '150px',
+        paddingBottom: '100px',
         position: 'relative',
-        zIndex: 1,
-      }}>
-
-        {/* ── TOP SECTION ── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1.2fr 1fr',
-          gap: '64px',
-          alignItems: 'center',
-          marginBottom: '100px',
-        }} className="faq-top-grid">
-          
-          {/* Top Left: Heading & Text */}
+        overflowX: 'hidden',
+      }}
+    >
+      <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+        {/* Header Block */}
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-              <div style={{ width: '24px', height: '1px', background: '#d1d5db' }} />
-              <span style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.15em', color: '#4b5563' }}>SUPPORT HUB</span>
-            </div>
-            <h2 style={{
-              fontSize: 'clamp(3rem, 5vw, 4.5rem)',
-              fontWeight: 900,
-              color: '#111',
-              letterSpacing: '-0.04em',
-              lineHeight: 1.05,
-              margin: '0 0 16px',
-            }}>
-              Everything you<br/>need, all in one<br/>
-              <span style={{ position: 'relative', display: 'inline-block' }}>
-                place!
-                <svg width="100%" height="20" viewBox="0 0 120 20" style={{ position: 'absolute', bottom: '-10px', left: 0, overflow: 'visible' }}>
-                  <path d="M5 15 Q 40 5, 115 15" fill="none" stroke="#111" strokeWidth="3" strokeLinecap="round" />
-                  <path d="M100 0 L 115 15" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M100 25 L 115 15" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </span>
-            </h2>
-            <p style={{
-              fontSize: '1.05rem',
-              color: '#6b7280',
-              lineHeight: 1.6,
-              maxWidth: 480,
-              marginTop: '32px'
-            }}>
-              Empowering your hacker journey with the right tools, guidance, and community. Reach out anytime to learn, collaborate, and grow together.
-            </p>
-          </motion.div>
-
-          {/* Top Right: Circular Graphic */}
-          <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', height: '360px', alignItems: 'center' }}>
-            <div style={{ position: 'absolute', right: '40px', top: '0px' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2"><path d="M12 2v20M2 12h20"/></svg>
-            </div>
-            
-            <div style={{ position: 'relative', width: 320, height: 320 }}>
-              {/* Dashed rings */}
-              <div style={{ position: 'absolute', inset: 0, border: '1px dashed #d1d5db', borderRadius: '50%' }} />
-              <div style={{ position: 'absolute', inset: 50, border: '1px dashed #e5e7eb', borderRadius: '50%' }} />
-              
-              {/* Small floating icon containers */}
-              <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 4 }} style={{ position: 'absolute', top: 10, left: 30, background: '#fff', borderRadius: '50%', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.06)' }}>
-                <Users size={24} color="#6b7280" strokeWidth={1.5} />
-              </motion.div>
-              <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 5, delay: 1 }} style={{ position: 'absolute', top: 40, right: -10, background: '#fff', borderRadius: '50%', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.06)' }}>
-                <FileText size={24} color="#6b7280" strokeWidth={1.5} />
-              </motion.div>
-              <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 3.5, delay: 2 }} style={{ position: 'absolute', bottom: -10, left: '50%', transform: 'translateX(-50%)', background: '#fff', borderRadius: '50%', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.06)' }}>
-                <Headphones size={24} color="#6b7280" strokeWidth={1.5} />
-              </motion.div>
-
-              {/* Center ? */}
-              <div style={{ position: 'absolute', inset: 60, background: '#fff', borderRadius: '50%', boxShadow: '0 24px 48px rgba(0,0,0,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: '6rem', fontWeight: 900, color: '#111' }}>?</span>
-              </div>
-
-              {/* Overlapping Chat bubble */}
-              <motion.div 
-                animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 3 }}
-                style={{ position: 'absolute', bottom: 40, right: 20, background: '#111', borderRadius: '32px 32px 32px 8px', padding: '20px', display: 'flex', gap: '6px', boxShadow: '0 16px 32px rgba(0,0,0,0.2)' }}
-              >
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />
-              </motion.div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── BOTTOM SECTION: FAQ Accordion ── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1.5fr',
-          gap: '64px',
-          alignItems: 'start',
-        }} className="faq-bottom-grid">
-
-          {/* Left: FAQs label + CTA + Illustration */}
-          <motion.div
-            initial={{ opacity: 0, x: -16 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <h3 style={{
-              fontSize: '3rem',
-              fontWeight: 900,
-              color: '#111',
-              letterSpacing: '-0.04em',
-              margin: '0 0 12px',
-              lineHeight: 1,
-            }}>FAQs</h3>
-            <p style={{
-              fontSize: '1rem',
-              color: '#6b7280',
-              lineHeight: 1.6,
-              margin: '0 0 32px',
-              maxWidth: 240,
-            }}>
-              Can't find what you're after?<br/>Chat with our stellar team!
-            </p>
-            <a
-              href="/contact"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '14px 28px',
-                background: '#111',
-                color: '#fff',
-                fontSize: '0.9rem',
-                fontWeight: 700,
-                borderRadius: 100,
-                textDecoration: 'none',
-                transition: 'transform 0.2s, background 0.2s',
-              }}
-              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              Chat to our team <span style={{ fontSize: '1.2rem' }}>→</span>
-            </a>
-
-            <LaptopGraphic />
-          </motion.div>
-
-          {/* Right: FAQ Accordion Card */}
-          <motion.div 
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            style={{ 
-              background: '#fff', 
-              borderRadius: '24px', 
-              padding: '32px 40px', 
-              boxShadow: '0 20px 40px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05)',
-              border: '1px solid rgba(0,0,0,0.02)'
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: '#fed7aa',
+              color: '#c2410c',
+              padding: '8px 20px',
+              borderRadius: '9999px',
+              fontWeight: 800,
+              fontSize: '13px',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              marginBottom: '16px',
             }}
           >
-            {faqs.map((faq, index) => (
-              <FaqItem
-                key={index}
-                faq={faq}
-                index={index}
-                isOpen={openIndex === index}
-                onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
-              />
-            ))}
+            <HelpCircle size={16} />
+            <span>Hackathon Help Center</span>
           </motion.div>
-        </div>
-      </div>
 
-      {/* ── DARK WAVE BANNER ── */}
-      <div style={{ position: 'relative', width: '100%', backgroundColor: '#111', marginTop: '120px', overflow: 'hidden' }}>
-        {/* SVG Wave at the top */}
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ position: 'absolute', top: '-1px', left: 0, width: '100%', height: '80px', fill: '#fdfdfd' }}>
-          <path d="M0,64L80,74.7C160,85,320,107,480,101.3C640,96,800,64,960,48C1120,32,1280,32,1360,32L1440,32L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z" />
-        </svg>
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            style={{
+              fontSize: 'clamp(2.5rem, 5.2vw, 4.2rem)',
+              fontWeight: 900,
+              color: '#0f172a',
+              letterSpacing: '-0.03em',
+              lineHeight: 1.1,
+              margin: '0 0 16px',
+            }}
+          >
+            Got Questions? <span style={{ color: '#ff3b69' }}>We've Got Answers!</span>
+          </motion.h1>
 
-        {/* Topographic background lines (optional simple detail) */}
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'repeating-radial-gradient(circle at 100% 100%, transparent 0, transparent 40px, #fff 40px, #fff 41px)' }} />
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            style={{
+              fontSize: 'clamp(1rem, 1.8vw, 1.25rem)',
+              color: '#64748b',
+              maxWidth: '640px',
+              margin: '0 auto',
+              lineHeight: 1.5,
+              fontWeight: 500,
+            }}
+          >
+            Everything you need to know about team formation, eligibility, domains, AI tools, and logistics.
+          </motion.p>
 
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '140px 48px 100px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }} className="banner-flex">
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }} className="banner-left">
-            {/* Headset Icon in dashed circles */}
-            <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <div style={{ position: 'absolute', inset: 0, border: '1px dashed rgba(255,255,255,0.2)', borderRadius: '50%' }} />
-              <div style={{ position: 'absolute', inset: 15, border: '1px dashed rgba(255,255,255,0.2)', borderRadius: '50%' }} />
-              <Headphones size={32} color="#fff" strokeWidth={1.5} />
-            </div>
-
-            <div>
-              <h3 style={{ color: '#fff', fontSize: '2.5rem', fontWeight: 800, margin: '0 0 8px', letterSpacing: '-0.02em' }}>Still have questions?</h3>
-              <p style={{ color: '#9ca3af', fontSize: '1.05rem', margin: 0, lineHeight: 1.6 }}>We're here to help you 24/7.<br/>Let's connect!</p>
-            </div>
+          {/* Hand-drawn doodle */}
+          <div
+            style={{
+              marginTop: '16px',
+              display: 'inline-block',
+              fontFamily: "'Patrick Hand', cursive",
+              fontSize: '19px',
+              color: '#ff3b69',
+              background: '#fff',
+              padding: '6px 20px',
+              borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
+              border: '2px dashed #ff3b69',
+              transform: 'rotate(1deg)',
+            }}
+          >
+            ★ NO SILLY QUESTIONS ON THIS SHIP • ASK AWAY! ★
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }} className="banner-right">
-            <a href="/contact" style={{ background: '#fff', color: '#111', padding: '16px 32px', borderRadius: '100px', fontSize: '1rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', transition: 'transform 0.2s', flexShrink: 0 }}
-               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+          {/* Search Bar */}
+          <div style={{ maxWidth: '580px', margin: '32px auto 24px', position: 'relative' }}>
+            <Search
+              size={20}
+              color="#94a3b8"
+              style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)' }}
+            />
+            <input
+              type="text"
+              placeholder="Search by keywords (e.g., 'teams', 'prizes', 'hardware', 'AI')..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '16px 20px 16px 54px',
+                borderRadius: '9999px',
+                border: '2px solid #e2e8f0',
+                backgroundColor: '#ffffff',
+                fontSize: '15px',
+                fontWeight: 600,
+                color: '#0f172a',
+                outline: 'none',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                transition: 'border-color 0.2s ease',
+              }}
+              onFocus={e => { e.currentTarget.style.borderColor = '#ff3b69'; }}
+              onBlur={e => { e.currentTarget.style.borderColor = '#e2e8f0'; }}
+            />
+          </div>
+
+          {/* Category Filter Chips */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            {[
+              { id: 'all', label: `All Queries (${FAQS.length})` },
+              { id: 'registration', label: 'Squad & Registration' },
+              { id: 'domains', label: 'Tracks & Guidelines' },
+              { id: 'logistics', label: 'Venue & Prizes' },
+            ].map(cat => {
+              const active = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    playCrewmatePopSound();
+                    setActiveCategory(cat.id);
+                  }}
+                  style={{
+                    backgroundColor: active ? '#0284c7' : '#fff',
+                    color: active ? '#fff' : '#0f172a',
+                    border: `2px solid ${active ? '#0284c7' : '#e2e8f0'}`,
+                    padding: '8px 20px',
+                    borderRadius: '9999px',
+                    fontWeight: 800,
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    boxShadow: active ? '0 6px 18px rgba(2, 132, 199, 0.25)' : 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Accordion List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <AnimatePresence>
+            {filtered.map((faq, idx) => {
+              const isOpen = openId === faq.id;
+              return (
+                <motion.div
+                  key={faq.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.3, delay: idx * 0.03 }}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '24px',
+                    border: `2px solid ${isOpen ? '#ff3b69' : '#f1f5f9'}`,
+                    boxShadow: isOpen ? '0 12px 30px rgba(255, 59, 105, 0.1)' : '0 4px 16px rgba(0,0,0,0.03)',
+                    overflow: 'hidden',
+                    transition: 'all 0.25s ease',
+                  }}
+                >
+                  <button
+                    onClick={() => toggleAccordion(faq.id)}
+                    style={{
+                      width: '100%',
+                      padding: '22px 28px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '16px',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '17px',
+                        fontWeight: 800,
+                        color: isOpen ? '#ff3b69' : '#0f172a',
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {faq.question}
+                    </span>
+
+                    <div
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '50%',
+                        backgroundColor: isOpen ? '#ffe4e6' : '#f8fafc',
+                        color: isOpen ? '#ff3b69' : '#64748b',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {isOpen ? <Minus size={18} /> : <Plus size={18} />}
+                    </div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      >
+                        <div
+                          style={{
+                            padding: '0 28px 24px',
+                            fontSize: '15px',
+                            color: '#475569',
+                            lineHeight: 1.6,
+                            fontWeight: 500,
+                            borderTop: '1px solid #f8fafc',
+                            paddingTop: '16px',
+                          }}
+                        >
+                          {faq.answer}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+
+          {filtered.length === 0 && (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '60px 24px',
+                backgroundColor: '#fff',
+                borderRadius: '24px',
+                border: '2px dashed #cbd5e1',
+              }}
             >
-              Chat with us <span style={{ fontSize: '1.4rem' }}>→</span>
-            </a>
-            
-            {/* Paper Plane Graphic */}
-            <div style={{ position: 'relative', width: '120px', height: '60px' }} className="hidden md:block">
-              <svg width="150" height="60" style={{ position: 'absolute', right: '30px', top: '10px' }}>
-                <path d="M150 10 Q 75 60 0 10" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeDasharray="4 4" />
-              </svg>
-              <Send size={36} color="#fff" strokeWidth={1.5} style={{ transform: 'rotate(45deg)', position: 'absolute', right: -10, top: -10 }} />
+              <p style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: '0 0 8px' }}>
+                No matching questions found!
+              </p>
+              <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 16px' }}>
+                Try searching with different terms or check with our team directly.
+              </p>
+              <button
+                onClick={() => { setSearchQuery(''); setActiveCategory('all'); }}
+                style={{
+                  backgroundColor: '#ff3b69',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '9999px',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                }}
+              >
+                Reset Search Filters
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Still Need Help CTA Card */}
+        <div
+          style={{
+            marginTop: '60px',
+            backgroundColor: '#ffffff',
+            borderRadius: '28px',
+            border: '2px solid #fed7aa',
+            padding: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '24px',
+            flexWrap: 'wrap',
+            boxShadow: '0 12px 30px rgba(251, 146, 60, 0.08)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ width: '60px', height: '70px', flexShrink: 0 }}>
+              <AmongUsCrewmate color="#f59e0b" hat="lightbulb" size={60} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px' }}>
+                Still have unanswered questions?
+              </h3>
+              <p style={{ fontSize: '14px', color: '#64748b', margin: 0, fontWeight: 500 }}>
+                Our student coordinators and faculty team are happy to assist you 24/7.
+              </p>
             </div>
           </div>
+
+          <a
+            href="/contact"
+            style={{
+              backgroundColor: '#0284c7',
+              color: '#ffffff',
+              padding: '14px 28px',
+              borderRadius: '9999px',
+              fontSize: '15px',
+              fontWeight: 800,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 8px 24px rgba(2, 132, 199, 0.3)',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 12px 30px rgba(2, 132, 199, 0.45)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(2, 132, 199, 0.3)';
+            }}
+          >
+            <span>Contact Flight Deck</span>
+            <ArrowRight size={18} />
+          </a>
         </div>
       </div>
-
-      {/* <PPTSection /> */}
-
-      <style>{`
-        @media (max-width: 900px) {
-          .faq-top-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
-          .faq-bottom-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
-          .banner-flex { flex-direction: column; align-items: flex-start !important; gap: 40px; }
-        }
-        @media (max-width: 640px) {
-          #faq > div { padding-left: 24px !important; padding-right: 24px !important; }
-          .banner-left { flex-direction: column; align-items: flex-start !important; gap: 24px !important; }
-        }
-      `}</style>
-    </section>
+    </div>
   );
 }

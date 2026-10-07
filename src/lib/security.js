@@ -1,5 +1,5 @@
 /**
- * Security Utilities for SRCAS Hackathon 3.0
+ * Security Utilities for HAXLR8 3.0
  * - Input sanitization
  * - Rate limiting with progressive delay
  * - Generic error messages

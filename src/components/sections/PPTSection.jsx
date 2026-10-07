@@ -15,7 +15,7 @@ export default function PPTSection() {
     }}>
 
       {/* ── TOP WAVE ── */}
-      <div style={{ background: "#ffffff", overflow: "hidden", lineHeight: 0, marginBottom: -2 }}>
+      <div style={{ background: "transparent", overflow: "hidden", lineHeight: 0, marginBottom: -2 }}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1000 100"
@@ -24,7 +24,7 @@ export default function PPTSection() {
         >
           <path
             d="M1000 0H0v52C62.5 28 125 4 250 4c250 0 250 96 500 96 125 0 187.5-24 250-48V0Z"
-            fill="#000"
+            fill="#070a13"
           />
         </svg>
       </div>
@@ -90,7 +90,7 @@ export default function PPTSection() {
             }}
           >
             Download Our{" "}
-            <span style={{ WebkitTextStroke: "2.5px rgba(255,255,255,0.85)", color: "transparent" }}>
+            <span style={{ WebkitTextStroke: "2.5px #38fedc", color: "transparent" }}>
               Official PPT
             </span>{" "}
             Template
@@ -104,13 +104,13 @@ export default function PPTSection() {
             transition={{ duration: 0.6, delay: 0.1 }}
             style={{
               fontSize: "clamp(0.95rem,1.6vw,1.1rem)",
-              color: "rgba(255,255,255,0.5)",
+              color: "#94a3b8",
               lineHeight: 1.7, maxWidth: 560,
               margin: "0 0 32px",
             }}
           >
-            All participants must use this official PPT template for their submissions.
-            This ensures uniformity and fairness in presentation across all teams.
+            All participants must use this official PPT template for their abstract submissions.
+            Ensures uniformity and fair evaluation by our judges and technical panel.
           </motion.p>
 
           {/* Download button */}
@@ -122,19 +122,20 @@ export default function PPTSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            whileHover={{ scale: 1.04, y: -2 }}
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.97 }}
             style={{
               display: "inline-flex", alignItems: "center", gap: 12,
               padding: "16px 42px",
-              background: "#fff", color: "#111",
-              fontSize: "0.88rem", fontWeight: 800,
-              letterSpacing: "0.06em", textTransform: "uppercase",
+              background: "linear-gradient(135deg, #0284c7, #38fedc)", color: "#070a13",
+              fontSize: "0.92rem", fontWeight: 900,
+              letterSpacing: "0.08em", textTransform: "uppercase",
               borderRadius: 999, textDecoration: "none",
-              transition: "box-shadow 0.3s ease",
+              boxShadow: "0 0 30px rgba(56, 254, 220, 0.45)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
             }}
-            onMouseEnter={e => e.currentTarget.style.boxShadow = "0 8px 32px rgba(255,255,255,0.18)"}
-            onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
+            onMouseEnter={e => e.currentTarget.style.boxShadow = "0 0 45px rgba(56, 254, 220, 0.7)"}
+            onMouseLeave={e => e.currentTarget.style.boxShadow = "0 0 30px rgba(56, 254, 220, 0.45)"}
           >
             <svg
               width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -145,7 +146,7 @@ export default function PPTSection() {
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            Download PPT
+            Download PPT Template
           </motion.a>
 
           {/* Fine print */}
@@ -166,7 +167,7 @@ export default function PPTSection() {
       </section>
 
       {/* ── BOTTOM WAVE ── */}
-      <div style={{ background: "#ffffff", overflow: "hidden", lineHeight: 0, marginTop: -2 }}>
+      <div style={{ background: "transparent", overflow: "hidden", lineHeight: 0, marginTop: -2 }}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1000 100"
@@ -175,7 +176,7 @@ export default function PPTSection() {
         >
           <path
             d="M1000 0H0v52C62.5 28 125 4 250 4c250 0 250 96 500 96 125 0 187.5-24 250-48V0Z"
-            fill="#000"
+            fill="#070a13"
           />
         </svg>
       </div>

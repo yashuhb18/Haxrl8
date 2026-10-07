@@ -42,32 +42,32 @@ const IconTrophy = () => (
 ───────────────────────────────────────── */
 const EVENTS = [
   {
-    index: 0, num: "01", day: "07", month: "JUN", year: "2026",
-    title: "Registration Opens",
-    desc: "Portal goes live. Assemble your team and lock in your spot before it fills up.",
-    tag: "Opens", tagColor: "#111", tagBg: "#f5f5f5", tagBorder: "#e0e0e0",
+    index: 0, num: "01", day: "08", month: "OCT", year: "2026",
+    title: "Shuttle Boarding (Registration Opens)",
+    desc: "Portal goes live. Assemble your 3–4 member undergraduate crew (inter-college allowed) and secure your spot on the flight manifest.",
+    tag: "Opens", tagColor: "#38fedc", tagBg: "rgba(56,254,220,0.1)", tagBorder: "rgba(56,254,220,0.3)",
     Icon: IconRegisterOpen,
   },
   {
-    index: 1, num: "02", day: "25", month: "JUL", year: "2026",
-    title: "Idea (PPT) Submission",
-    desc: "Final date to submit your initial idea and presentation deck.",
-    tag: "Deadline", tagColor: "#111", tagBg: "#f5f5f5", tagBorder: "#e0e0e0",
+    index: 1, num: "02", day: "28", month: "OCT", year: "2026",
+    title: "Oxygen Clock (Idea Papers Lock)",
+    desc: "Final deadline to submit your idea paper in Hydroponics (Agriculture), Navigation (Smart City), or MedBay (Healthcare).",
+    tag: "Deadline", tagColor: "#ef4444", tagBg: "rgba(239,68,68,0.1)", tagBorder: "rgba(239,68,68,0.3)",
     Icon: IconDeadline,
   },
   {
-    index: 2, num: "03", day: "07", month: "AUG", year: "2026",
-    title: "Shortlisted Teams Announced",
-    desc: "Selected teams notified and briefed on problem statements for the final round.",
-    tag: "Announcement", tagColor: "#111", tagBg: "#f5f5f5", tagBorder: "#e0e0e0",
+    index: 2, num: "03", day: "02", month: "NOV", year: "2026",
+    title: "Crew Manifest Confirmed (Shortlist)",
+    desc: "Expert panel evaluation concludes; shortlisted crew squads announced for the offline hackathon stage.",
+    tag: "Announcement", tagColor: "#facc15", tagBg: "rgba(250,204,21,0.1)", tagBorder: "rgba(250,204,21,0.3)",
     Icon: IconAnnounce,
   },
   {
-    index: 3, num: "04", day: "14", month: "AUG", year: "2026",
-    title: "Grand Final",
-    desc: "24 hours of intense hacking, live judging by industry experts, and the grand award ceremony.",
-    tag: "Main Event", tagColor: "#fff",
-    tagBg: "rgba(255,255,255,0.12)", tagBorder: "rgba(255,255,255,0.22)",
+    index: 3, num: "04", day: "06", month: "NOV", year: "2026",
+    title: "Docking at Base Station (Grand Finale)",
+    desc: "24-hour intense prototyping at Maharaja Institute of Technology Mysore, jury evaluation, and ₹30,000 bounty ceremony.",
+    tag: "Main Event (Nov 6–7)", tagColor: "#38fedc",
+    tagBg: "rgba(56,254,220,0.15)", tagBorder: "rgba(56,254,220,0.4)",
     Icon: IconTrophy, isFinal: true,
   },
 ];
@@ -110,54 +110,42 @@ function DesktopStickyCard({ event, scrollYProgress }) {
     >
       <div style={{
         display: "flex", flexDirection: "column",
-        background: isFinal ? "#0a0a0a" : "#fff",
-        border: isFinal
-          ? "1px solid rgba(255,255,255,0.1)"
-          : `1px solid ${hovered ? "#111" : "#e8e8e8"}`,
+        background: "rgba(15, 23, 42, 0.88)",
+        backdropFilter: "blur(14px)",
+        border: hovered
+          ? "1.5px solid #38fedc"
+          : isFinal
+            ? "1.5px solid rgba(56, 254, 220, 0.4)"
+            : "1.5px solid rgba(255, 255, 255, 0.12)",
         borderRadius: 22,
         padding: "24px 20px 20px",
         position: "relative", overflow: "hidden", cursor: "default",
         height: "100%",
         boxShadow: hovered
-          ? isFinal
-            ? "0 28px 70px rgba(0,0,0,0.45), 0 0 40px rgba(0,120,212,0.12)"
-            : "0 16px 50px rgba(0,0,0,0.1)"
-          : isFinal
-            ? "0 12px 40px rgba(0,0,0,0.25)"
-            : "0 2px 12px rgba(0,0,0,0.04)",
+          ? "0 28px 70px rgba(0,0,0,0.7), 0 0 30px rgba(56,254,220,0.25)"
+          : "0 12px 36px rgba(0,0,0,0.5)",
         transform: hovered ? "translateY(-5px)" : "translateY(0)",
         transition: "border-color 0.3s, box-shadow 0.35s, transform 0.35s cubic-bezier(0.22,1,0.36,1)",
       }}>
         <span style={{
           position: "absolute", bottom: -16, right: -4,
           fontSize: "8rem", fontWeight: 900, letterSpacing: "-0.08em", lineHeight: 1,
-          color: isFinal ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+          color: "rgba(56, 254, 220, 0.05)",
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           userSelect: "none", pointerEvents: "none",
         }}>{event.num}</span>
 
-        {isFinal && (
-          <div style={{
-            position: "absolute", top: 0, left: "10%", right: "10%", height: 1,
-            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)",
-          }} />
-        )}
-        {isFinal && (
-          <div style={{
-            position: "absolute", inset: 0, borderRadius: 22, pointerEvents: "none",
-            background: hovered
-              ? "radial-gradient(400px at 30% 40%, rgba(0,120,212,0.1), transparent 70%)"
-              : "transparent",
-            transition: "background 0.4s",
-          }} />
-        )}
+        <div style={{
+          position: "absolute", top: 0, left: "10%", right: "10%", height: 1,
+          background: "linear-gradient(90deg, transparent, rgba(56,254,220,0.4), transparent)",
+        }} />
 
         <div style={{
           width: 48, height: 48, borderRadius: 14,
-          background: isFinal ? "rgba(255,255,255,0.08)" : "#f5f5f5",
-          border: isFinal ? "1px solid rgba(255,255,255,0.12)" : "1px solid #eaeaea",
+          background: "rgba(56, 254, 220, 0.1)",
+          border: "1px solid rgba(56, 254, 220, 0.3)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          marginBottom: 16, color: isFinal ? "#fff" : "#111", flexShrink: 0,
+          marginBottom: 16, color: "#38fedc", flexShrink: 0,
           transition: "transform 0.3s",
           transform: hovered ? "scale(1.1)" : "scale(1)",
         }}>
@@ -168,16 +156,16 @@ function DesktopStickyCard({ event, scrollYProgress }) {
           <span style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             fontSize: "3rem", fontWeight: 900, letterSpacing: "-0.06em",
-            lineHeight: 0.9, color: isFinal ? "#fff" : "#111",
+            lineHeight: 0.9, color: "#f8fafc",
           }}>{event.day}</span>
           <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <span style={{
-              fontFamily: "monospace", fontSize: "0.7rem", fontWeight: 700,
-              letterSpacing: "0.14em", color: "#0078D4", textTransform: "uppercase",
+              fontFamily: "monospace", fontSize: "0.7rem", fontWeight: 800,
+              letterSpacing: "0.14em", color: "#38fedc", textTransform: "uppercase",
             }}>{event.month}</span>
             <span style={{
               fontFamily: "monospace", fontSize: "0.58rem", letterSpacing: "0.08em",
-              color: isFinal ? "rgba(255,255,255,0.28)" : "#c0c0c0",
+              color: "#64748b",
             }}>{event.year}</span>
           </div>
         </div>
@@ -185,15 +173,15 @@ function DesktopStickyCard({ event, scrollYProgress }) {
         <h3 style={{
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontSize: "1.05rem", fontWeight: 800, letterSpacing: "-0.02em",
-          lineHeight: 1.25, color: isFinal ? "#fff" : "#111",
+          lineHeight: 1.25, color: "#f8fafc",
           margin: "0 0 10px",
         }}>{event.title}</h3>
 
-        <div style={{ height: 1, background: isFinal ? "rgba(255,255,255,0.07)" : "#f0f0f0", marginBottom: 10 }} />
+        <div style={{ height: 1, background: "rgba(255,255,255,0.1)", marginBottom: 10 }} />
 
         <p style={{
           fontSize: "0.82rem", lineHeight: 1.5,
-          color: isFinal ? "rgba(255,255,255,0.42)" : "#888",
+          color: "#94a3b8",
           margin: 0, flex: 1,
         }}>{event.desc}</p>
 
@@ -204,7 +192,7 @@ function DesktopStickyCard({ event, scrollYProgress }) {
           background: event.tagBg, border: `1px solid ${event.tagBorder}`,
         }}>
           <span style={{
-            fontSize: "0.58rem", fontWeight: 700, letterSpacing: "0.16em",
+            fontSize: "0.58rem", fontWeight: 800, letterSpacing: "0.16em",
             color: event.tagColor, textTransform: "uppercase",
           }}>{event.tag}</span>
         </div>
@@ -236,26 +224,23 @@ function MobileStickyCard({ event }) {
   return (
     <motion.div ref={ref} style={{ opacity, x }}>
       <div style={{
-        background: isFinal ? "#0a0a0a" : "#fff",
-        border: isFinal ? "1px solid rgba(255,255,255,0.1)" : "1px solid #e8e8e8",
+        background: "rgba(15, 23, 42, 0.92)",
+        backdropFilter: "blur(14px)",
+        border: isFinal ? "1.5px solid rgba(56, 254, 220, 0.4)" : "1.5px solid rgba(255, 255, 255, 0.12)",
         borderRadius: 18, padding: "18px 16px",
         position: "relative", overflow: "hidden",
-        boxShadow: isFinal
-          ? "0 12px 40px rgba(0,0,0,0.25)"
-          : "0 2px 12px rgba(0,0,0,0.05)",
+        boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
       }}>
-        {isFinal && (
-          <div style={{
-            position: "absolute", top: 0, left: "10%", right: "10%", height: 1,
-            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)",
-          }} />
-        )}
+        <div style={{
+          position: "absolute", top: 0, left: "10%", right: "10%", height: 1,
+          background: "linear-gradient(90deg, transparent, rgba(56,254,220,0.4), transparent)",
+        }} />
 
         {/* Watermark number */}
         <span style={{
           position: "absolute", bottom: -10, right: 2,
           fontSize: "5rem", fontWeight: 900, letterSpacing: "-0.08em", lineHeight: 1,
-          color: isFinal ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+          color: "rgba(56, 254, 220, 0.05)",
           userSelect: "none", pointerEvents: "none",
         }}>{event.num}</span>
 
@@ -263,10 +248,10 @@ function MobileStickyCard({ event }) {
           {/* Icon */}
           <div style={{
             width: 38, height: 38, borderRadius: 11, flexShrink: 0,
-            background: isFinal ? "rgba(255,255,255,0.08)" : "#f5f5f5",
-            border: isFinal ? "1px solid rgba(255,255,255,0.12)" : "1px solid #eaeaea",
+            background: "rgba(56, 254, 220, 0.1)",
+            border: "1px solid rgba(56, 254, 220, 0.3)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: isFinal ? "#fff" : "#111",
+            color: "#38fedc",
           }}><Icon /></div>
 
           {/* Date */}
@@ -274,16 +259,16 @@ function MobileStickyCard({ event }) {
             <span style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: "2.2rem", fontWeight: 900, letterSpacing: "-0.05em",
-              lineHeight: 0.9, color: isFinal ? "#fff" : "#111",
+              lineHeight: 0.9, color: "#f8fafc",
             }}>{event.day}</span>
             <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <span style={{
-                fontFamily: "monospace", fontSize: "0.62rem", fontWeight: 700,
-                letterSpacing: "0.12em", color: "#0078D4",
+                fontFamily: "monospace", fontSize: "0.62rem", fontWeight: 800,
+                letterSpacing: "0.12em", color: "#38fedc",
               }}>{event.month}</span>
               <span style={{
                 fontFamily: "monospace", fontSize: "0.52rem",
-                color: isFinal ? "rgba(255,255,255,0.28)" : "#c0c0c0",
+                color: "#64748b",
               }}>{event.year}</span>
             </div>
           </div>
@@ -297,7 +282,7 @@ function MobileStickyCard({ event }) {
             flexShrink: 0,
           }}>
             <span style={{
-              fontSize: "0.52rem", fontWeight: 700, letterSpacing: "0.14em",
+              fontSize: "0.52rem", fontWeight: 800, letterSpacing: "0.14em",
               color: event.tagColor, textTransform: "uppercase",
             }}>{event.tag}</span>
           </div>
@@ -306,12 +291,12 @@ function MobileStickyCard({ event }) {
         <h3 style={{
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontSize: "0.92rem", fontWeight: 800, letterSpacing: "-0.02em",
-          color: isFinal ? "#fff" : "#111", margin: "0 0 6px",
+          color: "#f8fafc", margin: "0 0 6px",
         }}>{event.title}</h3>
 
         <p style={{
           fontSize: "0.78rem", lineHeight: 1.6,
-          color: isFinal ? "rgba(255,255,255,0.42)" : "#888", margin: 0,
+          color: "#94a3b8", margin: 0,
         }}>{event.desc}</p>
       </div>
     </motion.div>
@@ -337,13 +322,11 @@ function BeamDot({ event, scrollYProgress, vertical }) {
       scale,
       width: size, height: size,
       borderRadius: "50%",
-      background: isFinal ? "#0078D4" : "#111",
-      border: isFinal ? "3px solid #0078D4" : "3px solid #111",
+      background: "#070a13",
+      border: isFinal ? "3px solid #38fedc" : "3px solid #38fedc",
       display: "flex", alignItems: "center", justifyContent: "center",
-      color: "#fff",
-      boxShadow: isFinal
-        ? "0 0 0 5px rgba(0,120,212,0.15), 0 0 20px rgba(0,120,212,0.28)"
-        : "0 0 0 4px rgba(0,0,0,0.07)",
+      color: "#38fedc",
+      boxShadow: "0 0 16px rgba(56, 254, 220, 0.7), inset 0 0 8px rgba(56, 254, 220, 0.3)",
       position: "relative", zIndex: 10, flexShrink: 0,
     }}>
       <event.Icon />
@@ -363,7 +346,9 @@ function CTABanner({ mobile }) {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.95, ease: EASE }}
       style={{
-        background: "#0a0a0a", borderRadius: mobile ? 20 : 24,
+        background: "rgba(15, 23, 42, 0.95)",
+        backdropFilter: "blur(16px)",
+        borderRadius: mobile ? 20 : 24,
         padding: mobile ? "28px 24px" : "40px 48px",
         display: "flex",
         flexDirection: mobile ? "column" : "row",
@@ -371,16 +356,18 @@ function CTABanner({ mobile }) {
         justifyContent: "space-between",
         gap: 20, flexWrap: "wrap",
         position: "relative", overflow: "hidden",
+        border: "1.5px solid rgba(56, 254, 220, 0.25)",
+        boxShadow: "0 20px 50px rgba(0,0,0,0.6)",
       }}
     >
       <div aria-hidden style={{
         position: "absolute", top: 0, left: "8%", right: "8%", height: 1,
-        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent)",
+        background: "linear-gradient(90deg, transparent, rgba(56,254,220,0.5), transparent)",
       }} />
       <div aria-hidden style={{
         position: "absolute", left: -80, top: -80,
         width: 320, height: 320, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(0,120,212,0.1) 0%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(56,254,220,0.12) 0%, transparent 70%)",
         pointerEvents: "none",
       }} />
 
@@ -388,27 +375,28 @@ function CTABanner({ mobile }) {
         <div style={{
           display: "inline-flex", alignItems: "center", gap: 6,
           padding: "4px 12px", borderRadius: 999,
-          background: "rgba(0,120,212,0.15)",
-          border: "1px solid rgba(0,120,212,0.3)", marginBottom: 12,
+          background: "rgba(56,254,220,0.15)",
+          border: "1px solid rgba(56,254,220,0.3)", marginBottom: 12,
         }}>
           <div style={{
-            width: 5, height: 5, borderRadius: "50%", background: "#0078D4",
+            width: 6, height: 6, borderRadius: "50%", background: "#38fedc",
             animation: "pulse-dot 1.5s ease-in-out infinite",
+            boxShadow: "0 0 8px #38fedc",
           }} />
           <span style={{
-            fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.18em",
-            color: "#0078D4", textTransform: "uppercase",
-          }}>Registrations Open</span>
+            fontSize: "0.62rem", fontWeight: 800, letterSpacing: "0.18em",
+            color: "#38fedc", textTransform: "uppercase",
+          }}>CREW REGISTRATION OPEN</span>
         </div>
         <p style={{
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontSize: mobile ? "1rem" : "clamp(1.05rem,2vw,1.35rem)",
-          fontWeight: 800, color: "#fff", margin: 0,
+          fontWeight: 800, color: "#f8fafc", margin: 0,
           letterSpacing: "-0.02em", lineHeight: 1.3,
         }}>
           Don't wait — spots fill fast.<br />
-          <span style={{ color: "rgba(255,255,255,0.42)", fontWeight: 500, fontSize: "0.88em" }}>
-            Registration closes July 25, 2026.
+          <span style={{ color: "#38fedc", fontWeight: 600, fontSize: "0.88em" }}>
+            Registration closes October 28, 2026.
           </span>
         </p>
       </div>
@@ -418,24 +406,25 @@ function CTABanner({ mobile }) {
         style={{
           display: "inline-flex", alignItems: "center", gap: 10,
           padding: mobile ? "12px 22px" : "15px 30px",
-          background: "#fff", color: "#111",
+          background: "linear-gradient(135deg, #38fedc 0%, #2dd4bf 100%)", color: "#070a13",
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontWeight: 800, fontSize: mobile ? "0.82rem" : "0.88rem",
-          letterSpacing: "-0.01em", borderRadius: 13,
+          letterSpacing: "-0.01em", borderRadius: 12,
           textDecoration: "none", flexShrink: 0,
+          boxShadow: "0 8px 25px rgba(56,254,220,0.35)",
           transition: "transform 0.3s, box-shadow 0.3s",
         }}
         onMouseEnter={e => {
           e.currentTarget.style.transform = "translateY(-3px)";
-          e.currentTarget.style.boxShadow = "0 10px 28px rgba(0,0,0,0.16)";
+          e.currentTarget.style.boxShadow = "0 12px 35px rgba(56,254,220,0.5)";
         }}
         onMouseLeave={e => {
           e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "none";
+          e.currentTarget.style.boxShadow = "0 8px 25px rgba(56,254,220,0.35)";
         }}
       >
         View Shortlisted Teams
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#070a13" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>
       </a>
@@ -489,13 +478,13 @@ export default function TimelineSection() {
           {/* Fine grid */}
           <svg aria-hidden style={{
             position: "absolute", inset: 0, width: "100%", height: "100%",
-            opacity: 0.03, pointerEvents: "none",
+            opacity: 0.04, pointerEvents: "none",
           }}>
             {Array.from({ length: 14 }).map((_, i) => (
-              <line key={`v${i}`} x1={`${(i+1)*7.14}%`} y1="0" x2={`${(i+1)*7.14}%`} y2="100%" stroke="#000" strokeWidth="1"/>
+              <line key={`v${i}`} x1={`${(i+1)*7.14}%`} y1="0" x2={`${(i+1)*7.14}%`} y2="100%" stroke="#38fedc" strokeWidth="1"/>
             ))}
             {Array.from({ length: 10 }).map((_, i) => (
-              <line key={`h${i}`} x1="0" y1={`${(i+1)*10}%`} x2="100%" y2={`${(i+1)*10}%`} stroke="#000" strokeWidth="1"/>
+              <line key={`h${i}`} x1="0" y1={`${(i+1)*10}%`} x2="100%" y2={`${(i+1)*10}%`} stroke="#38fedc" strokeWidth="1"/>
             ))}
           </svg>
 
@@ -504,7 +493,7 @@ export default function TimelineSection() {
             position: "absolute", top: "50%", left: "50%",
             transform: "translate(-50%,-50%)",
             fontSize: "clamp(12rem,28vw,24rem)", fontWeight: 900,
-            letterSpacing: "-0.08em", color: "rgba(0,0,0,0.022)",
+            letterSpacing: "-0.08em", color: "rgba(56,254,220,0.03)",
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             userSelect: "none", pointerEvents: "none",
             whiteSpace: "nowrap", lineHeight: 1,
@@ -532,27 +521,24 @@ export default function TimelineSection() {
             >
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                  <div style={{ width: 28, height: 1, background: "#111" }} />
+                  <div style={{ width: 28, height: 2, background: "#38fedc", boxShadow: "0 0 10px rgba(56,254,220,0.8)" }} />
                   <p style={{
-                    fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.22em",
-                    color: "#111", textTransform: "uppercase", margin: 0,
-                  }}>Event Timeline</p>
+                    fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.22em",
+                    color: "#38fedc", textTransform: "uppercase", margin: 0,
+                  }}>MISSION TRAJECTORY &amp; FLIGHT LOG</p>
                 </div>
                 <h2 style={{
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontSize: "clamp(2.6rem,5vw,4.4rem)", fontWeight: 900,
-                  lineHeight: 1.0, letterSpacing: "-0.045em", color: "#111", margin: 0,
+                  lineHeight: 1.0, letterSpacing: "-0.045em", color: "#f8fafc", margin: 0,
                 }}>
                   Mark your{" "}
-                  <span style={{ WebkitTextStroke: "2.5px #111", color: "transparent" }}>
+                  <span style={{ WebkitTextStroke: "2px #38fedc", color: "transparent" }}>
                     calendar.
                   </span>
                 </h2>
               </div>
 
-
-
-              
             </motion.div>
 
             {/* Horizontal beam row */}
@@ -560,12 +546,13 @@ export default function TimelineSection() {
               <div style={{
                 position: "absolute", top: "50%", left: 0, width: "100%", height: 3,
                 transform: "translateY(-50%)",
-                background: "#e8e8e8", borderRadius: 999, zIndex: 0,
+                background: "rgba(255,255,255,0.12)", borderRadius: 999, zIndex: 0,
               }} />
               <motion.div style={{
                 position: "absolute", top: "50%", left: 0, height: 3,
                 transform: "translateY(-50%)",
-                background: "linear-gradient(90deg, #0078D4 0%, #111 100%)",
+                background: "linear-gradient(90deg, #38fedc 0%, #2dd4bf 100%)",
+                boxShadow: "0 0 14px rgba(56,254,220,0.8)",
                 borderRadius: 999, zIndex: 1,
                 width: beamWidth,
               }} />
@@ -707,7 +694,7 @@ export default function TimelineSection() {
 
       {/* Mobile CTA — outside sticky, normal flow */}
       <div className="tl-mobile-cta" style={{
-        backgroundColor: "#fff", padding: "0 1.25rem 72px",
+        backgroundColor: "#070a13", padding: "0 1.25rem 72px",
         fontFamily: "'Plus Jakarta Sans', sans-serif",
       }}>
         <CTABanner mobile={true} />
@@ -724,7 +711,7 @@ export default function TimelineSection() {
           display: block;
           height: 300vh;
           position: relative;
-          background: #fff;
+          background: #070a13;
           font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .tl-sticky {
@@ -734,7 +721,7 @@ export default function TimelineSection() {
           overflow: hidden;
           display: flex;
           align-items: center;
-          background: #fff;
+          background: #070a13;
         }
         .tl-desktop-cta { display: block; }
 
@@ -757,7 +744,7 @@ export default function TimelineSection() {
           .tl-mobile-outer {
             display: block;
             position: relative;
-            background: #fff;
+            background: #070a13;
             padding: 4rem 0 2rem;
             font-family: 'Plus Jakarta Sans', sans-serif;
           }
@@ -765,7 +752,7 @@ export default function TimelineSection() {
             position: relative;
             display: flex;
             align-items: center;
-            background: #fff;
+            background: #070a13;
           }
           .tl-mobile-cta { display: block; }
         }

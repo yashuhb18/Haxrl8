@@ -267,7 +267,7 @@ export default function AdminEvaluateSubmission() {
                 
                 <div style={{ display:'flex', gap:32, marginTop:24 }}>
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:13, fontWeight:600, color:S.t1, marginBottom:12 }}>SDG's Addressed</div>
+                    <div style={{ fontSize:13, fontWeight:600, color:S.t1, marginBottom:12 }}>Domain / Track Addressed</div>
                     <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
                       {submission?.sdg_goal ? submission.sdg_goal.split(',').map((sdg, idx) => {
                         const match = sdg.match(/SDG (\d+)\s*-\s*(.*)/i);

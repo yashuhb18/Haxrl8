@@ -1,8 +1,8 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { useLocation, BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
+import PlayfulNavbar from './components/layout/PlayfulNavbar';
+import PlayfulFooter from './components/layout/PlayfulFooter';
 import EntryVideoPopup from './components/ui/EntryVideoPopup';
 
 // Pages
@@ -73,19 +73,19 @@ function ScrollToTopButton() {
           exit={{ opacity: 0, scale: 0.7, y: 16 }}
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          title="Back to top"
+          title="Back to Top"
           style={{
             position: 'fixed', bottom: 32, right: 32,
-            width: 44, height: 44, borderRadius: '50%',
-            background: '#111', color: '#fff', border: 'none',
+            width: 48, height: 48, borderRadius: '50%',
+            background: '#ffffff', color: '#ff3b69', border: '2.5px solid #ff3b69',
             cursor: 'pointer', display: 'flex',
             alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 6px 24px rgba(0,0,0,0.18)', zIndex: 900,
+            boxShadow: '0 8px 24px rgba(255, 59, 105, 0.25)', zIndex: 900,
           }}
-          onMouseEnter={e => e.currentTarget.style.background = '#333'}
-          onMouseLeave={e => e.currentTarget.style.background = '#111'}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(255, 59, 105, 0.4)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(255, 59, 105, 0.25)'; }}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 19V5M5 12l7-7 7 7" />
           </svg>
         </motion.button>
@@ -98,12 +98,19 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}>
+      <Suspense fallback={
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fffaf3', color: '#0f172a', gap: 16, fontFamily: "'Fredoka', sans-serif" }}>
+          <div style={{ width: 44, height: 44, border: '4px solid #fecaca', borderTopColor: '#ff3b69', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: '0.04em', color: '#ff3b69' }}>LAUNCHING HAXLR8 3.0...</span>
+        </div>
+      }>
         <Routes>
-          {/* Direct redirects to shortlisted page */}
-          <Route path="/register" element={<Navigate to="/shortlisted" replace />} />
-          <Route path="/login" element={<Navigate to="/shortlisted" replace />} />
-          <Route path="/dashboard" element={<Navigate to="/shortlisted" replace />} />
+          {/* Auth page — standalone, no Navbar/Footer */}
+          <Route path="/register" element={<AuthPage />} />
+          <Route path="/login" element={<AuthPage />} />
+
+          {/* Dashboard — standalone, no Navbar/Footer */}
+          <Route path="/dashboard" element={<DashboardPage />} />
 
           {/* Admin Dashboard */}
           <Route path="/udview" element={<AdminLayout />}>
@@ -123,7 +130,7 @@ function App() {
             <div className="app" style={{ minHeight: '100vh' }}>
               {/* <EntryVideoPopup /> */}
               <ScrollToTopButton />
-              <Navbar />
+              <PlayfulNavbar />
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/prizes" element={<PrizesPage />} />
@@ -138,7 +145,7 @@ function App() {
                 <Route path="/shortlisted" element={<ShortlistedPage />} />
                 <Route path="/winners" element={<WinnersPage />} />
               </Routes>
-              <Footer />
+              <PlayfulFooter />
             </div>
           } />
         </Routes>

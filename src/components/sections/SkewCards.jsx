@@ -5,25 +5,25 @@ import SpoilSafeImg from '../../assets/skewcards/SpoilSafe.png';
 
 const cards = [
   {
-    title: 'CopyFlag',
-    desc: 'CopyFlag is addressing a growing challenge in the generative AI era, where original work can be copied, modified, and redistributed at scale. The startup has built a platform that uses multimodal vision models to detect both direct copies and AI-modified designs across the internet. Combined with vector search through Azure AI Search, it identifies infringements at scale and automatically initiates takedowns, making intellectual property protection accessible to the creators who need it most.',
+    title: 'Hydroponics (Agriculture)',
+    desc: 'Power life support, smart farming, and food supply chains with AI and IoT. Build smart crop health monitoring, yield prediction, precision irrigation, and real-time sensor networks to prevent spoilage.',
+    gradientFrom: '#4dff03',
+    gradientTo: '#00d0ff',
+    img: SpoilSafeImg,
+  },
+  {
+    title: 'Navigation (Smart City)',
+    desc: 'Engineer solutions for starship and urban grids. Tackle challenges in intelligent traffic routing, automated waste management, energy-efficient public infrastructure, and decentralized civic services.',
     gradientFrom: '#ffbc00',
     gradientTo: '#ff0058',
     img: copyflagImg,
   },
   {
-    title: 'Revora Health',
-    desc: 'Revora Health is changing how recovery is experienced beyond the clinic. The startup has built a solution that combines computer vision with multimodal AI to deliver real-time movement analysis and personalized guidance. Built on Azure AI, it enables continuous feedback and support, helping patients recover with greater confidence while extending care beyond scheduled sessions.',
+    title: 'MedBay (Healthcare)',
+    desc: 'Transform patient care with predictive analytics, computer vision, and IoT telemetry. Build low-cost diagnostic screening, rural clinical assistance tools, telemedicine networks, and rehabilitation support.',
     gradientFrom: '#03a9f4',
     gradientTo: '#ff0058',
     img: revoraImg,
-  },
-  {
-    title: 'SpoilSafe',
-    desc: 'SpoilSafe brings real-time visibility to food freshness across the cold chain. The startup has built a system that uses low-cost sensors to detect gases like ethylene and ammonia, paired with machine learning models on Azure to predict spoilage in real time. This shift allows teams to move from reactive monitoring to proactive decision-making, with clear insight into what is at risk and what action to take.',
-    gradientFrom: '#4dff03',
-    gradientTo: '#00d0ff',
-    img: SpoilSafeImg,
   },
 ];
 
@@ -74,23 +74,23 @@ function SkewCard({ title, desc, gradientFrom, gradientTo, img, forceActive }) {
           position: 'relative',
           zIndex: 20,
           left: active ? '-15px' : '0px',
-          background: 'rgba(255,255,255,0.05)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
+          background: 'rgba(15, 23, 42, 0.88)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: active ? '0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(56,254,220,0.2)' : '0 12px 36px rgba(0,0,0,0.5)',
           borderRadius: '16px',
-          color: '#111',
-          transition: 'left 0.5s ease',
+          color: '#f8fafc',
+          transition: 'all 0.5s ease',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          border: '1px solid rgba(255,255,255,0.1)',
+          border: `1.5px solid ${active ? 'rgba(56, 254, 220, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`,
           overflow: 'hidden',
           width: '100%',
         }}
       >
         {/* Image — grayscale → color on hover */}
-        <div style={{ width: '100%', height: '160px', overflow: 'hidden', flexShrink: 0 }}>
+        <div style={{ width: '100%', height: '160px', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
           <img
             src={img}
             alt={title}
@@ -102,12 +102,17 @@ function SkewCard({ title, desc, gradientFrom, gradientTo, img, forceActive }) {
               transition: 'filter 0.5s ease',
             }}
           />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.9) 0%, transparent 60%)' }} />
         </div>
 
         {/* Text */}
-        <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <h2 style={{ marginBottom: '12px', fontSize: '22px', fontWeight: 800, letterSpacing: '0.01em' }}>{title}</h2>
-          <p style={{ fontSize: '13px', lineHeight: 1.75, fontWeight: 500, color: '#374151' }}>{desc}</p>
+        <div style={{ padding: '22px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <span style={{ fontSize: 13, animation: 'pulse 1.5s infinite' }}>🛸</span>
+            <span style={{ fontSize: '10px', fontWeight: 800, color: '#38fedc', letterSpacing: '0.12em', textTransform: 'uppercase' }}>SECTOR ONLINE</span>
+          </div>
+          <h3 style={{ marginBottom: '12px', fontSize: '20px', fontWeight: 800, letterSpacing: '0.01em', color: '#f8fafc' }}>{title}</h3>
+          <p style={{ fontSize: '13px', lineHeight: 1.75, fontWeight: 400, color: '#94a3b8' }}>{desc}</p>
         </div>
       </div>
     </div>
@@ -127,29 +132,38 @@ export default function SkewCards() {
 
   return (
     <>
-      <div style={{ background: '#fff', padding: '96px 24px' }}>
+      <div style={{ background: '#070a13', padding: '100px 24px', position: 'relative', overflow: 'hidden' }}>
+
+        {/* Subtle grid */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.04,
+          backgroundImage: 'linear-gradient(to right, #38fedc 1px, transparent 1px), linear-gradient(to bottom, #38fedc 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }} />
 
         {/* Header */}
-        <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 64px auto' }}>
-          <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 900, color: '#111', lineHeight: 1.15, letterSpacing: '-0.02em', marginBottom: '20px' }}>
-            Three Startups Advance to the Imagine Cup World Championship
+        <div style={{ textAlign: 'center', maxWidth: '740px', margin: '0 auto 64px auto', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(56,254,220,0.1)', border: '1px solid rgba(56,254,220,0.3)', padding: '5px 16px', borderRadius: 100, marginBottom: 16 }}>
+            <span style={{ fontSize: 13 }}>🛰️</span>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#38fedc', letterSpacing: '0.15em', textTransform: 'uppercase' }}>SECTOR DESIGNATION · SKELD SHIPBOARD MODULES</span>
+          </div>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900, color: '#f8fafc', lineHeight: 1.15, letterSpacing: '-0.02em', marginBottom: '20px' }}>
+            Three Shipboard Innovation Sectors
           </h2>
-          <p style={{ fontSize: '1rem', color: '#555', lineHeight: 1.75, fontWeight: 400 }}>
-            Meet the three World Finalists of the Microsoft Imagine Cup, student founders who have shown standout innovation, clarity of vision, and real momentum behind what they are building.
-            <br /><br />
-            Next stop: the World Championship, where their ideas take the global stage.
+          <p style={{ fontSize: '1.05rem', color: '#94a3b8', lineHeight: 1.75, fontWeight: 400 }}>
+            Choose your sector across <span style={{ color: '#50ef39', fontWeight: 700 }}>Hydroponics</span>, <span style={{ color: '#facc15', fontWeight: 700 }}>Navigation</span>, or <span style={{ color: '#38fedc', fontWeight: 700 }}>MedBay</span>. Assemble your 3–4 member crew and compete for the ₹30,000 bounty at Maharaja Institute of Technology Mysore.
           </p>
         </div>
 
         {/* ── Desktop: all 3 side by side ── */}
-        <div className="skewcards-desktop" style={{ display: 'flex', justifyContent: 'center', alignItems: 'stretch', flexWrap: 'wrap', gap: '80px' }}>
+        <div className="skewcards-desktop" style={{ display: 'flex', justifyContent: 'center', alignItems: 'stretch', flexWrap: 'wrap', gap: '80px', position: 'relative', zIndex: 1 }}>
           {cards.map((card, idx) => (
             <SkewCard key={idx} {...card} />
           ))}
         </div>
 
         {/* ── Mobile: carousel one at a time ── */}
-        <div className="skewcards-mobile" style={{ display: 'none', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+        <div className="skewcards-mobile" style={{ display: 'none', flexDirection: 'column', alignItems: 'center', gap: '24px', position: 'relative', zIndex: 1 }}>
           {/* Single card display */}
           <div style={{ width: '100%', maxWidth: '340px', overflow: 'hidden' }}>
             <div
@@ -176,11 +190,12 @@ export default function SkewCards() {
                   width: idx === activeIdx ? '28px' : '10px',
                   height: '10px',
                   borderRadius: '100px',
-                  background: idx === activeIdx ? '#111' : '#d1d5db',
+                  background: idx === activeIdx ? '#38fedc' : 'rgba(255,255,255,0.2)',
                   border: 'none',
                   cursor: 'pointer',
                   padding: 0,
                   transition: 'all 0.3s ease',
+                  boxShadow: idx === activeIdx ? '0 0 10px rgba(56,254,220,0.8)' : 'none',
                 }}
               />
             ))}
@@ -188,33 +203,28 @@ export default function SkewCards() {
         </div>
 
         {/* CTA Button */}
-        <div style={{ textAlign: 'center', marginTop: '64px' }}>
+        <div style={{ textAlign: 'center', marginTop: '64px', position: 'relative', zIndex: 1 }}>
           <a
-            href="https://aka.ms/2026ImagineCupWorldFinalists"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/register"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '10px',
-              background: '#111',
-              color: '#fff',
+              background: 'linear-gradient(135deg, #38fedc 0%, #2dd4bf 100%)',
+              color: '#070a13',
               padding: '14px 36px',
               borderRadius: '100px',
-              fontWeight: 700,
+              fontWeight: 800,
               fontSize: '0.9rem',
               letterSpacing: '0.04em',
               textDecoration: 'none',
               transition: 'all 0.2s ease',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+              boxShadow: '0 8px 25px rgba(56,254,220,0.35)',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,0,0,0.18)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.12)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 35px rgba(56,254,220,0.5)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(56,254,220,0.35)'; }}
           >
-            Meet the World Finalists
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
+            REGISTER YOUR SQUAD (3–4 CREW) →
           </a>
         </div>
 

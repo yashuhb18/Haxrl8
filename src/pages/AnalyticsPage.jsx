@@ -36,12 +36,12 @@ const ChartTip = ({ active, payload, label }) => {
     || payload[0].name
     || label;
   return (
-    <div style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:10, padding:'10px 14px', boxShadow:'0 4px 20px rgba(0,0,0,.1)' }}>
-      <p style={{ fontSize:11, color:'#6b7280', fontWeight:700, textTransform:'uppercase', letterSpacing:'.05em', marginBottom:4 }}>
+    <div style={{ background:'rgba(10, 16, 30, 0.95)', border:'1px solid rgba(56, 254, 220, 0.3)', borderRadius:10, padding:'10px 14px', boxShadow:'0 4px 20px rgba(0,0,0,.5)' }}>
+      <p style={{ fontSize:11, color:'#38fedc', fontWeight:700, textTransform:'uppercase', letterSpacing:'.05em', marginBottom:4 }}>
         {title}
       </p>
-      <p style={{ fontSize:16, fontWeight:800, color:'#111827' }}>
-        {payload[0].value} <span style={{ fontSize:11, fontWeight:500, color:'#9ca3af' }}>count</span>
+      <p style={{ fontSize:16, fontWeight:800, color:'#ffffff' }}>
+        {payload[0].value} <span style={{ fontSize:11, fontWeight:500, color:'#94a3b8' }}>count</span>
       </p>
     </div>
   );
@@ -87,28 +87,31 @@ export default function AnalyticsPage() {
   ];
 
   const card = {
-    background:'#fff', border:'1px solid #e5e7eb', borderRadius:18,
+    background: 'rgba(15, 23, 42, 0.85)',
+    border: '1.5px solid rgba(56, 254, 220, 0.2)',
+    borderRadius: 18,
     padding: isMobile ? '18px 16px' : '28px 32px',
-    boxShadow:'0 1px 4px rgba(0,0,0,.04)',
+    boxShadow: '0 4px 20px rgba(0,0,0,.3), 0 0 15px rgba(56, 254, 220, 0.08)',
+    color: '#ffffff',
   };
 
   return (
-    <div style={{ minHeight:'100vh', background:'#f8fafc', fontFamily:"'Inter','Segoe UI',sans-serif" }}>
+    <div style={{ minHeight:'100vh', background:'#070a13', color:'#ffffff', fontFamily:"'Plus Jakarta Sans', sans-serif" }}>
       <div style={{ maxWidth:'100%', padding: isMobile ? '80px 14px 40px' : isTablet ? '90px 24px 48px' : '100px 60px 60px' }}>
 
         {/* ── HEADER ── */}
         <div style={{ display:'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent:'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap:12, marginBottom:24 }}>
           <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-            <div style={{ background:'#4f46e5', borderRadius:12, padding:10, display:'flex', flexShrink:0 }}>
-              <Activity size={isMobile ? 18 : 22} color="#fff" strokeWidth={2.5} />
+            <div style={{ background:'linear-gradient(135deg, #0284c7, #38fedc)', borderRadius:12, padding:10, display:'flex', flexShrink:0 }}>
+              <Activity size={isMobile ? 18 : 22} color="#070a13" strokeWidth={2.5} />
             </div>
             <div>
-              <h1 style={{ fontSize: isMobile ? 20 : 26, fontWeight:800, color:'#111827', margin:0, letterSpacing:'-.4px' }}>Event Analytics</h1>
-              <p style={{ fontSize:12, color:'#6b7280', margin:'3px 0 0', fontWeight:500 }}>SRCAS Hackathon 3.0 — Final Statistics</p>
+              <h1 style={{ fontSize: isMobile ? 20 : 26, fontWeight:900, color:'#ffffff', margin:0, letterSpacing:'-.4px' }}>HAXLR8 3.0 Telemetry</h1>
+              <p style={{ fontSize:12, color:'#38fedc', margin:'3px 0 0', fontWeight:600 }}>Maharaja Institute of Technology Mysore • Star Base Analytics</p>
             </div>
           </div>
-          <span style={{ display:'flex', alignItems:'center', gap:6, background:'#fff', border:'1px solid #e5e7eb', color:'#374151', fontSize:11, fontWeight:600, padding:'6px 12px', borderRadius:10, alignSelf: isMobile ? 'flex-start' : 'auto' }}>
-            <Calendar size={12} color="#9ca3af" /> Final Event Data • July 26, 2026
+          <span style={{ display:'flex', alignItems:'center', gap:6, background:'rgba(15, 23, 42, 0.8)', border:'1px solid rgba(56, 254, 220, 0.3)', color:'#38fedc', fontSize:11, fontWeight:700, padding:'6px 14px', borderRadius:10, alignSelf: isMobile ? 'flex-start' : 'auto' }}>
+            <Calendar size={12} color="#38fedc" /> Nov 06–07, 2026 Finale
           </span>
         </div>
 
@@ -121,9 +124,9 @@ export default function AnalyticsPage() {
                   <Icon size={isMobile ? 18 : 24} color={color} strokeWidth={2} />
                 </div>
                 <div style={{ minWidth:0 }}>
-                  <p style={{ fontSize: isMobile ? 10 : 12, color:'#6b7280', fontWeight:600, margin:'0 0 3px' }}>{title}</p>
-                  <p style={{ fontSize: isMobile ? 20 : 28, fontWeight:800, color:'#111827', margin:'0 0 2px', lineHeight:1 }}>{value}</p>
-                  <p style={{ fontSize: isMobile ? 10 : 11, color:'#9ca3af', fontWeight:500, margin:0 }}>{subtitle}</p>
+                  <p style={{ fontSize: isMobile ? 10 : 12, color:'#94a3b8', fontWeight:700, margin:'0 0 3px', textTransform:'uppercase', letterSpacing:'0.04em' }}>{title}</p>
+                  <p style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:'#ffffff', margin:'0 0 2px', lineHeight:1 }}>{value}</p>
+                  <p style={{ fontSize: isMobile ? 10 : 11, color:'#38fedc', fontWeight:600, margin:0 }}>{subtitle}</p>
                 </div>
               </div>
             </div>

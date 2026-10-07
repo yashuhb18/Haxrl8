@@ -3,36 +3,45 @@ import { supabase } from '../../lib/supabaseClient';
 import EventTimeline from '../../components/EventTimeline';
 import { motion, AnimatePresence } from 'framer-motion';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
+import ProblemStatementPDF from '../../assets/PS_example/Hackathon Problem Statement 2026.pdf';
 
 const TIMELINE_STEPS = [
-  { title:'Registration', date:'Jun 21' },
-  { title:'Team Confirmation', date:'Jul 25' },
-  { title:'Idea Submission', date:'Jul 25' },
-  { title:'Shortlist Announced', date:'Aug 7' },
-  { title:'Grand Finale', date:'Aug 14' },
+  { title: 'Registration', date: 'Oct 08' },
+  { title: 'Team Lock', date: 'Oct 28' },
+  { title: 'Idea Paper', date: 'Oct 28' },
+  { title: 'Shortlist', date: 'Nov 02' },
+  { title: 'Grand Finale', date: 'Nov 06–07' },
 ];
 
-const card = (extra={}) => ({ background:'#fff', borderRadius:16, padding:'24px', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', border:'1px solid #f3f4f6', ...extra });
+const card = (extra = {}) => ({
+  background: '#ffffff',
+  borderRadius: 22,
+  padding: '24px',
+  boxShadow: '0 6px 20px rgba(0,0,0,0.04)',
+  border: '2px solid #fed7aa',
+  color: '#0f172a',
+  ...extra,
+});
 
 const CheckItem = ({ label, status }) => {
   let icon, style, color;
   if (status === 'done') {
-    icon = <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>;
-    style = { width:16, height:16, borderRadius:'50%', background:'#10b981', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 };
-    color = '#111';
+    icon = <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>;
+    style = { width: 20, height: 20, borderRadius: '50%', background: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 6px rgba(22, 163, 74, 0.3)' };
+    color = '#15803d';
   } else if (status === 'active') {
     icon = null;
-    style = { width:16, height:16, borderRadius:'50%', border:'2px dashed #10b981', flexShrink:0 };
-    color = '#10b981';
+    style = { width: 20, height: 20, borderRadius: '50%', border: '2px dashed #ff3b69', flexShrink: 0, background: '#fff1f2' };
+    color = '#ff3b69';
   } else {
     icon = null;
-    style = { width:16, height:16, borderRadius:'50%', border:'2px solid #e5e7eb', flexShrink:0 };
-    color = '#9ca3af';
+    style = { width: 20, height: 20, borderRadius: '50%', border: '2px solid #cbd5e1', flexShrink: 0, background: '#f8fafc' };
+    color = '#94a3b8';
   }
   return (
-    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <div style={style}>{icon}</div>
-      <span style={{ fontSize:13, fontWeight:600, color }}>{label}</span>
+      <span style={{ fontSize: 13.5, fontWeight: status === 'active' ? 800 : 700, color }}>{label}</span>
     </div>
   );
 };
@@ -41,9 +50,6 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
   const [totalTeams, setTotalTeams] = useState(245);
   const [showRulebook, setShowRulebook] = useState(false);
   const [showNotification, setShowNotification] = useState(true);
-  // const missingIds = teamMembers?.some(m => !m.id_card_front_url || !m.id_card_back_url);
-  // const [showIdPopup, setShowIdPopup] = useState(missingIds);
-  const [showIdPopup, setShowIdPopup] = useState(false);
 
   useEffect(() => {
     const fetchTeamCount = async () => {
@@ -80,10 +86,9 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
 
   const now = new Date();
   const milestones = [
-    { title: 'Team Confirmation', dateStr: '2026-07-25T23:59:59', icon: '👥', desc: 'Form your team and confirm details' },
-    { title: 'Idea Submission', dateStr: '2026-07-25T23:59:59', icon: '💡', desc: 'Submit your Idea' },
-    { title: 'Shortlist Announced', dateStr: '2026-08-07T12:00:00', icon: '🚩', desc: 'Top teams will be shortlisted' },
-    { title: 'Grand Finale', dateStr: '2026-08-14T09:00:00', icon: '🏆', desc: 'Final presentations and winner announcement' }
+    { title: 'Registration & Idea Submission', dateStr: '2026-10-28T23:59:59', icon: '💡', desc: 'Submit team details & idea paper' },
+    { title: 'Shortlist Announced', dateStr: '2026-11-02T12:00:00', icon: '🚩', desc: 'Top teams announced for offline finale' },
+    { title: 'Grand Finale (MIT Mysore)', dateStr: '2026-11-06T09:00:00', icon: '🏆', desc: '24-hour hackathon & ₹30,000 bounty' }
   ];
 
   const upcomingMilestones = milestones.filter(m => new Date(m.dateStr) > now);
@@ -96,419 +101,298 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
   };
   const daysToNext = getDaysLeft(nextMilestone.dateStr);
 
-
-  
-  // Time ago formatter
-  const timeAgo = (dateStr) => {
-    if (!dateStr) return 'Just now';
-    const diff = Math.floor((new Date() - new Date(dateStr)) / 1000);
-    if (diff < 60) return `${Math.max(1, diff)}s ago`;
-    if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
-    return `${Math.floor(diff/86400)}d ago`;
-  };
-
-  // Synthesize Recent Activity
-  const activities = [];
-  if (teamData?.created_at) {
-    activities.push({ id: 'team_created', icon: '✅', color: '#16a34a', bg: '#f0fdf4', title: <span><strong>Registration completed successfully</strong></span>, date: new Date(teamData.created_at) });
-  }
-  if (teamMembers?.length > 0) {
-    teamMembers.forEach(m => {
-      if (m.created_at && m.email !== user?.email) {
-        activities.push({ id: `member_${m.id}`, icon: '👥', color: '#8b5cf6', bg: '#f5f3ff', title: <span><strong style={{color:'#111'}}>{m.full_name}</strong> joined the team</span>, date: new Date(m.created_at) });
-      }
-    });
-  }
-  if (submissions?.length > 0) {
-    submissions.forEach(sub => {
-      activities.push({ id: `sub_${sub.id}`, icon: '☁️', color: '#f97316', bg: '#fff7ed', title: <span>Project <strong>"{sub.project_title || 'Submission'}"</strong> uploaded</span>, date: new Date(sub.created_at) });
-    });
-  }
-  
-  activities.sort((a, b) => b.date - a.date);
-  const recentActivities = activities.slice(0, 5);
-
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       
-      {/* Scroll Notification */}
+      {/* Priority Mission Broadcast Banner */}
       {showNotification && (
-        <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 10, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden' }}>
-          <span style={{ fontSize: 18 }}>🚨</span>
-          <marquee style={{ fontSize: 14, fontWeight: 700, color: '#b91c1c', flex: 1 }} scrollamount="6">
-            Final Extension: Submit your project presentation by today, July 26, 6:00 PM IST—no further extensions or late submissions will be accepted.
-          </marquee>
-          <button onClick={() => setShowNotification(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#b91c1c', opacity: 0.7 }} onMouseEnter={e => e.currentTarget.style.opacity='1'} onMouseLeave={e => e.currentTarget.style.opacity='0.7'}>
+        <div style={{ background: '#fee2e2', border: '1.5px solid #fca5a5', borderRadius: 16, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 14, overflow: 'hidden', boxShadow: '0 4px 14px rgba(239, 68, 68, 0.08)' }}>
+          <span style={{ fontSize: 22 }}>🚨</span>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: '#991b1b', flex: 1, letterSpacing: '0.01em', lineHeight: 1.5 }}>
+            <strong>STARSHIP MISSION ADVISORY:</strong> Registration &amp; Idea Abstract Paper lock on <strong>October 28, 2026 at 11:59 PM IST</strong>. Confirm your 3–4 crew members before lock!
+          </div>
+          <button onClick={() => setShowNotification(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#991b1b', opacity: 0.7 }} onMouseEnter={e => e.currentTarget.style.opacity='1'} onMouseLeave={e => e.currentTarget.style.opacity='0.7'}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
       )}
 
-      {/* Scroll Notification */}
+      {/* Cosmic Event Timeline */}
       <EventTimeline steps={TIMELINE_STEPS} currentStepIndex={currentStepIndex} />
 
-      {/* 2. Stats Grid (4 columns) */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:16 }}>
+      {/* Stats Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
         
         {/* Rulebook Card */}
-        <div style={card({ display:'flex', flexDirection:'column', padding:'20px', cursor:'pointer', border:'1.5px solid #fca5a5', background:'#fef2f2' })} onClick={() => setShowRulebook(true)}>
-          <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:16 }}>
-            <div style={{ width:48, height:48, borderRadius:12, background:'#fee2e2', color:'#ef4444', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>📄</div>
+        <div
+          style={card({
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '24px',
+            cursor: 'pointer',
+            border: '2px solid #fecaca',
+            background: 'linear-gradient(135deg, #fff1f2 0%, #ffffff 100%)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+          })}
+          onClick={() => setShowRulebook(true)}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(255, 59, 105, 0.12)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.04)'; }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: '#fee2e2', color: '#ff3b69', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 12px rgba(255, 59, 105, 0.15)' }}>📄</div>
             <div>
-              <div style={{ fontSize:17, fontWeight:800, color:'#111', lineHeight:1 }}>Rulebook</div>
-              <div style={{ fontSize:12, fontWeight:700, color:'#ef4444', marginTop:4 }}>Important</div>
+              <div style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', lineHeight: 1.2 }}>Flight Rulebook</div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#dc2626', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mandatory Protocols</div>
             </div>
           </div>
-          <div style={{ marginTop:'auto', fontSize:13, fontWeight:700, color:'#dc2626' }}>View rules & criteria →</div>
+          <div style={{ marginTop: 'auto', fontSize: 12.5, fontWeight: 800, color: '#ff3b69', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            View flight protocols →
+          </div>
         </div>
 
-        
-
-        {/* Submission Guidelines Video Card */}
-        {/* <a href="https://www.youtube.com" target="_blank" rel="noreferrer" style={{ textDecoration:'none' }}>
-          <div style={card({ display:'flex', flexDirection:'column', padding:'20px', cursor:'pointer', height:'100%', border:'1.5px solid #c4b5fd', background:'#f5f3ff' })}>
-            <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:16 }}>
-              <div style={{ width:48, height:48, borderRadius:12, background:'#ede9fe', color:'#8b5cf6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>📹</div>
-              <div>
-                <div style={{ fontSize:17, fontWeight:800, color:'#111', lineHeight:1 }}>Submission Guide</div>
-                <div style={{ fontSize:12, fontWeight:700, color:'#8b5cf6', marginTop:4 }}>Video Tutorial</div>
-              </div>
-            </div>
-            <div style={{ marginTop:'auto', fontSize:13, fontWeight:700, color:'#6d28d9' }}>Watch on YouTube ↗</div>
-          </div>
-        </a> */}
-
         {/* Days to Next Milestone Card */}
-        <div style={card({ display:'flex', flexDirection:'column', padding:'20px' })}>
-          <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:16 }}>
-            <div style={{ width:48, height:48, borderRadius:12, background:'#eff6ff', color:'#3b82f6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>📅</div>
+        <div style={card({ display: 'flex', flexDirection: 'column', padding: '24px', background: 'linear-gradient(135deg, #fefce8 0%, #ffffff 100%)', border: '2px solid #fef08a' })}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: '#fef08a', color: '#ca8a04', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 12px rgba(202, 138, 4, 0.15)' }}>⏳</div>
             <div>
-              <div style={{ fontSize:24, fontWeight:800, color:'#111', lineHeight:1 }}>{daysToNext}</div>
-              <div style={{ fontSize:13, fontWeight:600, color:'#6b7280', marginTop:4 }}>Days to Milestone</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: '#a16207', lineHeight: 1 }}>{daysToNext} Days</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#854d0e', marginTop: 4 }}>Time to Milestone</div>
             </div>
           </div>
-          <div style={{ marginTop:'auto', fontSize:13, fontWeight:700, color:'#9ca3af' }}>{nextMilestone.title}</div>
+          <div style={{ marginTop: 'auto', fontSize: 12.5, fontWeight: 800, color: '#713f12' }}>{nextMilestone.title}</div>
         </div>
 
         {/* Teams Participating Card */}
-        <div style={card({ display:'flex', flexDirection:'column', padding:'20px' })}>
-          <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:16 }}>
-            <div style={{ width:48, height:48, borderRadius:12, background:'#fefce8', color:'#eab308', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>⭐</div>
+        <div style={card({ display: 'flex', flexDirection: 'column', padding: '24px', background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)', border: '2px solid #bbf7d0' })}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 12px rgba(22, 163, 74, 0.15)' }}>⭐</div>
             <div>
-              <div style={{ fontSize:24, fontWeight:800, color:'#111', lineHeight:1 }}>{totalTeams}</div>
-              <div style={{ fontSize:13, fontWeight:600, color:'#6b7280', marginTop:4 }}>Teams Participating</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: '#15803d', lineHeight: 1 }}>{totalTeams}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#166534', marginTop: 4 }}>Crew Squadrons</div>
             </div>
           </div>
-          <div style={{ marginTop:'auto', fontSize:13, fontWeight:700, color:'#9ca3af' }}>Active hackers</div>
+          <div style={{ marginTop: 'auto', fontSize: 12.5, fontWeight: 800, color: '#14532d' }}>National Participants</div>
         </div>
 
       </div>
 
-      {/* 3. Main Grid (3 columns) */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(300px, 1fr))', gap:16 }}>
-        {/* Announcements */}
-        <div style={card({ display:'flex', flexDirection:'column' })}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-            <h3 style={{ fontSize:16, fontWeight:800, color:'#111', margin:0 }}>Announcements</h3>
+      {/* Main Grid: Comms, Readiness, Milestones */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
+        
+        {/* Starship Comms */}
+        <div style={card({ display: 'flex', flexDirection: 'column' })}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 20 }}>📡</span>
+              <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', margin: 0 }}>Starship Comms</h3>
+            </div>
           </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:16, flex:1 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
             {announcements.length === 0 ? (
-              <div style={{ textAlign:'center', color:'#9ca3af', padding:'20px 0', fontSize:13 }}>
-                No announcements yet.
+              <div style={{ textAlign: 'center', color: '#64748b', padding: '24px 0', fontSize: 13.5, background: '#f8fafc', borderRadius: 14, border: '1px dashed #cbd5e1' }}>
+                No active broadcasts. All telemetry nominal.
               </div>
             ) : announcements.slice(0, 3).map(a => (
-              <div key={a.id} style={{ display:'flex', gap:12 }}>
-                {a.tag ? (
-                  <span style={{ fontSize:10, fontWeight:800, color:'#10b981', background:'#ecfdf5', padding:'4px 8px', borderRadius:6, height:'fit-content' }}>{a.tag}</span>
-                ) : (
-                  <span style={{ fontSize:14, color:'#3b82f6', padding:'4px 8px' }}>📢</span>
-                )}
+              <div key={a.id} style={{ display: 'flex', gap: 12, background: '#f8fafc', padding: '14px', borderRadius: 14, border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: 18, color: '#ff3b69', flexShrink: 0 }}>📢</span>
                 <div>
-                  <div style={{ fontSize:14, fontWeight:800, color:'#111' }}>{a.title}</div>
-                  <div style={{ fontSize:13, color:'#6b7280', marginTop:4, display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{a.message}</div>
-                  <div style={{ fontSize:11, color:'#9ca3af', marginTop:6 }}>{new Date(a.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} • Admin</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{a.title}</div>
+                  <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 4, lineHeight: 1.4 }}>{a.message || a.content}</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6, fontWeight: 600 }}>{new Date(a.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} • Starfleet Admin</div>
                 </div>
               </div>
             ))}
           </div>
-          <div onClick={() => setActiveTab('announcements')} style={{ marginTop:20, textAlign:'center', fontSize:13, fontWeight:700, color:'#6b7280', cursor:'pointer' }}>View all announcements</div>
+          <div onClick={() => setActiveTab('announcements')} style={{ marginTop: 20, textAlign: 'center', fontSize: 12.5, fontWeight: 800, color: '#ff3b69', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            View all broadcasts →
+          </div>
         </div>
 
-        {/* Project Progress */}
-        <div style={card({ display:'flex', flexDirection:'column' })}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-            <h3 style={{ fontSize:16, fontWeight:800, color:'#111', margin:0 }}>Project Progress</h3>
+        {/* Mission Readiness */}
+        <div style={card({ display: 'flex', flexDirection: 'column' })}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 20 }}>🎯</span>
+              <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', margin: 0 }}>Mission Readiness</h3>
+            </div>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:24, flex:1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flex: 1 }}>
             {/* Circular Gauge */}
-            <div style={{ position:'relative', width:120, height:120, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <svg viewBox="0 0 36 36" style={{ position:'absolute', width:'100%', height:'100%', transform:'rotate(-90deg)' }}>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f3f4f6" strokeWidth="4" />
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10b981" strokeWidth="4" strokeDasharray={`${overallProgress}, 100`} />
+            <div style={{ position: 'relative', width: 120, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg viewBox="0 0 36 36" style={{ position: 'absolute', width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f1e7db" strokeWidth="4" />
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ff3b69" strokeWidth="4" strokeDasharray={`${overallProgress}, 100`} />
               </svg>
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontSize:24, fontWeight:900, color:'#111', lineHeight:1 }}>{overallProgress}%</div>
-                <div style={{ fontSize:10, fontWeight:600, color:'#6b7280', marginTop:2 }}>Overall Progress</div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 26, fontWeight: 900, color: '#ff3b69', lineHeight: 1 }}>{overallProgress}%</div>
+                <div style={{ fontSize: 10, fontWeight: 800, color: '#64748b', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Readiness</div>
               </div>
             </div>
             {/* Checklist */}
-            <div style={{ display:'flex', flexDirection:'column', gap:12, flex:1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
               <CheckItem label="Registration" status="done" />
-              <CheckItem label="Team Confirmation" status={hasTeam ? 'done' : 'active'} />
-              <CheckItem label="Idea Submission" status={hasSubmitted ? 'done' : (hasTeam ? 'active' : 'pending')} />
-              <CheckItem label="Shortlist Announced" status={hasSubmitted ? 'active' : 'pending'} />
+              <CheckItem label="Crew Manifest" status={hasTeam ? 'done' : 'active'} />
+              <CheckItem label="Idea Deck" status={hasSubmitted ? 'done' : (hasTeam ? 'active' : 'pending')} />
+              <CheckItem label="Shortlist Clearance" status={hasSubmitted ? 'active' : 'pending'} />
               <CheckItem label="Grand Finale" status="pending" />
             </div>
           </div>
-          <div style={{ marginTop:20, textAlign:'center', fontSize:13, fontWeight:700, color:'#10b981' }}>Keep going! You're on the right track.</div>
+          <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#64748b' }}>
+            {hasTeam ? 'Roster locked! Prepare abstract paper for submission.' : 'Assemble 3–4 crew members in "My Team" to advance.'}
+          </div>
         </div>
 
         {/* Upcoming Milestones */}
-        <div style={card({ display:'flex', flexDirection:'column' })}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-            <h3 style={{ fontSize:16, fontWeight:800, color:'#111', margin:0 }}>Upcoming Milestones</h3>
+        <div style={card({ display: 'flex', flexDirection: 'column' })}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 20 }}>🗓️</span>
+              <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', margin: 0 }}>Upcoming Milestones</h3>
+            </div>
           </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:16, flex:1 }}>
-            {upcomingMilestones.slice(0, 4).map((m, i) => (
-              <div key={i} style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <div style={{ width:40, height:40, borderRadius:10, background: m.icon==='🏆'?'#fefce8':'#eff6ff', color: m.icon==='🏆'?'#eab308':'#3b82f6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>{m.icon}</div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:14, fontWeight:800, color:'#111' }}>{m.title}</div>
-                  <div style={{ fontSize:12, color:'#6b7280' }}>{m.desc}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
+            {milestones.map((m, idx) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: '#f8fafc', borderRadius: 14, border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 20 }}>{m.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>{m.title}</div>
+                    <div style={{ fontSize: 11.5, color: '#64748b', fontWeight: 600 }}>{m.desc}</div>
+                  </div>
                 </div>
-                <div style={{ textAlign:'right' }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:'#111' }}>{new Date(m.dateStr).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</div>
-                  <div style={{ fontSize:11, color:'#9ca3af' }}>{getDaysLeft(m.dateStr)} days left</div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#ff3b69', background: '#ffe4e6', padding: '3px 8px', borderRadius: 100 }}>
+                    {getDaysLeft(m.dateStr)}d left
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
       </div>
 
-      {/* 4. Bottom Grid (2 columns) */}
-      <div className="dash-grid-2" style={{ display:'grid', gridTemplateColumns:'2fr 1.2fr', gap:16 }}>
-        {/* Recent Activity */}
-        <div style={card({ display:'flex', flexDirection:'column' })}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-            <h3 style={{ fontSize:16, fontWeight:800, color:'#111', margin:0 }}>Recent Activity</h3>
-          </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            {recentActivities.length > 0 ? recentActivities.map(act => (
-              <div key={act.id} style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <div style={{ width:32, height:32, borderRadius:'50%', background:act.bg, color:act.color, display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>{act.icon}</div>
-                <div style={{ fontSize:14, color:'#374151', flex:1 }}>{act.title}</div>
-                <div style={{ fontSize:12, color:'#9ca3af' }}>{timeAgo(act.date)}</div>
-              </div>
-            )) : (
-              <div style={{ fontSize:13, color:'#9ca3af', fontStyle:'italic' }}>No recent activity.</div>
-            )}
+      {/* ── ARTIFACTS & MISSION RESOURCES QUICK PANEL ── */}
+      <div style={card({ display: 'flex', flexDirection: 'column', gap: 16 })}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
+              📦 Official Mission Artifacts &amp; Downloads
+            </h3>
+            <p style={{ fontSize: 13, color: '#64748b', margin: 0, fontWeight: 500 }}>
+              Essential templates, guidelines, and problem statements for your squad.
+            </p>
           </div>
         </div>
 
-        {/* Team Activity */}
-        <div style={card({ display:'flex', flexDirection:'column' })}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-            <h3 style={{ fontSize:16, fontWeight:800, color:'#111', margin:0 }}>Team Activity</h3>
-            <span style={{ fontSize:13, fontWeight:700, color:'#3b82f6', cursor:'pointer' }} onClick={() => setActiveTab('team')}>View team</span>
-          </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:16, flex:1 }}>
-            {teamMembers?.length > 0 ? teamMembers.map((m, i) => {
-              const isMe = m.email === user?.email;
-              const isLeader = m.email === user?.email || m.id === teamData?.leader_id;
-              const colors = [
-                { bg:'#10b981', labelBg:'#ecfdf5', labelColor:'#10b981' },
-                { bg:'#8b5cf6', labelBg:'#f3e8ff', labelColor:'#7e22ce' },
-                { bg:'#f97316', labelBg:'#ffedd5', labelColor:'#c2410c' },
-                { bg:'#3b82f6', labelBg:'#dbeafe', labelColor:'#1d4ed8' }
-              ];
-              const c = colors[i % colors.length];
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+          {/* PPT Template */}
+          <a
+            href={OfficialPPT}
+            download="HAXLR8_3.0_Template.pptx"
+            style={{
+              textDecoration: 'none',
+              background: '#fef2f2',
+              border: '1.5px solid #fecaca',
+              borderRadius: 16,
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              transition: 'transform 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
+          >
+            <span style={{ fontSize: 28 }}>📊</span>
+            <div>
+              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#991b1b' }}>Official PPT Deck</div>
+              <div style={{ fontSize: 11, color: '#b91c1c', fontWeight: 600 }}>Required PPTX Format</div>
+            </div>
+          </a>
 
-              return (
-                <div key={m.id || i} style={{ display:'flex', alignItems:'center', gap:12 }}>
-                  <div style={{ width:36, height:36, borderRadius:'50%', background:c.bg, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:14 }}>
-                    {m.full_name ? m.full_name[0].toUpperCase() : '?'}
-                  </div>
-                  <div style={{ flex:1 }}>
-                    <div style={{ fontSize:14, fontWeight:800, color:'#111' }}>{m.full_name || 'Member'} {isMe && <span style={{ color:'#9ca3af', fontWeight:500 }}>(You)</span>}</div>
-                  </div>
-                  {isLeader ? (
-                    <div style={{ fontSize:11, fontWeight:700, color:c.labelColor, background:c.labelBg, padding:'2px 8px', borderRadius:20 }}>Team Lead</div>
-                  ) : (
-                    <div style={{ fontSize:11, fontWeight:600, color:'#6b7280' }}>Member</div>
-                  )}
-                </div>
-              );
-            }) : (
-              <div style={{ fontSize:13, color:'#9ca3af', fontStyle:'italic' }}>No team members yet.</div>
-            )}
-          </div>
-          
-          <div style={{ marginTop:24, paddingTop:16, borderTop:'1px solid #f3f4f6', display:'flex', alignItems:'center', gap:12 }}>
-            
+          {/* Problem Statement PDF */}
+          <a
+            href={ProblemStatementPDF}
+            download="HAXLR8-Problem-Statements-2026.pdf"
+            style={{
+              textDecoration: 'none',
+              background: '#eff6ff',
+              border: '1.5px solid #bfdbfe',
+              borderRadius: 16,
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              transition: 'transform 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
+          >
+            <span style={{ fontSize: 28 }}>📑</span>
+            <div>
+              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#1e40af' }}>Problem Statements</div>
+              <div style={{ fontSize: 11, color: '#2563eb', fontWeight: 600 }}>Download PDF Tracks</div>
+            </div>
+          </a>
+
+          {/* Leader vs Impostor Protocol */}
+          <div
+            onClick={() => setActiveTab('resources')}
+            style={{
+              cursor: 'pointer',
+              background: '#fdf4ff',
+              border: '1.5px solid #f5d0fe',
+              borderRadius: 16,
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              transition: 'transform 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
+          >
+            <span style={{ fontSize: 28 }}>👑</span>
+            <div>
+              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#86198f' }}>Leader vs Impostor</div>
+              <div style={{ fontSize: 11, color: '#a21caf', fontWeight: 600 }}>Flight Security Briefing</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Rulebook Modal */}
-      <AnimatePresence>
-        {showRulebook && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowRulebook(false)}
-              style={{
-                position: 'fixed', inset: 0, zIndex: 9998,
-                background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
-                cursor: 'pointer'
-              }}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              style={{
-                position: 'fixed', inset: 0, zIndex: 9999,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '20px', pointerEvents: 'none'
-              }}
-            >
-              <div style={{
-                pointerEvents: 'auto',
-                width: '100%', maxWidth: 700, maxHeight: '85vh',
-                background: '#fff', borderRadius: 24,
-                boxShadow: '0 24px 48px rgba(0,0,0,0.2)',
-                display: 'flex', flexDirection: 'column',
-                overflow: 'hidden', fontFamily: "'Plus Jakarta Sans', sans-serif"
-              }}>
-                {/* Header */}
-                <div style={{ padding: '24px 32px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafafa' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: '#E5243B15', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>📄</div>
-                    <div>
-                      <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#111' }}>Official Rulebook</h2>
-                      <p style={{ margin: '2px 0 0', fontSize: '0.85rem', color: '#6b7280', fontWeight: 500 }}>SRCAS Hackathon 3.0</p>
-                    </div>
-                  </div>
-                  <button onClick={() => setShowRulebook(false)} style={{ background: 'none', border: 'none', fontSize: 28, cursor: 'pointer', color: '#9ca3af', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 8 }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#f3f4f6'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'none'}>&times;</button>
-                </div>
-                
-                {/* Body */}
-                <div style={{ padding: '32px', overflowY: 'auto', fontSize: '0.95rem', color: '#4b5563', lineHeight: 1.7 }}>
-                  <h3 style={{ color: '#111', fontSize: '1.1rem', fontWeight: 800, marginTop: 0, letterSpacing: '-0.01em' }}>1. Eligibility & Team Formation</h3>
-                  <ul style={{ paddingLeft: 20, marginBottom: 24 }}>
-                    <li style={{ marginBottom: 6 }}>All team members must be currently enrolled college students.</li>
-                    <li style={{ marginBottom: 6 }}>Teams must consist of exactly 2 to 4 members. Solo participation is not permitted.</li>
-                    <li style={{ marginBottom: 6 }}>All members must belong to the same institution.</li>
-                    <li style={{ marginBottom: 6 }}><strong>Registration:</strong> Only the Team Leader needs to create an account on the hackathon platform. Team members should NOT register separately.</li>
-                    <li>Valid college ID cards are mandatory for the offline finale.</li>
-                  </ul>
+      {/* Flight Rulebook Modal */}
+      {showRulebook && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div style={{ background: '#ffffff', border: '2px solid #fed7aa', borderRadius: 24, width: '100%', maxWidth: 620, overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.18)', position: 'relative' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fffaf3' }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color: '#0f172a' }}>📜 HAXLR8 3.0 Flight Rulebook</div>
+              <button onClick={() => setShowRulebook(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94a3b8' }}>&times;</button>
+            </div>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '70vh', overflowY: 'auto', fontSize: 14, color: '#475569', lineHeight: 1.6 }}>
+              <h4 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px' }}>1. Team Composition &amp; Eligibility</h4>
+              <p>Squads must consist of 3 to 4 undergraduate students. Inter-college and inter-branch teams are 100% permitted. All participants must carry official college identity cards.</p>
 
-                  <h3 style={{ color: '#111', fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.01em' }}>2. Problem Statements & Tracks</h3>
-                  <ul style={{ paddingLeft: 20, marginBottom: 24 }}>
-                    <li style={{ marginBottom: 6 }}>Projects must address one of the provided 17 UN Sustainable Development Goals (SDGs).</li>
-                    <li>Teams may change their selected SDG until the Idea Submission deadline.</li>
-                  </ul>
+              <h4 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px' }}>2. 24-Hour Offline Hackathon</h4>
+              <p>The finale will be conducted live on campus at Maharaja Institute of Technology Mysore on November 06–07, 2026. High-speed Wi-Fi, power workstations, meals, and midnight snacks are provided.</p>
 
-                  <h3 style={{ color: '#111', fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.01em' }}>3. Submission & Development Rules</h3>
-                  <ul style={{ paddingLeft: 20, marginBottom: 24 }}>
-                    <li style={{ marginBottom: 6 }}><strong>Round 1 (Idea Submission):</strong> Teams must submit a 500-word Project Description and the official PPT format.</li>
-                    <li style={{ marginBottom: 6 }}><strong>Round 2 (Finale):</strong> Shortlisted teams will present their working prototypes offline at the SRCAS campus.</li>
-                    <li style={{ marginBottom: 6 }}><strong>24-Hour Software Rule:</strong> All software coding and application development must take place exclusively during the 24-hour hackathon period. Bringing pre-written code, using proprietary existing projects, or plagiarism will lead to immediate disqualification.</li>
-                    <li style={{ marginBottom: 6 }}><strong>Hardware & IoT Exception:</strong> If you are building a hardware-based project, you may procure the required devices, assemble, and test them before the Hackathon. However, during the 24-hour event, you are strictly expected to develop the software application, integrate it with your IoT devices, and demonstrate the final connected solution.</li>
-                    <li><strong>Vibe Coding:</strong> "Vibe coding" (using AI-assisted coding tools and LLMs to help build your project) is completely allowed during the 24-hour hacking period.</li>
-                  </ul>
-
-                  <h3 style={{ color: '#111', fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.01em' }}>4. Judging Criteria</h3>
-                  <ul style={{ paddingLeft: 20, marginBottom: 24 }}>
-                    <li style={{ marginBottom: 6 }}><strong>Innovation & Creativity (25%):</strong> How unique is the approach?</li>
-                    <li style={{ marginBottom: 6 }}><strong>Impact & SDG Alignment (25%):</strong> Does it effectively address the chosen goal?</li>
-                    <li style={{ marginBottom: 6 }}><strong>Technical Complexity (25%):</strong> Quality of code and technology stack used.</li>
-                    <li><strong>Feasibility & Presentation (25%):</strong> Can this be implemented in the real world? How well was it pitched?</li>
-                  </ul>
-
-                  <h3 style={{ color: '#111', fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.01em' }}>5. Code of Conduct</h3>
-                  <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
-                    <li style={{ marginBottom: 6 }}>Maintain a respectful and collaborative environment. Harassment of any kind will not be tolerated.</li>
-                    <li>The decisions made by the judges are final and binding.</li>
-                  </ul>
-                </div>
-
-                {/* Footer */}
-                <div style={{ padding: '20px 32px', borderTop: '1px solid #f0f0f0', background: '#fafafa', display: 'flex', justifyContent: 'flex-end' }}>
-                  <button onClick={() => setShowRulebook(false)} style={{ padding: '10px 24px', background: '#111', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#333'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#111'}>
-                    I Understand
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-
-        {/* ID card popup - commented out
-        {showIdPopup && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowIdPopup(false)}
-              style={{
-                position: 'fixed', inset: 0, zIndex: 9998,
-                background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
-                cursor: 'pointer'
-              }}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              style={{
-                position: 'fixed', inset: 0, zIndex: 9999,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '20px', pointerEvents: 'none'
-              }}
-            >
-              <div style={{
-                pointerEvents: 'auto',
-                width: '100%', maxWidth: 450,
-                background: '#fff', borderRadius: 24,
-                boxShadow: '0 24px 48px rgba(0,0,0,0.2)',
-                display: 'flex', flexDirection: 'column',
-                overflow: 'hidden', fontFamily: "'Plus Jakarta Sans', sans-serif",
-                textAlign: 'center', padding: '32px 24px'
-              }}>
-                <div style={{ fontSize: 48, marginBottom: 16 }}>🆔</div>
-                <h2 style={{ margin: '0 0 8px', fontSize: '1.25rem', fontWeight: 800, color: '#111' }}>Action Required: Upload ID Cards</h2>
-                <p style={{ margin: '0 0 24px', fontSize: '0.9rem', color: '#6b7280', lineHeight: 1.6 }}>
-                  Please upload Front & Back Student ID cards for all team members to complete verification before proceeding.
-                </p>
-                <div style={{ display: 'flex', gap: 12, width: '100%' }}>
-                  <button onClick={() => setShowIdPopup(false)} style={{ flex: 1, padding: '12px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer' }}>Later</button>
-                  <button 
-                    onClick={() => {
-                      setShowIdPopup(false);
-                      window.location.hash = '#upload-id';
-                      setActiveTab('team');
-                    }} 
-                    style={{ flex: 1, padding: '12px', background: '#D97706', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer' }}
-                  >
-                    Add ID Cards Now
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-        */}
-      </AnimatePresence>
+              <h4 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px' }}>3. Evaluation &amp; Judging (100 Points)</h4>
+              <ul style={{ paddingLeft: 20 }}>
+                <li>Innovation &amp; Originality (25%)</li>
+                <li>Technical Feasibility &amp; Depth (25%)</li>
+                <li>Real-world Impact &amp; Scalability (25%)</li>
+                <li>Live Pitch &amp; Working Demonstration (25%)</li>
+              </ul>
+            </div>
+            <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'flex-end', background: '#fafafa' }}>
+              <button onClick={() => setShowRulebook(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#ff3b69', color: '#fff', border: 'none', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
+                Close Protocol Window
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

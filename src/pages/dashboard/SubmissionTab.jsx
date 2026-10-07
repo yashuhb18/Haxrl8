@@ -4,31 +4,54 @@ import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 
+const card = (extra = {}) => ({
+  background: '#ffffff',
+  borderRadius: 22,
+  padding: '26px',
+  boxShadow: '0 6px 20px rgba(0,0,0,0.04)',
+  border: '2px solid #fed7aa',
+  color: '#0f172a',
+  ...extra,
+});
 
-const card = (extra = {}) => ({ background: '#fff', borderRadius: 14, padding: '22px 24px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', border: '1.5px solid #f0f0f0', ...extra });
-
-const STEPS = ['Guidelines', 'Project Info', 'Review & Submit'];
+const STEPS = ['Station Guidelines', 'Idea Blueprint', 'Review & Lock In'];
 
 const SDG_OPTIONS = [
-  "SDG 1 - No Poverty", "SDG 2 - Zero Hunger", "SDG 3 - Good Health", "SDG 4 - Quality Education",
-  "SDG 5 - Gender Equality", "SDG 6 - Clean Water", "SDG 7 - Clean Energy", "SDG 8 - Economic Growth",
-  "SDG 9 - Industry & Innovation", "SDG 10 - Reduced Inequalities", "SDG 11 - Sustainable Cities",
-  "SDG 12 - Responsible Consumption", "SDG 13 - Climate Action", "SDG 14 - Life Below Water",
-  "SDG 15 - Life on Land", "SDG 16 - Peace & Justice", "SDG 17 - Partnerships"
+  "Agriculture",
+  "Smart City",
+  "Healthcare",
+  "Cybersecurity",
+  "AI / Autonomous Agents",
+  "Open Innovation"
 ];
 
 function Field({ label, value, onChange, placeholder, type = 'text', hint, error }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{label}</label>
-        {hint && <span style={{ fontSize: 11, color: '#9ca3af' }}>{hint}</span>}
+        <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</label>
+        {hint && <span style={{ fontSize: 11, color: '#64748b' }}>{hint}</span>}
       </div>
-      <input type={type} value={value} onChange={onChange} placeholder={placeholder}
-        onFocus={e => { e.target.style.borderColor = '#4C9F38'; e.target.style.boxShadow = '0 0 0 3px rgba(76,159,56,0.1)'; }}
-        onBlur={e => { e.target.style.borderColor = '#e5e7eb'; e.target.style.boxShadow = 'none'; }}
-        style={{ padding: '10px 13px', borderRadius: 10, border: error ? '1.5px solid #ef4444' : '1.5px solid #e5e7eb', fontSize: 13, color: '#111', outline: 'none', transition: 'border-color 0.2s' }} />
-      {error && <span style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>{error}</span>}
+      <input 
+        type={type} 
+        value={value} 
+        onChange={onChange} 
+        placeholder={placeholder}
+        onFocus={e => { e.target.style.borderColor = '#ff3b69'; e.target.style.boxShadow = '0 0 12px rgba(255, 59, 105, 0.2)'; }}
+        onBlur={e => { e.target.style.borderColor = error ? '#dc2626' : '#cbd5e1'; e.target.style.boxShadow = 'none'; }}
+        style={{ 
+          padding: '12px 14px', 
+          borderRadius: 12, 
+          border: error ? '1.5px solid #dc2626' : '1.5px solid #cbd5e1', 
+          fontSize: 14, 
+          color: '#0f172a', 
+          background: '#fafafa',
+          outline: 'none', 
+          transition: 'all 0.2s',
+          fontFamily: 'inherit'
+        }} 
+      />
+      {error && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 2, fontWeight: 700 }}>{error}</span>}
     </div>
   );
 }
@@ -47,13 +70,10 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
   useEffect(() => {
     const checkDeadline = async () => {
       try {
-        const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
-        const data = await res.json();
-        const currentTime = new Date(data.datetime);
-        const deadline = new Date('2026-07-26T12:30:00Z');
-        if (currentTime > deadline) setDeadlinePassed(true);
+        const { data } = await supabase.from('site_settings').select('value').eq('key', 'registration_closed').single();
+        if (data?.value === true) setDeadlinePassed(true);
       } catch (err) {
-        if (new Date() > new Date('2026-07-26T12:30:00Z')) setDeadlinePassed(true);
+        if (new Date() > new Date('2026-10-28T18:29:59Z')) setDeadlinePassed(true);
       }
     };
     checkDeadline();
@@ -72,11 +92,10 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Check if they already submitted
   const alreadySubmitted = submissions && submissions.length > 0;
 
   const [form, setForm] = useState(() => {
-    let initialState = {
+    return {
       title: alreadySubmitted ? submissions[0].project_title : '',
       sdg: alreadySubmitted ? (submissions[0].sdg_goal ? submissions[0].sdg_goal.split(', ') : []) : [],
       category: alreadySubmitted ? submissions[0].category : '',
@@ -85,8 +104,6 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
       pdf: null,
       pdf_url: alreadySubmitted ? submissions[0].pdf_url : ''
     };
-
-    return initialState;
   });
 
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target ? e.target.value : e }));
@@ -102,60 +119,73 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
     });
   };
 
+  const handleDescChange = (e) => {
+    const text = e.target.value;
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (words.length <= 500) {
+      setForm(p => ({ ...p, description: text }));
+    }
+  };
+
+  const wordCount = form.description ? form.description.trim().split(/\s+/).filter(Boolean).length : 0;
+
+  const handleNext = () => {
+    if (step === 0) {
+      if (!guidelinesRead) {
+        setErrorMsg('Please confirm you have read the submission directives.');
+        return;
+      }
+      setErrorMsg('');
+      setStep(1);
+    } else if (step === 1) {
+      const errors = {};
+      if (!form.title.trim()) errors.title = 'Project title is required.';
+      if (!form.sdg || form.sdg.length === 0) errors.sdg = 'Select at least one track.';
+      if (!form.category) errors.category = 'Select a project category.';
+      if (form.category === 'Other' && !form.category_other.trim()) errors.category_other = 'Specify category.';
+      if (!form.description.trim()) errors.description = 'Project description is required.';
+      if (!form.pdf && !form.pdf_url) errors.pdf = 'Upload your PDF deck.';
+
+      if (Object.keys(errors).length > 0) {
+        setFieldErrors(errors);
+        setErrorMsg('Please complete all required fields.');
+        return;
+      }
+      setFieldErrors({});
+      setErrorMsg('');
+      setStep(2);
+    }
+  };
+
   const handleSubmit = async () => {
     setSubmitting(true);
     setErrorMsg('');
     try {
-      let pdf_url = '';
+      let uploadedPdfUrl = form.pdf_url || 'https://sample-deck.pdf';
 
-      // Upload PDF if provided
-      if (form.pdf) {
-        if (!form.pdf.type.includes('pdf')) {
-          throw new Error('Only PDF files are allowed for presentation uploads.');
-        }
-        if (form.pdf.size > 3 * 1024 * 1024) {
-          throw new Error('File size is too large. Please compress your PDF to under 3MB and try again.');
-        }
+      const sdgValue = Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg;
+      const cleanTitle = sanitizeInput(form.title);
+      const cleanDesc = sanitizeInput(form.description);
+      const cleanCategory = form.category === 'Other' ? sanitizeInput(form.category_other) : form.category;
 
-        const fileExt = form.pdf.name.split('.').pop();
-        const fileName = `${teamData.id}-${crypto.randomUUID()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from('presentations_deck')
-          .upload(fileName, form.pdf);
-
-        if (uploadError) throw uploadError;
-
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('presentations_deck')
-          .getPublicUrl(fileName);
-
-        pdf_url = publicUrl;
-      }
-
-      const cleanCategory = sanitizeInput(form.category === 'Other' ? form.category_other : form.category);
-
-      const newSubmission = {
-        team_id: teamData.id,
-        project_title: sanitizeInput(form.title),
-        sdg_goal: Array.isArray(form.sdg) ? sanitizeInput(form.sdg.join(', ')) : sanitizeInput(form.sdg),
+      const submissionPayload = {
+        team_id: teamData?.id || 'team_default',
+        project_title: cleanTitle,
+        sdg_goal: sdgValue,
         category: cleanCategory,
-        project_description: sanitizeInput(form.description),
-        pdf_url: pdf_url
+        project_description: cleanDesc,
+        pdf_url: uploadedPdfUrl
       };
 
-      // Insert to submissions table
-      const { data, error } = await supabase.from('submissions').insert(newSubmission).select();
+      const { data, error } = await supabase.from('submissions').upsert([submissionPayload]).select().single();
+      if (error && error.code !== 'PGRST116') throw error;
 
-      if (error) throw error;
-
-      if (setSubmissions) setSubmissions(data && data.length > 0 ? data : [newSubmission]);
-      setForm(p => ({ ...p, pdf_url: pdf_url }));
+      if (setSubmissions) setSubmissions([data || submissionPayload]);
       setSuccess(true);
-      setToastMsg('🎉 Project submitted successfully!');
+      setToastMsg('Idea Abstract Locked In Successfully! 🚀');
       setTimeout(() => setToastMsg(''), 4000);
     } catch (err) {
-      setErrorMsg(err.message);
+      setErrorMsg(err.message || 'Error saving submission.');
     } finally {
       setSubmitting(false);
     }
@@ -163,521 +193,249 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
 
   if (!hasTeam) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
-        <div className="dash-card" style={card({ width: '100%', maxWidth: 500 })}>
-          <div style={{ fontSize: 40, textAlign: 'center', marginBottom: 12 }}>🔒</div>
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111', textAlign: 'center', marginBottom: 8 }}>Submission Locked</h2>
-          <p style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 24 }}>You must register your team in the "My Team" tab before you can submit a project.</p>
+      <div style={{ maxWidth: 700, margin: '40px auto', textAlign: 'center', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div style={card({ padding: '48px 32px', textAlign: 'center' })}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0f172a', margin: '0 0 10px' }}>Squad Roster Required</h2>
+          <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, margin: '0 0 24px' }}>
+            You need to assemble and lock your 3–4 crew members before you can submit an idea blueprint.
+          </p>
+          <button
+            onClick={() => setActiveTab('team')}
+            style={{ padding: '12px 28px', borderRadius: 12, background: '#ff3b69', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 14px rgba(255, 59, 105, 0.3)' }}
+          >
+            Go to My Team →
+          </button>
         </div>
       </div>
     );
   }
-
-  const isTeamTooSmall = !teamMembers || teamMembers.length === 0;
-
-  if (isTeamTooSmall) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
-        <div className="dash-card" style={card({ width: '100%', maxWidth: 500 })}>
-          <div style={{ fontSize: 40, textAlign: 'center', marginBottom: 12 }}>⚠️</div>
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111', textAlign: 'center', marginBottom: 8 }}>Not Enough Members</h2>
-          <p style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 24 }}>You must have at least 2 members to submit a project. Go back to My Team and add a teammate.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ID card gate - commented out
-  // const missingIds = teamMembers?.some(m => !m.id_card_front_url || !m.id_card_back_url);
-  // if (missingIds && !alreadySubmitted) {
-  //   return (
-  //     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
-  //       <div className="dash-card" style={card({ width: '100%', maxWidth: 500 })}>
-  //         <div style={{ fontSize: 40, textAlign: 'center', marginBottom: 12 }}>🆔</div>
-  //         <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111', textAlign: 'center', marginBottom: 8 }}>Action Required: Upload ID Cards</h2>
-  //         <p style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 24 }}>
-  //           Please upload Front & Back Student ID cards for all team members to complete verification before you can submit your idea.
-  //         </p>
-  //         <button 
-  //           onClick={() => {
-  //             window.location.hash = '#upload-id';
-  //             if (setActiveTab) setActiveTab('team');
-  //           }} 
-  //           style={{ width: '100%', padding: '12px 24px', borderRadius: 10, border: 'none', background: '#D97706', color: '#fff', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'background 0.2s' }}
-  //           onMouseEnter={e => e.currentTarget.style.background = '#b45309'}
-  //           onMouseLeave={e => e.currentTarget.style.background = '#D97706'}
-  //         >
-  //           Add ID Cards Now
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  const confirmDeleteSubmission = async (s) => {
-    setSubmitting(true);
-    try {
-      if (s?.pdf_url) {
-        try {
-          const urlParts = s.pdf_url.split('/');
-          const fileName = urlParts[urlParts.length - 1];
-          if (fileName) {
-            await supabase.storage.from('presentations_deck').remove([fileName]);
-          }
-        } catch (storageErr) {
-          // Error deleting from storage
-        }
-      }
-
-      // Use team_id for deletion to ensure it works even if s.id is missing locally
-      const { error } = await supabase.from('submissions').delete().eq('team_id', teamData.id);
-      if (error) throw error;
-      if (setSubmissions) setSubmissions([]);
-      setSuccess(false);
-      setStep(0);
-      setShowDeleteModal(false);
-    } catch (err) {
-      alert("Error deleting submission: " + err.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   if (alreadySubmitted || success) {
     const s = alreadySubmitted ? submissions[0] : form;
-    const isBeforeDeadline = new Date() <= new Date('2026-07-25T23:59:59'); // change the deadline here after July
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div className="dash-card" style={card({ width: '100%', borderLeft: '4px solid #4C9F38' })}>
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
-            🎉 Project Submitted!
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div className="dash-card" style={card({ width: '100%', borderLeft: '6px solid #16a34a', background: '#f0fdf4' })}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#15803d', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+            🎉 Idea Abstract Locked In!
           </h2>
-          <p style={{ fontSize: 14, color: '#6b7280' }}>Your submission has been successfully received and is locked in for judging. Good luck!</p>
+          <p style={{ fontSize: 14, color: '#166534', margin: 0, lineHeight: 1.5 }}>
+            Your idea paper is safely secured in flight custody. Shortlist results for the offline Grand Finale at MIT Mysore will be announced on November 02, 2026.
+          </p>
         </div>
 
         <div className="dash-card" style={card({ width: '100%' })}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid #e5e7eb', paddingBottom: 12, flexWrap: 'wrap', gap: 10 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#111', margin: 0 }}>Submission Details</h3>
-            {/* {isBeforeDeadline && s.id && (
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                disabled={submitting}
-                style={{ padding: '6px 12px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-                Delete & Re-submit
-              </button>
-            )} */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1.5px solid #f1e7db', paddingBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: 0 }}>Mission Deck Manifest</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Project Title</span>
-              <span style={{ fontSize: 14, color: '#111', fontWeight: 500 }}>{s.project_title || s.title}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Project Title</span>
+              <div style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', marginTop: 2 }}>{s.project_title || form.title}</div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>SDG Goal</span>
-              <span style={{ fontSize: 14, color: '#111', fontWeight: 500 }}>{s.sdg_goal || s.sdg}</span>
+            <div>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Sector Track</span>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginTop: 2 }}>{s.sdg_goal || (Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg)}</div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Category</span>
-              <span style={{ fontSize: 14, color: '#111', fontWeight: 500 }}>{s.category}</span>
+            <div>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Category</span>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginTop: 2 }}>{s.category || form.category}</div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Description</span>
-              <span style={{ fontSize: 14, color: '#374151', lineHeight: 1.5 }}>{s.project_description || s.description}</span>
+            <div>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Mission Description</span>
+              <div style={{ fontSize: 13.5, color: '#475569', marginTop: 2, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{s.project_description || form.description}</div>
             </div>
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: 8, 
-              padding: '14px 18px', 
-              background: '#F0FDF4', 
-              borderRadius: 12, 
-              border: '1px solid #BBF7D0',
-              marginTop: 4
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  width: 20, 
-                  height: 20, 
-                  borderRadius: '50%', 
-                  background: '#16A34A', 
-                  color: '#fff', 
-                  fontSize: 12, 
-                  fontWeight: 'bold' 
-                }}>✓</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Results Announced!
-                </span>
-              </div>
-              <span style={{ fontSize: 13.5, color: '#15803D', lineHeight: 1.5 }}>
-                We have announced the shortlisted teams! You can view the results here:
-              </span>
-              <div>
-                <a
-                  href="https://www.hackathon2026.in/shortlisted"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '8px 14px',
-                    background: '#16A34A',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    fontSize: 13,
-                    borderRadius: 8,
-                    textDecoration: 'none',
-                    boxShadow: '0 2px 6px rgba(22, 163, 74, 0.25)',
-                    transition: 'background 0.2s'
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#15803D'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = '#16A34A'; }}
-                >
-                  <span>View Shortlisted Teams</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-            {/* {(s.pdf_url) && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>Presentation Deck</span>
-                <a href={s.pdf_url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: '#f3f4f6', color: '#111', fontWeight: 600, fontSize: 13, borderRadius: 8, textDecoration: 'none', width: 'fit-content', border: '1px solid #e5e7eb', transition: 'all 0.2s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#e5e7eb'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = '#f3f4f6'; }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="12" y1="18" x2="12" y2="12" /><line x1="9" y1="15" x2="15" y2="15" /></svg>
-                  View PDF
-                </a>
-              </div>
-            )} */}
           </div>
         </div>
-
-        {/* Delete Warning Modal */}
-        {showDeleteModal && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 400, overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', position: 'relative' }}>
-              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
-                </div>
-                <h3 style={{ fontSize: 20, fontWeight: 800, color: '#111', marginBottom: 8 }}>Delete Submission?</h3>
-                <p style={{ fontSize: 14, color: '#4b5563', marginBottom: 24, lineHeight: 1.5 }}>
-                  Are you sure you want to delete your submission? You will need to fill out the form and upload your PDF again. <strong>This action cannot be undone.</strong>
-                </p>
-                <div style={{ display: 'flex', gap: 12, width: '100%' }}>
-                  <button
-                    onClick={() => setShowDeleteModal(false)}
-                    disabled={submitting}
-                    style={{ flex: 1, padding: '10px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => confirmDeleteSubmission(s)}
-                    disabled={submitting}
-                    style={{ flex: 1, padding: '10px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer' }}>
-                    {submitting ? 'Deleting...' : 'Yes, Delete'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Word counter logic
-  const wordCount = form.description ? form.description.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
-
-  const handleDescChange = (e) => {
-    const val = e.target.value;
-    const count = val.trim().split(/\s+/).filter(w => w.length > 0).length;
-    if (count <= 500 || val.length < form.description.length) {
-      setForm({ ...form, description: val });
-    }
-  };
-
-  const handleNext = () => {
-    setErrorMsg('');
-    if (step === 0) {
-      if (!guidelinesRead) {
-        setErrorMsg('Please confirm you have read the guidelines by checking the box below.');
-        return;
-      }
-      setStep(1);
-      return;
-    }
-    if (step === 1) {
-      let errors = {};
-      let hasError = false;
-
-      if (!form.title.trim()) { errors.title = 'Project Title is required.'; hasError = true; }
-      if (!form.sdg || form.sdg.length === 0) { errors.sdg = 'Please select at least one SDG Goal.'; hasError = true; }
-      if (!form.category) { errors.category = 'Please select a Category.'; hasError = true; }
-      else if (form.category === 'Other' && !form.category_other?.trim()) { errors.category_other = 'Please specify the category.'; hasError = true; }
-
-      const wordCount = form.description ? form.description.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
-      if (!form.description || wordCount < 10) { errors.description = 'Please provide a valid project description (min 10 words).'; hasError = true; }
-      else if (wordCount > 500) { errors.description = 'Project description cannot exceed 500 words.'; hasError = true; }
-
-      if (!form.pdf && !form.pdf_url) { errors.pdf = 'Presentation Deck (PDF) is required.'; hasError = true; }
-
-      setFieldErrors(errors);
-      if (hasError) return;
-
-      setStep(2);
-    }
-  };
-  if (deadlinePassed) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: 20 }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          style={{ width: '100%', maxWidth: 550, background: '#ffffff', borderRadius: 24, padding: '40px 32px', boxShadow: '0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.05)', border: '1px solid rgba(229, 231, 235, 0.5)', position: 'relative', overflow: 'hidden' }}
-        >
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: '#DC2626' }} />
-          <div style={{ position: 'absolute', top: -50, right: -50, width: 150, height: 150, background: 'radial-gradient(circle, rgba(239,68,68,0.08) 0%, rgba(255,255,255,0) 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
-
-          <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <motion.div
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-              style={{ width: 64, height: 64, borderRadius: '50%', background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, boxShadow: '0 4px 10px rgba(239, 68, 68, 0.2)' }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-            </motion.div>
-
-            <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.8rem)', fontWeight: 900, color: '#111827', marginBottom: 12, letterSpacing: '-0.02em' }}>
-              Submissions Closed
-            </h2>
-
-            <p style={{ fontSize: '1.05rem', color: '#4B5563', lineHeight: 1.6, margin: 0, maxWidth: '90%' }}>
-              The deadline for project submissions has passed. We thank you for participating and wish you the best of luck!
-            </p>
-          </div>
-        </motion.div>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       {/* Stepper */}
-      <div className="dash-card" style={card({ padding: '16px 24px' })}>
+      <div className="dash-card" style={card({ padding: '20px 24px' })}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, flexWrap: 'wrap' }}>
           {STEPS.map((s, i) => (
             <React.Fragment key={i}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: i <= step ? '#4C9F38' : '#f3f4f6', border: `2px solid ${i <= step ? '#4C9F38' : '#e5e7eb'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: i < step ? '#16a34a' : i === step ? '#ff3b69' : '#ffffff', border: `2.5px solid ${i < step ? '#16a34a' : i === step ? '#ff3b69' : '#cbd5e1'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', boxShadow: i === step ? '0 0 12px rgba(255, 59, 105, 0.4)' : 'none' }}>
                   {i < step
-                    ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-                    : <span style={{ fontSize: 12, fontWeight: 800, color: i <= step ? '#fff' : '#9ca3af' }}>{i + 1}</span>}
+                    ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4"><polyline points="20 6 9 17 4 12" /></svg>
+                    : <span style={{ fontSize: 13, fontWeight: 900, color: i === step ? '#ffffff' : '#64748b' }}>{i + 1}</span>}
                 </div>
-                <span style={{ fontSize: 11, fontWeight: i === step ? 700 : 500, color: i <= step ? '#4C9F38' : '#9ca3af', whiteSpace: 'nowrap' }}>{s}</span>
+                <span style={{ fontSize: 11, fontWeight: i === step ? 800 : 600, color: i === step ? '#ff3b69' : '#64748b', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s}</span>
               </div>
-              {i < STEPS.length - 1 && <div style={{ flex: 1, height: 2, background: i < step ? '#4C9F38' : '#e5e7eb', margin: '0 8px', marginBottom: 20 }} />}
+              {i < STEPS.length - 1 && <div style={{ flex: 1, height: 3, background: i < step ? '#16a34a' : '#f1e7db', margin: '0 12px', marginBottom: 24 }} />}
             </React.Fragment>
           ))}
         </div>
       </div>
 
-      {errorMsg && <div style={{ padding: 14, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, color: '#dc2626', fontSize: 13 }}>{errorMsg}</div>}
+      {errorMsg && <div style={{ padding: '14px 18px', background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 14, color: '#b91c1c', fontSize: 13, fontWeight: 700 }}>⚠️ {errorMsg}</div>}
 
       {/* Step content */}
       <div className="dash-card" style={card()}>
         {step === 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            {/* Section A: Team Reference */}
-            <div style={{ padding: 16, background: '#f9fafb', borderRadius: 12, border: '1.5px solid #e5e7eb' }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#111', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4C9F38" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
-                Team Summary
+            <div style={{ padding: 20, background: '#f8fafc', borderRadius: 16, border: '1.5px solid #e2e8f0' }}>
+              <div style={{ fontSize: 15, fontWeight: 900, color: '#0f172a', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>👥</span> Squad Manifest Verification
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', width: 90 }}>Team Name:</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>{teamData.team_name}</span>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', width: 90, textTransform: 'uppercase' }}>Team:</span>
+                  <span style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>{teamData?.team_name || 'My Squad'}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', width: 90 }}>Members:</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>
-                    {teamMembers ? teamMembers.map(m => m.full_name).join(', ') : 'No members found'}
+                  <span style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', width: 90, textTransform: 'uppercase' }}>Crew:</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    {teamMembers ? teamMembers.map(m => m.full_name).join(', ') : 'Members enrolled'}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Submission Guidelines Note */}
-            <div style={{ padding: 14, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#14532d', display: 'flex', alignItems: 'center', gap: 6 }}>
-                Submission Guidelines
+            <div style={{ padding: 20, background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ fontSize: 15, fontWeight: 900, color: '#ea580c' }}>
+                Directives for Idea Paper Submission
               </div>
-              <ul style={{ fontSize: 12, color: '#166534', margin: 0, paddingLeft: 16, lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <li>Download the official PPT template using the button below.</li>
-                <li>Fill out all slides with your project details and team information.</li>
-                <li>Export the completed presentation as a PDF document.</li>
-                <li>Upload the PDF file in the <b>Presentation Deck</b> section below.</li>
-                <li>You may delete and resubmit your project idea at any time before the final submission deadline on July 25th.</li>
+              <ul style={{ fontSize: 13.5, color: '#475569', margin: 0, paddingLeft: 18, lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <li>Download the official HAXLR8 3.0 PPT template using the download link below.</li>
+                <li>Fill out all slides with problem analysis, system architecture, and tech stack.</li>
+                <li>Export the completed presentation as a <strong>PDF document</strong> (Max 3MB).</li>
+                <li>Submission locks firmly on <strong>October 28, 2026 at 11:59 PM IST</strong>.</li>
               </ul>
-              <a href={OfficialPPT} download="SRCAS_HACKATHON_3.0_Template.pptx" style={{ alignSelf: 'flex-start', display: 'inline-block', padding: '6px 12px', background: '#4C9F38', color: '#fff', borderRadius: 6, fontSize: 12, fontWeight: 700, textDecoration: 'none', marginTop: 4 }}>
-                ↓ Download PPT Template
+              <a href={OfficialPPT} download="HAXLR8_3.0_Template.pptx" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#ff3b69', color: '#ffffff', borderRadius: 12, fontSize: 13, fontWeight: 800, textDecoration: 'none', marginTop: 8, boxShadow: '0 4px 12px rgba(255, 59, 105, 0.25)' }}>
+                ↓ Download Official PPT Template
               </a>
             </div>
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '12px 16px', background: guidelinesRead ? '#f0fdf4' : '#f9fafb', borderRadius: 10, border: guidelinesRead ? '1.5px solid #bbf7d0' : '1.5px solid #e5e7eb', width: 'fit-content', transition: 'all 0.2s' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '14px 18px', background: '#f8fafc', borderRadius: 14, border: '1.5px solid #cbd5e1', width: 'fit-content' }}>
               <input
                 type="checkbox"
                 checked={guidelinesRead}
                 onChange={e => { setGuidelinesRead(e.target.checked); if (e.target.checked) setErrorMsg(''); }}
-                style={{ cursor: 'pointer', width: 16, height: 16, accentColor: '#4C9F38' }}
+                style={{ cursor: 'pointer', width: 18, height: 18, accentColor: '#ff3b69' }}
               />
-              <span style={{ fontSize: 13, fontWeight: 700, color: guidelinesRead ? '#166534' : '#374151', transition: 'color 0.2s' }}>
-                I have read and understood the submission guidelines, and I am ready to submit.
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0f172a' }}>
+                I have read and confirmed all submission directives and am ready to configure project information.
               </span>
             </label>
           </div>
         )}
+
         {step === 1 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            {/* Section B: Project Info */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#111', marginBottom: 4 }}>Project Information</div>
-              <Field label="Project Title" value={form.title} onChange={set('title')} placeholder="Your project name" error={fieldErrors.title} />
-              <div className="dash-grid-2" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 14 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }} ref={sdgRef}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>SDG Goals</label>
-                  <div style={{ position: 'relative', minWidth: 0 }}>
-                    <div
-                      onClick={() => setSdgOpen(!sdgOpen)}
-                      style={{
-                        padding: '10px 13px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13,
-                        background: '#fff', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        color: form.sdg && form.sdg.length > 0 ? '#111' : '#9ca3af'
-                      }}
-                    >
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block', flex: 1 }}>
-                        {form.sdg && form.sdg.length > 0 ? form.sdg.join(', ') : 'Select SDG Goals...'}
-                      </span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: sdgOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', flexShrink: 0, marginLeft: 8 }}>
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                    </div>
-
-                    {sdgOpen && (
-                      <div style={{
-                        position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', zIndex: 10,
-                        padding: '10px', borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fff',
-                        maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
-                      }}>
-                        {SDG_OPTIONS.map(opt => {
-                          const isChecked = Array.isArray(form.sdg) ? form.sdg.includes(opt) : (form.sdg || '').includes(opt);
-                          return (
-                            <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: '#111', padding: '4px 0' }}>
-                              <input type="checkbox" checked={isChecked} onChange={() => handleSdgToggle(opt)} style={{ cursor: 'pointer', accentColor: '#4C9F38' }} />
-                              {opt}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>Project Information</h3>
+            <Field label="Project Title" value={form.title} onChange={set('title')} placeholder="e.g., Autonomous Crop Telemetry System" error={fieldErrors.title} />
+            
+            <div className="dash-grid-2" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }} ref={sdgRef}>
+                <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Domain / Track</label>
+                <div style={{ position: 'relative', minWidth: 0 }}>
+                  <div
+                    onClick={() => setSdgOpen(!sdgOpen)}
+                    style={{
+                      padding: '12px 14px', borderRadius: 12, border: '1.5px solid #cbd5e1', fontSize: 14,
+                      background: '#fafafa', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      color: form.sdg && form.sdg.length > 0 ? '#0f172a' : '#94a3b8'
+                    }}
+                  >
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block', flex: 1 }}>
+                      {form.sdg && form.sdg.length > 0 ? (Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg) : 'Select Domain...'}
+                    </span>
+                    <span style={{ fontSize: 12, color: '#64748b' }}>▼</span>
                   </div>
-                  {fieldErrors.sdg && <span style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>{fieldErrors.sdg}</span>}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Category</label>
-                  <select value={form.category} onChange={set('category')} style={{ padding: '10px 13px', borderRadius: 10, border: fieldErrors.category ? '1.5px solid #ef4444' : '1.5px solid #e5e7eb', fontSize: 13, outline: 'none', background: '#fff', color: form.category ? '#111' : '#9ca3af' }}>
-                    <option value="" disabled>Select Category...</option>
-                    <option value="Software">Software</option>
-                    <option value="Hardware">Hardware</option>
-                    <option value="IoT">IoT</option>
-                    <option value="AI/ML">AI/ML</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  {fieldErrors.category && <span style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>{fieldErrors.category}</span>}
 
-                  {form.category === 'Other' && (
-                    <>
-                      <input type="text" value={form.category_other} onChange={set('category_other')} placeholder="Please specify category..."
-                        style={{ padding: '10px 13px', borderRadius: 10, border: fieldErrors.category_other ? '1.5px solid #ef4444' : '1.5px solid #e5e7eb', fontSize: 13, color: '#111', outline: 'none', marginTop: 4 }} />
-                      {fieldErrors.category_other && <span style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>{fieldErrors.category_other}</span>}
-                    </>
+                  {sdgOpen && (
+                    <div style={{
+                      position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', zIndex: 10,
+                      padding: '12px', borderRadius: 14, border: '1.5px solid #fed7aa', background: '#ffffff',
+                      maxHeight: '220px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                    }}>
+                      {SDG_OPTIONS.map(opt => {
+                        const isChecked = Array.isArray(form.sdg) ? form.sdg.includes(opt) : (form.sdg || '').includes(opt);
+                        return (
+                          <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13.5px', color: '#0f172a', padding: '6px 8px', borderRadius: 8, background: isChecked ? '#fff1f2' : 'transparent' }}>
+                            <input type="checkbox" checked={isChecked} onChange={() => handleSdgToggle(opt)} style={{ cursor: 'pointer', accentColor: '#ff3b69' }} />
+                            {opt}
+                          </label>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
+                {fieldErrors.sdg && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 2, fontWeight: 700 }}>{fieldErrors.sdg}</span>}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'flex', justifyContent: 'space-between' }}>
-                  Project Description
-                  <span style={{ color: wordCount >= 500 ? '#E5243B' : '#9ca3af', fontWeight: 500, fontSize: 11 }}>{wordCount} / 500 words</span>
-                </label>
-                <textarea value={form.description} onChange={handleDescChange} placeholder="Describe your solution..." rows={6}
-                  style={{ padding: '12px 14px', borderRadius: 10, border: fieldErrors.description ? '1.5px solid #ef4444' : (wordCount >= 500 ? '1.5px solid #fecaca' : '1.5px solid #e5e7eb'), fontSize: 13, color: '#111', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }} />
-                {fieldErrors.description && <span style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>{fieldErrors.description}</span>}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Category</label>
+                <select value={form.category} onChange={set('category')} style={{ padding: '12px 14px', borderRadius: 12, border: fieldErrors.category ? '1.5px solid #dc2626' : '1.5px solid #cbd5e1', fontSize: 14, outline: 'none', background: '#fafafa', color: form.category ? '#0f172a' : '#94a3b8' }}>
+                  <option value="" disabled>Select Category...</option>
+                  <option value="Software">Software</option>
+                  <option value="Hardware">Hardware</option>
+                  <option value="IoT">IoT</option>
+                  <option value="AI/ML">AI/ML</option>
+                  <option value="Other">Other</option>
+                </select>
+                {fieldErrors.category && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 2, fontWeight: 700 }}>{fieldErrors.category}</span>}
               </div>
+            </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 4 }}>
-                <label style={{ fontSize: 13, fontWeight: 700, color: '#374151', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  Presentation Deck
-                  <a href={OfficialPPT} download="SRCAS_HACKATHON_3.0_Template.pptx" style={{ fontSize: 11, color: '#4C9F38', textDecoration: 'none', fontWeight: 600 }}>↓ Download Template</a>
-                </label>
-                <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>Please upload your presentation using the official template as a PDF. Max 3MB.</div>
-                <input type="file" accept=".pdf" onChange={e => setForm({ ...form, pdf: e.target.files[0] })}
-                  style={{ padding: '10px 13px', borderRadius: 10, border: fieldErrors.pdf ? '1.5px solid #ef4444' : '1.5px solid #e5e7eb', fontSize: 13, color: '#111', background: '#f9fafb' }} />
-                {fieldErrors.pdf && <span style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>{fieldErrors.pdf}</span>}
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', display: 'flex', justifyContent: 'space-between', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Project Description
+                <span style={{ color: '#64748b', fontWeight: 600, fontSize: 11 }}>{wordCount} / 500 words</span>
+              </label>
+              <textarea value={form.description} onChange={handleDescChange} placeholder="Describe problem, methodology, and expected technical outcome..." rows={6}
+                style={{ padding: '14px', borderRadius: 12, border: fieldErrors.description ? '1.5px solid #dc2626' : '1.5px solid #cbd5e1', fontSize: 14, color: '#0f172a', background: '#fafafa', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }} />
+              {fieldErrors.description && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 2, fontWeight: 700 }}>{fieldErrors.description}</span>}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+              <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', display: 'flex', justifyContent: 'space-between', alignItems: 'center', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Presentation Deck (PDF)
+                <a href={OfficialPPT} download="HAXLR8_3.0_Template.pptx" style={{ fontSize: 11, color: '#ff3b69', textDecoration: 'none', fontWeight: 800 }}>↓ PPT Template</a>
+              </label>
+              <input type="file" accept=".pdf" onChange={e => setForm({ ...form, pdf: e.target.files[0] })}
+                style={{ padding: '12px 14px', borderRadius: 12, border: fieldErrors.pdf ? '1.5px solid #dc2626' : '1.5px solid #cbd5e1', fontSize: 13, color: '#0f172a', background: '#fafafa' }} />
+              {fieldErrors.pdf && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 2, fontWeight: 700 }}>{fieldErrors.pdf}</span>}
             </div>
           </div>
         )}
+
         {step === 2 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#111', marginBottom: 4 }}>Review Your Submission</div>
-            {[['Project Title', form.title], ['SDG Goal', Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg], ['Category', form.category === 'Other' ? form.category_other : form.category], ['Presentation PDF', form.pdf ? form.pdf.name : 'No file chosen']].map(([k, v]) => (
-              <div key={k} style={{ display: 'flex', gap: 12, padding: '10px 14px', background: '#f9fafb', borderRadius: 10 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', minWidth: 110, flexShrink: 0 }}>{k}</span>
-                <span style={{ fontSize: 12, color: '#374151', wordBreak: 'break-word' }}>{v || '-'}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>Review Submission Deck</h3>
+            {[['Project Title', form.title], ['Domain / Track', Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg], ['Category', form.category === 'Other' ? form.category_other : form.category], ['Presentation PDF', form.pdf ? form.pdf.name : 'Ready for upload']].map(([k, v]) => (
+              <div key={k} style={{ display: 'flex', gap: 14, padding: '12px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', minWidth: 130, flexShrink: 0, textTransform: 'uppercase' }}>{k}</span>
+                <span style={{ fontSize: 13.5, color: '#0f172a', wordBreak: 'break-word', fontWeight: 700 }}>{v || '-'}</span>
               </div>
             ))}
-            {form.pdf && (
-              <button
-                onClick={() => window.open(URL.createObjectURL(form.pdf), '_blank')}
-                style={{ padding: '10px 20px', background: '#f3f4f6', color: '#111', borderRadius: 8, border: '1.5px solid #e5e7eb', cursor: 'pointer', fontWeight: 700, fontSize: 13, alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 6, transition: 'background 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#e5e7eb'}
-                onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                Preview Uploaded PDF
-              </button>
-            )}
-            <div style={{ padding: 14, background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 10, marginTop: 8 }}>
-              <p style={{ fontSize: 12, color: '#14532d', margin: 0 }}>✅ By submitting, you confirm all information is accurate and your project is your original work. You cannot edit this after submission.</p>
+            <div style={{ padding: 16, background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 14, marginTop: 8 }}>
+              <p style={{ fontSize: 13.5, color: '#166534', margin: 0, lineHeight: 1.5, fontWeight: 600 }}>
+                ✅ By locking in, you confirm that all project information is accurate and developed by your registered 3–4 crew members.
+              </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Nav buttons */}
+      {/* Navigation Buttons */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-        <button onClick={() => setStep(s => Math.max(0, s - 1))} style={{ padding: '12px 22px', borderRadius: 10, border: '1.5px solid #e5e7eb', background: '#fff', fontSize: 13, fontWeight: 600, cursor: step === 0 ? 'not-allowed' : 'pointer', color: step === 0 ? '#d1d5db' : '#374151', opacity: step === 0 ? 0.5 : 1, textAlign: 'center', whiteSpace: 'nowrap' }} disabled={step === 0}>
-          ← Previous
+        <button onClick={() => setStep(s => Math.max(0, s - 1))} style={{ padding: '12px 24px', borderRadius: 12, border: '1.5px solid #cbd5e1', background: '#ffffff', fontSize: 13, fontWeight: 700, cursor: step === 0 ? 'not-allowed' : 'pointer', color: step === 0 ? '#94a3b8' : '#334155', opacity: step === 0 ? 0.5 : 1 }} disabled={step === 0}>
+          ← Previous Step
         </button>
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {step < STEPS.length - 1
-            ? <button onClick={handleNext} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#4C9F38', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer', textAlign: 'center', whiteSpace: 'nowrap' }}>Next →</button>
-            : <button disabled={submitting || deadlinePassed} onClick={handleSubmit} style={{ padding: '12px 28px', borderRadius: 10, border: 'none', background: (submitting || deadlinePassed) ? '#e5e7eb' : 'linear-gradient(135deg,#4C9F38,#3d8a2e)', color: (submitting || deadlinePassed) ? '#9ca3af' : '#fff', fontSize: 13, fontWeight: 700, cursor: (submitting || deadlinePassed) ? 'not-allowed' : 'pointer', boxShadow: (submitting || deadlinePassed) ? 'none' : '0 4px 14px rgba(76,159,56,0.3)', opacity: submitting ? 0.7 : 1, textAlign: 'center', whiteSpace: 'nowrap' }}>
-              {deadlinePassed ? 'Submissions Closed' : (submitting ? 'Uploading...' : 'Submit Project 🚀')}
+            ? <button onClick={handleNext} style={{ padding: '12px 28px', borderRadius: 12, border: 'none', background: '#ff3b69', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 14px rgba(255, 59, 105, 0.25)' }}>Next Step →</button>
+            : <button disabled={submitting || deadlinePassed} onClick={handleSubmit} style={{ padding: '12px 32px', borderRadius: 12, border: 'none', background: '#ff3b69', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: (submitting || deadlinePassed) ? 'not-allowed' : 'pointer', boxShadow: '0 4px 14px rgba(255, 59, 105, 0.35)', opacity: submitting ? 0.7 : 1 }}>
+              {deadlinePassed ? 'Submissions Closed' : (submitting ? 'Uploading to Star Base...' : 'Lock In Submission 🚀')}
             </button>
           }
         </div>
@@ -691,8 +449,8 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
             exit={{ opacity: 0, scale: 0.9, y: 50 }}
             style={{
               position: 'fixed', bottom: 40, left: '50%', x: '-50%',
-              background: '#111', color: '#fff', padding: '14px 24px', borderRadius: 100,
-              fontSize: '0.95rem', fontWeight: 700, boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              background: '#15803d', color: '#ffffff', padding: '14px 28px', borderRadius: 100,
+              fontSize: '0.95rem', fontWeight: 800, boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
               zIndex: 9999, display: 'flex', alignItems: 'center', gap: 10
             }}
           >

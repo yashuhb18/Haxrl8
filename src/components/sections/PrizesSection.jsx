@@ -50,20 +50,20 @@ export const PrizesSection = () => {
     <section id="prizes" style={{
       position:"relative",
       padding:"100px 2.5rem 120px",
-      backgroundColor:"#fff",
+      backgroundColor:"#070a13",
       overflow:"hidden",
       fontFamily:"'Plus Jakarta Sans', sans-serif",
     }}>
       {/* Grid background */}
       <svg aria-hidden style={{
         position:"absolute", inset:0, width:"100%", height:"100%",
-        opacity:0.035, pointerEvents:"none",
+        opacity:0.04, pointerEvents:"none",
       }}>
         {Array.from({ length: 14 }).map((_, i) => (
-          <line key={`v${i}`} x1={`${(i+1)*7.14}%`} y1="0" x2={`${(i+1)*7.14}%`} y2="100%" stroke="#000" strokeWidth="1"/>
+          <line key={`v${i}`} x1={`${(i+1)*7.14}%`} y1="0" x2={`${(i+1)*7.14}%`} y2="100%" stroke="#38fedc" strokeWidth="1"/>
         ))}
         {Array.from({ length: 10 }).map((_, i) => (
-          <line key={`h${i}`} x1="0" y1={`${(i+1)*10}%`} x2="100%" y2={`${(i+1)*10}%`} stroke="#000" strokeWidth="1"/>
+          <line key={`h${i}`} x1="0" y1={`${(i+1)*10}%`} x2="100%" y2={`${(i+1)*10}%`} stroke="#38fedc" strokeWidth="1"/>
         ))}
       </svg>
 
@@ -78,20 +78,20 @@ export const PrizesSection = () => {
           style={{ marginBottom:64 }}
         >
           <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:18 }}>
-            <div style={{ width:28, height:1, background:"#111" }} />
+            <div style={{ width:28, height:2, background:"#38fedc", boxShadow: "0 0 10px rgba(56,254,220,0.8)" }} />
             <p style={{
-              fontSize:"0.7rem", fontWeight:700, letterSpacing:"0.22em",
-              color:"#111", textTransform:"uppercase", margin:0,
-            }}>The Prizes</p>
+              fontSize:"0.72rem", fontWeight:800, letterSpacing:"0.22em",
+              color:"#38fedc", textTransform:"uppercase", margin:0,
+            }}>THE STARSHIP BOUNTY VAULT</p>
           </div>
           <h2 style={{
-            fontSize:"clamp(2.8rem,6vw,5rem)", fontWeight:800,
-            lineHeight:1.05, letterSpacing:"-0.04em", color:"#111", margin:0,
+            fontSize:"clamp(2.8rem,6vw,5rem)", fontWeight:900,
+            lineHeight:1.05, letterSpacing:"-0.04em", color:"#f8fafc", margin:0,
           }}>
-            Win more than<br />bragging rights.
+            Win more than<br /><span style={{ color: '#38fedc', textShadow: '0 0 25px rgba(56,254,220,0.4)' }}>bragging rights.</span>
           </h2>
-          <p style={{ fontSize:"1.05rem", color:"#666", maxWidth:480, marginTop:14, lineHeight:1.6 }}>
-            Exclusive prizes, life-changing opportunities and perks that set you ahead.
+          <p style={{ fontSize:"1.05rem", color:"#94a3b8", maxWidth:520, marginTop:14, lineHeight:1.7 }}>
+            Official ₹30,000 Starship Bounty Pool, elite co-pilot credentials, and galactic recognition at Maharaja Institute of Technology Mysore.
           </p>
         </motion.div>
 
@@ -117,22 +117,22 @@ export const PrizesSection = () => {
           <button className="reward-btn" onClick={() => { navigate("/prizes"); window.scrollTo({ top: 0, behavior: 'instant' }); }}>
             <span className="IconContainer">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 60 20" className="box-top box">
-                <path strokeLinecap="round" strokeWidth={4} stroke="#59c23a" d="M2 18L58 18" />
-                <circle strokeWidth={5} stroke="#59c23a" fill="#101218" r={7} cy="9.5" cx="20.5" />
-                <circle strokeWidth={5} stroke="#59c23a" fill="#101218" r={7} cy="9.5" cx="38.5" />
+                <path strokeLinecap="round" strokeWidth={4} stroke="#38fedc" d="M2 18L58 18" />
+                <circle strokeWidth={5} stroke="#38fedc" fill="#070a13" r={7} cy="9.5" cx="20.5" />
+                <circle strokeWidth={5} stroke="#38fedc" fill="#070a13" r={7} cy="9.5" cx="38.5" />
               </svg>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 58 44" className="box-body box">
                 <mask fill="white" id="path-1-inside-1_81_19">
                   <rect rx={3} height={44} width={58} />
                 </mask>
-                <rect mask="url(#path-1-inside-1_81_19)" strokeWidth={8} stroke="#59c23a" fill="#101218" rx={3} height={44} width={58} />
-                <line strokeWidth={6} stroke="#59c23a" y2={29} x2={58} y1={29} x1="-3.61529e-09" />
-                <path strokeLinecap="round" strokeWidth={5} stroke="#59c23a" d="M45.0005 20L36 3" />
-                <path strokeLinecap="round" strokeWidth={5} stroke="#59c23a" d="M21 3L13.0002 19.9992" />
+                <rect mask="url(#path-1-inside-1_81_19)" strokeWidth={8} stroke="#38fedc" fill="#070a13" rx={3} height={44} width={58} />
+                <line strokeWidth={6} stroke="#38fedc" y2={29} x2={58} y1={29} x1="-3.61529e-09" />
+                <path strokeLinecap="round" strokeWidth={5} stroke="#38fedc" d="M45.0005 20L36 3" />
+                <path strokeLinecap="round" strokeWidth={5} stroke="#38fedc" d="M21 3L13.0002 19.9992" />
               </svg>
               <span className="coin" />
             </span>
-            <span className="text">View More Prizes</span>
+            <span className="text">VIEW ALL BOUNTY TIERS →</span>
           </button>
         </motion.div>
 

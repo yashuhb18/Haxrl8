@@ -1,1 +1,93 @@
 @import "tailwindcss";
+
+:root {
+  --space-bg: #070a13;
+  --space-surface: #0e1526;
+  --space-card: rgba(15, 23, 42, 0.75);
+  --space-border: rgba(255, 255, 255, 0.1);
+  --neon-cyan: #38fedc;
+  --neon-red: #ef4444;
+  --neon-lime: #50ef39;
+  --neon-yellow: #facc15;
+  --neon-blue: #0284c7;
+}
+
+body {
+  background-color: #070a13;
+  color: #f8fafc;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Cosmic Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #070a13;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+  border: 1px solid rgba(56, 254, 220, 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #38fedc;
+}
+
+/* Cosmic Glass HUD Utility Classes */
+.hud-glass {
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.hud-glass-hover:hover {
+  border-color: rgba(56, 254, 220, 0.4);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 254, 220, 0.15);
+}
+
+/* Scanline Overlay for Starship Terminals */
+.scanlines {
+  position: relative;
+}
+.scanlines::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
+  z-index: 2;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* Neon Text Glows */
+.text-glow-cyan {
+  text-shadow: 0 0 20px rgba(56, 254, 220, 0.6), 0 0 40px rgba(56, 254, 220, 0.3);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 0 40px rgba(239, 68, 68, 0.3);
+}
+
+.text-glow-lime {
+  text-shadow: 0 0 20px rgba(80, 239, 57, 0.6), 0 0 40px rgba(80, 239, 57, 0.3);
+}
+
+/* Pulse Keyframes */
+@keyframes beaconPulse {
+  0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 6px rgba(239,68,68,0.7)); }
+  50% { opacity: 0.4; transform: scale(0.95); filter: drop-shadow(0 0 1px rgba(239,68,68,0.2)); }
+}
+
+@keyframes zeroGDrift {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
