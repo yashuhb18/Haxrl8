@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { Search, ChevronDown, ChevronRight, ChevronLeft, Check, Leaf, ExternalLink, Bold, Italic, Underline, List, Link2, Mail, Phone, User, MapPin, Building2, Hash } from 'lucide-react';
@@ -14,6 +14,8 @@ const S = {
 
 export default function AdminEvaluateSubmission() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/udview';
   const { id } = useParams();
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminName, setAdminName] = useState('Admin');
@@ -174,7 +176,7 @@ export default function AdminEvaluateSubmission() {
             <button 
               onClick={() => {
                 const currentIndex = allSubmissionIds.indexOf(id);
-                if (currentIndex > 0) navigate(`/udview/evaluations/${allSubmissionIds[currentIndex - 1]}`);
+                if (currentIndex > 0) navigate(`${basePath}/evaluations/${allSubmissionIds[currentIndex - 1]}`);
               }}
               disabled={allSubmissionIds.indexOf(id) <= 0}
               style={{ display:'flex', alignItems:'center', gap:6, background:S.card, border:'1px solid '+S.border, padding:'8px 16px', borderRadius:8, fontSize:13, fontWeight:600, color: allSubmissionIds.indexOf(id) <= 0 ? S.t3 : S.t1, cursor: allSubmissionIds.indexOf(id) <= 0 ? 'not-allowed' : 'pointer' }}
@@ -184,7 +186,7 @@ export default function AdminEvaluateSubmission() {
             <button 
               onClick={() => {
                 const currentIndex = allSubmissionIds.indexOf(id);
-                if (currentIndex >= 0 && currentIndex < allSubmissionIds.length - 1) navigate(`/udview/evaluations/${allSubmissionIds[currentIndex + 1]}`);
+                if (currentIndex >= 0 && currentIndex < allSubmissionIds.length - 1) navigate(`${basePath}/evaluations/${allSubmissionIds[currentIndex + 1]}`);
               }}
               disabled={allSubmissionIds.indexOf(id) === -1 || allSubmissionIds.indexOf(id) >= allSubmissionIds.length - 1}
               style={{ display:'flex', alignItems:'center', gap:6, background:S.card, border:'1px solid '+S.border, padding:'8px 16px', borderRadius:8, fontSize:13, fontWeight:600, color: (allSubmissionIds.indexOf(id) === -1 || allSubmissionIds.indexOf(id) >= allSubmissionIds.length - 1) ? S.t3 : S.t1, cursor: (allSubmissionIds.indexOf(id) === -1 || allSubmissionIds.indexOf(id) >= allSubmissionIds.length - 1) ? 'not-allowed' : 'pointer' }}

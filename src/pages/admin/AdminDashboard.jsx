@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight, Mail, Send, CheckCircle2, RefreshCw } from 'lucide-react';
@@ -15,6 +15,8 @@ const S = {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/udview';
   const [isAdmin, setIsAdmin] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [teams, setTeams] = useState([]);
@@ -342,7 +344,7 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
                 <div style={{ padding:'14px 22px', borderTop:'1px solid #F1F5F9', textAlign:'center' }}>
-                  <button onClick={() => navigate('/udview/submissions')} style={{ background:'none', border:'none', fontSize:12, fontWeight:700, color:S.primary, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4 }}>
+                  <button onClick={() => navigate(`${basePath}/submissions`)} style={{ background:'none', border:'none', fontSize:12, fontWeight:700, color:S.primary, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4 }}>
                     View all submissions <ChevronRight size={14}/>
                   </button>
                 </div>
@@ -353,10 +355,10 @@ export default function AdminDashboard() {
                 <h3 style={{ fontSize:15, fontWeight:700, margin:'0 0 16px' }}>Quick Actions</h3>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
                   {[
-                    { Icon: Users, label:'Users', color:'#2563EB', bg:'#DBEAFE', onClick: () => navigate('/udview/users') },
-                    { Icon: Flag, label:'Teams', color:'#059669', bg:'#D1FAE5', onClick: () => navigate('/udview/teams') },
-                    { Icon: CheckSquare, label:'Evaluations', color:'#D97706', bg:'#FEF3C7', onClick: () => navigate('/udview/evaluations') },
-                    { Icon: Megaphone, label:'Announcements', color:'#6C4EFF', bg:'#EEE8FF', onClick: () => navigate('/udview/announcements') }
+                    { Icon: Users, label:'Users', color:'#2563EB', bg:'#DBEAFE', onClick: () => navigate(`${basePath}/users`) },
+                    { Icon: Flag, label:'Teams', color:'#059669', bg:'#D1FAE5', onClick: () => navigate(`${basePath}/teams`) },
+                    { Icon: CheckSquare, label:'Evaluations', color:'#D97706', bg:'#FEF3C7', onClick: () => navigate(`${basePath}/evaluations`) },
+                    { Icon: Megaphone, label:'Announcements', color:'#6C4EFF', bg:'#EEE8FF', onClick: () => navigate(`${basePath}/announcements`) }
                   ].map((a, i) => (
                     <button key={i} onClick={a.onClick} style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:8, padding:'18px 12px', borderRadius:12, border:'1px solid #F1F5F9', background:S.card, cursor:'pointer', boxShadow:'0 1px 2px rgba(0,0,0,.04)', transition:'box-shadow .15s' }}
                       onMouseEnter={e => e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,.08)'}

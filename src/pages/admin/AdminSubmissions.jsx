@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
-import { FileText, Search, ChevronRight, Download, Calendar as CalendarIcon, Filter, Eye } from 'lucide-react';
+import { FileText, Search, ChevronRight, Download, Calendar as CalendarIcon, Filter, Eye, X, ExternalLink } from 'lucide-react';
 
 const S = {
   bg: '#F8FAFC', card: '#FFFFFF', border: '#E5E7EB', primary: '#6C4EFF',
@@ -26,6 +26,31 @@ export default function AdminSubmissions() {
   const [tabCounts, setTabCounts] = useState({ all: 0, pending: 0, shortlisted: 0, rejected: 0 });
   const [teams, setTeams] = useState([]);
   const [totalFilteredCount, setTotalFilteredCount] = useState(0);
+  const [pdfModal, setPdfModal] = useState(null);
+
+  const openPdfSafe = (url) => {
+    if (!url) return;
+    try {
+      if (url.startsWith('data:')) {
+        const arr = url.split(',');
+        const mime = arr[0].match(/:(.*?);/)?.[1] || 'application/pdf';
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        const blob = new Blob([u8arr], { type: mime });
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+      } else {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    } catch (err) {
+      console.warn('PDF open error:', err);
+      window.open(url, '_blank');
+    }
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -310,9 +335,14 @@ export default function AdminSubmissions() {
                           </td>
                           <td style={{ padding:'16px 20px', textAlign:'center' }}>
                             {s.fileUrl ? (
-                              <a href={s.fileUrl} target="_blank" rel="noreferrer" title="View PDF" style={{ width:32, height:32, borderRadius:'50%', border:'1px solid '+S.border, background:S.card, display:'inline-flex', alignItems:'center', justifyContent:'center', color:S.t2, cursor:'pointer', textDecoration:'none', transition:'all 0.2s' }}>
+                              <button
+                                type="button"
+                                onClick={() => setPdfModal({ url: s.fileUrl, title: s.subTitle, teamName: s.teamName })}
+                                title="Preview Presentation Deck PDF"
+                                style={{ width:32, height:32, borderRadius:'50%', border:'1px solid '+S.border, background:S.card, display:'inline-flex', alignItems:'center', justifyContent:'center', color:S.primary, cursor:'pointer', transition:'all 0.2s' }}
+                              >
                                 <Eye size={16}/>
-                              </a>
+                              </button>
                             ) : (
                               <span title="No PDF" style={{ width:32, height:32, borderRadius:'50%', border:'1px solid '+S.border, background:S.bg, display:'inline-flex', alignItems:'center', justifyContent:'center', color:S.border, cursor:'not-allowed' }}>
                                 <Eye size={16}/>
@@ -359,6 +389,41 @@ export default function AdminSubmissions() {
             </div>
           </div>
         </div>
+
+        {/* PDF PREVIEW MODAL */}
+        {pdfModal && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.7)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:24, backdropFilter:'blur(4px)' }}>
+            <div style={{ background:'#ffffff', borderRadius:16, width:'100%', maxWidth:920, height:'90vh', display:'flex', flexDirection:'column', overflow:'hidden', boxShadow:'0 25px 50px -12px rgba(0,0,0,0.25)', border:'1.5px solid #fed7aa' }}>
+              <div style={{ padding:'16px 20px', borderBottom:'1px solid #e2e8f0', display:'flex', alignItems:'center', justifyContent:'space-between', background:'#fffaf3' }}>
+                <div>
+                  <div style={{ fontSize:15, fontWeight:800, color:'#0f172a' }}>{pdfModal.title}</div>
+                  <div style={{ fontSize:12, color:'#ea580c', fontWeight:700 }}>Team {pdfModal.teamName}</div>
+                </div>
+                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  <button
+                    onClick={() => openPdfSafe(pdfModal.url)}
+                    style={{ display:'flex', alignItems:'center', gap:6, background:'#ff3b69', color:'#ffffff', border:'none', padding:'8px 14px', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer' }}
+                  >
+                    <ExternalLink size={14}/> Open in New Tab
+                  </button>
+                  <button
+                    onClick={() => setPdfModal(null)}
+                    style={{ width:32, height:32, borderRadius:8, border:'1px solid #cbd5e1', background:'#ffffff', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#64748b' }}
+                  >
+                    <X size={18}/>
+                  </button>
+                </div>
+              </div>
+              <div style={{ flex:1, background:'#1e293b' }}>
+                <iframe
+                  src={pdfModal.url}
+                  title={pdfModal.title}
+                  style={{ width:'100%', height:'100%', border:'none' }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
     </>
   );
 }

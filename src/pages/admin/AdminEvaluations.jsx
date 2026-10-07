@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
+import { syncLocalDataToSupabase } from '../../lib/syncService';
 import { FileText, Search, ChevronDown, Download, ChevronRight, MoreVertical, ChevronLeft, Star, Clock, XCircle, Eye, Calendar as CalendarIcon, ClipboardCheck, Filter } from 'lucide-react';
 
 const S = {
@@ -14,6 +15,8 @@ const S = {
 
 export default function AdminEvaluations() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/udview';
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [evaluations, setEvaluations] = useState([]);
@@ -29,22 +32,19 @@ export default function AdminEvaluations() {
   const [totalFilteredCount, setTotalFilteredCount] = useState(0);
 
   const fetchData = useCallback(async () => {
+    try {
+      await syncLocalDataToSupabase();
+    } catch (e) {
+      console.warn('Sync error:', e);
+    }
     const [cAll, cC, cP, cI, cO] = await Promise.all([
       supabase.from('submissions').select('*', { count: 'exact', head: true }),
       supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'Completed'),
-      supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'Pending'),
+      supabase.from('submissions').select('*', { count: 'exact', head: true }).or('status.eq.Pending,status.eq.Under Review,status.is.null'),
       supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'In Progress'),
       supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'Overdue'),
     ]);
     
-    setTabCounts({
-      all: cAll.count || 0,
-      completed: cC.count || 0,
-      pending: cP.count || 0,
-      inProgress: cI.count || 0,
-      overdue: cO.count || 0
-    });
-
     setTabCounts({
       all: cAll.count || 0,
       completed: cC.count || 0,
@@ -68,13 +68,15 @@ export default function AdminEvaluations() {
     checkAuth();
   }, [navigate, fetchData]);
 
-
-
   const buildQuery = async (isExport = false) => {
     let query = supabase.from('submissions').select('*', { count: 'exact' });
     
     if (activeTab !== 'All Evaluations') {
-      query = query.eq('status', activeTab);
+      if (activeTab === 'Pending' || activeTab === 'Under Review') {
+        query = query.or('status.eq.Pending,status.eq.Under Review,status.is.null');
+      } else {
+        query = query.eq('status', activeTab);
+      }
     }
 
     if (searchTerm) {
@@ -413,7 +415,7 @@ export default function AdminEvaluations() {
                           </td>
                           <td style={{ padding:'16px 20px', textAlign:'center' }}>
                             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
-                              <button onClick={() => navigate(`/udview/evaluations/${e.id}`)} style={{ background:S.card, border:'1px solid '+S.border, borderRadius:6, color:S.t2, cursor:'pointer', padding:6, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                              <button onClick={() => navigate(`${basePath}/evaluations/${e.id}`)} style={{ background:S.card, border:'1px solid '+S.border, borderRadius:6, color:S.t2, cursor:'pointer', padding:6, display:'flex', alignItems:'center', justifyContent:'center' }}>
                                 <Eye size={14}/>
                               </button>
                             </div>

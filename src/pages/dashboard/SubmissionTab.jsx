@@ -163,7 +163,21 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
     setSubmitting(true);
     setErrorMsg('');
     try {
-      let uploadedPdfUrl = form.pdf_url || 'https://sample-deck.pdf';
+      let uploadedPdfUrl = form.pdf_url;
+      if (form.pdf) {
+        if (form.pdf.size > 5 * 1024 * 1024) {
+          throw new Error('Presentation PDF size exceeds 5MB limit. Please compress your PDF deck.');
+        }
+        uploadedPdfUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error('Failed to process PDF file.'));
+          reader.readAsDataURL(form.pdf);
+        });
+      }
+      if (!uploadedPdfUrl) {
+        uploadedPdfUrl = 'https://sample-deck.pdf';
+      }
 
       const sdgValue = Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg;
       const cleanTitle = sanitizeInput(form.title);
