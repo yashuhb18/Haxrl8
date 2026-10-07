@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 import { sendSubmissionConfirmationEmail } from '../../lib/emailService';
+import { ensureUUID, isUUID } from '../../lib/syncService';
 
 const card = (extra = {}) => ({
   background: '#ffffff',
@@ -169,8 +170,9 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
       const cleanDesc = sanitizeInput(form.description);
       const cleanCategory = form.category === 'Other' ? sanitizeInput(form.category_other) : form.category;
 
+      const validTeamId = ensureUUID(teamData?.id);
       const submissionPayload = {
-        team_id: teamData?.id || 'team_default',
+        team_id: validTeamId,
         project_title: cleanTitle,
         sdg_goal: sdgValue,
         category: cleanCategory,
@@ -181,7 +183,9 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
       try {
         const { data, error } = await supabase.from('submissions').upsert([submissionPayload]).select().single();
         if (error && error.code !== 'PGRST116') throw error;
-        if (setSubmissions) setSubmissions([data || submissionPayload]);
+        const savedSub = data || submissionPayload;
+        if (setSubmissions) setSubmissions([savedSub]);
+        localStorage.setItem('haxlr8_submissions_db', JSON.stringify([savedSub]));
       } catch (subErr) {
         console.warn('Supabase submissions upsert fallback:', subErr);
         localStorage.setItem('haxlr8_submissions_db', JSON.stringify([submissionPayload]));

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
+import { syncLocalDataToSupabase } from '../../lib/syncService';
 import { FileText, Search, ChevronRight, Download, Calendar as CalendarIcon, Filter, Eye } from 'lucide-react';
 
 const S = {
@@ -27,9 +28,15 @@ export default function AdminSubmissions() {
   const [totalFilteredCount, setTotalFilteredCount] = useState(0);
 
   const fetchData = useCallback(async () => {
+    try {
+      await syncLocalDataToSupabase();
+    } catch (e) {
+      console.warn('Sync error:', e);
+    }
+
     const [cAll, cP, cS, cR] = await Promise.all([
       supabase.from('submissions').select('*', { count: 'exact', head: true }),
-      supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'Pending'),
+      supabase.from('submissions').select('*', { count: 'exact', head: true }).or('status.eq.Pending,status.eq.Under Review,status.is.null'),
       supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'Shortlisted'),
       supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'Rejected'),
     ]);
@@ -60,7 +67,11 @@ export default function AdminSubmissions() {
     let query = supabase.from('submissions').select('*', { count: 'exact' });
     
     if (activeTab !== 'All Submissions') {
-      query = query.eq('status', activeTab);
+      if (activeTab === 'Under Review' || activeTab === 'Pending') {
+        query = query.or('status.eq.Pending,status.eq.Under Review,status.is.null');
+      } else {
+        query = query.eq('status', activeTab);
+      }
     }
 
     if (searchTerm) {
@@ -101,7 +112,7 @@ export default function AdminSubmissions() {
             teamTrack: sub.category || 'General',
             subTitle: sub.project_title || 'Untitled Project',
             subDesc: sub.project_description || 'No description provided',
-            status: sub.status || 'Pending',
+            status: sub.status || 'Under Review',
             fileUrl: sub.pdf_url || null,
             date: sub.created_at || new Date().toISOString()
           };
@@ -183,7 +194,7 @@ export default function AdminSubmissions() {
 
   const tabs = [
     { label: 'All Submissions', count: tabCounts.all, bg: '#F1F5F9', color: '#64748B' },
-    { label: 'Pending', count: tabCounts.pending, bg: '#FEF3C7', color: '#D97706' },
+    { label: 'Under Review', count: tabCounts.pending, bg: '#FEF3C7', color: '#D97706' },
     { label: 'Shortlisted', count: tabCounts.shortlisted, bg: '#DBEAFE', color: '#2563EB' },
     { label: 'Rejected', count: tabCounts.rejected, bg: '#FEF2F2', color: '#DC2626' }
   ];

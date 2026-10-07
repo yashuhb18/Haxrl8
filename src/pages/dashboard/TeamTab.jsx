@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
 import { Rocket, Users, Flag, ClipboardList, MoreVertical, Info, Target, Calendar, Check, AlertCircle, Clock } from 'lucide-react';
 import { sendParticipantWelcomeEmail } from '../../lib/emailService';
+import { ensureUUID, isUUID } from '../../lib/syncService';
 // import IdCardUpload from '../../components/IdCardUpload';
 
 const INDIA_STATES_CITIES = {
@@ -321,18 +322,22 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         finalTeamData = { ...teamData, team_name: cleanTeamName };
       } else {
         let team = null;
+        currentTeamId = ensureUUID(currentTeamId || teamData?.id);
+        const validLeaderId = ensureUUID(user?.id);
         try {
           const { data: createdTeam, error: teamErr } = await supabase.from('teams').insert({
-            leader_id: user?.id || 'leader_' + Date.now(),
+            id: currentTeamId,
+            leader_id: validLeaderId,
             team_name: cleanTeamName
           }).select().single();
           if (teamErr) throw teamErr;
           team = createdTeam;
+          localStorage.setItem('haxlr8_teams_db', JSON.stringify(team));
         } catch (tErr) {
           console.warn('Supabase teams insert notice:', tErr);
           team = {
-            id: 'team_' + Math.random().toString(36).substring(2, 10),
-            leader_id: user?.id || 'leader_' + Date.now(),
+            id: currentTeamId,
+            leader_id: validLeaderId,
             team_name: cleanTeamName,
             created_at: new Date().toISOString()
           };
@@ -406,7 +411,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           id_card_back_url: m.id_card_back_url,
           is_leader: memberIsLeader
         };
-        if (m.id) payload.id = m.id; // Include ID for upsert if it exists
+        if (m.id && isUUID(m.id)) payload.id = m.id; // Only include ID if valid UUID
         return payload;
       };
 
@@ -421,9 +426,10 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         const { data: members, error: memErr } = await supabase.from('team_members').upsert(allMembers).select();
         if (memErr) throw memErr;
         if (members) savedMembers = members;
+        localStorage.setItem('haxlr8_members_db', JSON.stringify(savedMembers));
       } catch (mErr) {
         console.warn('Supabase members upsert notice:', mErr);
-        savedMembers = allMembers.map((m, idx) => ({ ...m, id: m.id || 'mem_' + idx + '_' + Date.now() }));
+        savedMembers = allMembers.map((m) => ({ ...m, id: ensureUUID(m.id) }));
         localStorage.setItem('haxlr8_members_db', JSON.stringify(savedMembers));
       }
 

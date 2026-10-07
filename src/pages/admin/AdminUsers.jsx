@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
+import { syncLocalDataToSupabase } from '../../lib/syncService';
 import { Users, Flag, BookOpen, Shield, Search, ChevronDown, Download, ChevronRight, Plus, ChevronLeft, Eye, CheckCircle, X, Clock } from 'lucide-react';
 
 const S = {
@@ -38,6 +39,11 @@ export default function AdminUsers() {
   const [adminEmail, setAdminEmail] = useState('');
 
   const fetchData = useCallback(async () => {
+    try {
+      await syncLocalDataToSupabase();
+    } catch (e) {
+      console.warn('Sync error:', e);
+    }
     const { count: total } = await supabase.from('team_members').select('*', { count: 'exact', head: true });
     setTotalUsersDB(total || 0);
     setLoading(false);

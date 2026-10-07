@@ -1,4 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
+
+const isUUID = (str) => typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
 
 const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder-project.supabase.co';
 const rawSupabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key';
@@ -28,13 +31,21 @@ function notifyAuthListeners(event, session) {
 function getLocalSession() {
   try {
     const raw = localStorage.getItem(LOCAL_SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed?.user && !isUUID(parsed.user.id)) {
+      parsed.user.id = uuidv4();
+      localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(parsed));
+    }
+    return parsed;
   } catch (e) {
     return null;
   }
 }
 
 function setLocalSession(user) {
+  if (user && !isUUID(user.id)) {
+    user.id = uuidv4();
+  }
   const session = {
     access_token: 'haxlr8_token_' + Date.now(),
     token_type: 'bearer',
@@ -97,7 +108,7 @@ export const supabase = {
 
       // Resilient Squad Leader Session (guaranteed to log in commander so they can access their dashboard)
       const user = {
-        id: 'leader_' + (cleanEmail.includes('yash') ? 'yash_organizer' : btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16) || 'leader_commander'),
+        id: uuidv4(),
         email: cleanEmail,
         user_metadata: {
           full_name: cleanEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
@@ -129,7 +140,7 @@ export const supabase = {
       }
 
       const user = {
-        id: 'leader_' + Date.now().toString(36),
+        id: uuidv4(),
         email: cleanEmail,
         user_metadata: {
           full_name: fullName,

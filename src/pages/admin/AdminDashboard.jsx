@@ -2,8 +2,9 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
-import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight, Mail, Send, CheckCircle2 } from 'lucide-react';
+import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight, Mail, Send, CheckCircle2, RefreshCw } from 'lucide-react';
 import { getEmailDispatchLogs, HAXLR8_HOST_EMAIL } from '../../lib/emailService';
+import { syncLocalDataToSupabase } from '../../lib/syncService';
 
 // Style constants
 const S = {
@@ -23,8 +24,15 @@ export default function AdminDashboard() {
   const [showEmail, setShowEmail] = useState(false);
   const [exactCounts, setExactCounts] = useState({ teams: 0, members: 0, subs: 0, evals: 0 });
   const [emailLogs, setEmailLogs] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchData = useCallback(async () => {
+    try {
+      await syncLocalDataToSupabase();
+    } catch (syncErr) {
+      console.warn('Sync error:', syncErr);
+    }
+
     // 1. Fetch exact counts (instant, no data download)
     const [cT, cM, cS, cE] = await Promise.all([
       supabase.from('teams').select('*', { count: 'exact', head: true }),
@@ -158,7 +166,25 @@ export default function AdminDashboard() {
               <div style={{ fontSize:11, fontWeight:500, color:S.t2, display:'flex', alignItems:'center', gap:4 }}>Home <ChevronRight size={12}/> <span style={{color:S.t1}}>Dashboard</span></div>
             </div>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+            <button
+              onClick={async () => {
+                setIsRefreshing(true);
+                try { await fetchData(); } finally { setIsRefreshing(false); }
+              }}
+              disabled={isRefreshing}
+              style={{
+                display:'flex', alignItems:'center', gap:8,
+                background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:10,
+                padding:'8px 14px', fontSize:12.5, fontWeight:700, color:'#334155',
+                cursor: isRefreshing ? 'not-allowed' : 'pointer',
+                transition:'all 0.2s'
+              }}
+              title="Synchronize database telemetry & local registrations"
+            >
+              <RefreshCw size={14} style={{ animation: isRefreshing ? 'spin 0.8s linear infinite' : 'none', color: '#ff3b69' }} />
+              {isRefreshing ? 'Syncing...' : 'Sync & Refresh'}
+            </button>
             <div 
               onClick={() => setShowEmail(!showEmail)}
               style={{ display:'flex', alignItems:'center', gap:10, borderLeft:'1px solid '+S.border, paddingLeft:20, cursor:'pointer' }}

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
+import { syncLocalDataToSupabase } from '../../lib/syncService';
 import { Users, Flag, CheckSquare, Search, ChevronDown, Download, ChevronRight, MoreVertical, ChevronLeft, Trophy } from 'lucide-react';
 
 const S = {
@@ -31,6 +32,11 @@ export default function AdminTeams() {
   const [totalFilteredCount, setTotalFilteredCount] = useState(0);
 
   const fetchData = useCallback(async () => {
+    try {
+      await syncLocalDataToSupabase();
+    } catch (e) {
+      console.warn('Sync error:', e);
+    }
     const { count: total } = await supabase.from('teams').select('*', { count: 'exact', head: true });
     setTotalTeamsDB(total || 0);
     setLoading(false);
