@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import DomainWheel from '../../components/ui/DomainWheel';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 import emitersSeal from '../../assets/logo/emiters-seal.png';
+import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 export { DomainWheel };
 export const SDGWheel = DomainWheel;
@@ -51,31 +52,42 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
                   gap:12,
                   padding:'11px 14px',
                   borderRadius:14,
-                  border: active ? '1.5px solid #fda4af' : '1.5px solid transparent',
+                  border: active ? '1.5px solid #7dd3fc' : '1.5px solid transparent',
                   cursor:'pointer',
                   textAlign:'left',
                   width:'100%',
-                  background: active ? '#ffe4e6' : 'transparent',
+                  background: active ? '#e0f2fe' : 'transparent',
                   outline:'none',
                   transition:'all 0.15s',
-                  boxShadow: active ? '0 4px 12px rgba(255, 59, 105, 0.12)' : 'none',
+                  boxShadow: active ? '0 4px 12px rgba(2, 132, 199, 0.15)' : 'none',
                 }}
-                onMouseEnter={e => { if(!active) e.currentTarget.style.background='#fdf4e7'; }}
+                onMouseEnter={e => { if(!active) e.currentTarget.style.background='#f0f9ff'; }}
                 onMouseLeave={e => { if(!active) e.currentTarget.style.background='transparent'; }}
               >
-                <span style={{ fontSize:18, flexShrink:0, color: active ? '#ff3b69' : '#94a3b8', fontWeight:900 }}>{item.icon}</span>
+                <span style={{ fontSize:18, flexShrink:0, color: active ? '#0284c7' : '#94a3b8', fontWeight:900 }}>{item.icon}</span>
                 {!collapsed && (
-                  <span style={{ fontSize:13.5, fontWeight: active ? 800 : 600, color: active ? '#ff3b69' : '#475569', whiteSpace:'nowrap', letterSpacing:'0.01em' }}>
+                  <span style={{ fontSize:13.5, fontWeight: active ? 800 : 600, color: active ? '#0284c7' : '#475569', whiteSpace:'nowrap', letterSpacing:'0.01em' }}>
                     {item.label}
                   </span>
                 )}
                 {!collapsed && active && (
-                  <div style={{ marginLeft:'auto', width:7, height:7, borderRadius:'50%', background:'#ff3b69', boxShadow:'0 0 8px #ff3b69' }}/>
+                  <div style={{ marginLeft:'auto', width:7, height:7, borderRadius:'50%', background:'#0284c7', boxShadow:'0 0 8px #0284c7' }}/>
                 )}
               </button>
             );
           })}
         </nav>
+
+        {/* Crewmate Mascot */}
+        <div style={{ padding:'12px', margin:'0 10px 12px', background:'#f0f9ff', borderRadius:16, border:'1.5px solid #bae6fd', display:'flex', alignItems:'center', gap:10, justifyContent: collapsed ? 'center' : 'flex-start' }}>
+          <AmongUsCrewmate color="cyan" size={collapsed ? 36 : 42} speechText="Ready for launch, Crewmate!" />
+          {!collapsed && (
+            <div>
+              <div style={{ fontSize:11.5, fontWeight:900, color:'#0369a1', textTransform:'uppercase', letterSpacing:'0.04em' }}>Flight Deck</div>
+              <div style={{ fontSize:10, fontWeight:700, color:'#0284c7' }}>● All Tasks Nominal</div>
+            </div>
+          )}
+        </div>
 
         {/* Footer nav */}
         <div style={{ padding:'12px 10px', borderTop:'1.5px solid #f1e7db' }}>
@@ -168,7 +180,7 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
               onMouseLeave={e => { e.currentTarget.style.background='#fff7ed'; }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-              <div style={{ position:'absolute', top:2, right:2, width:8, height:8, borderRadius:'50%', background:'#ff3b69', boxShadow:'0 0 8px #ff3b69' }}/>
+              <div style={{ position:'absolute', top:2, right:2, width:8, height:8, borderRadius:'50%', background:'#0284c7', boxShadow:'0 0 8px #0284c7' }}/>
             </button>
 
             {/* Profile Avatar with Leader Crown */}
@@ -187,7 +199,7 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
                 transition:'all 0.2s',
               }}
             >
-              <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg, #ff3b69, #f59e0b)', display:'flex', alignItems:'center', justifyContent:'center', color:'#ffffff', fontSize:'13px', fontWeight:900, boxShadow:'0 2px 8px rgba(255, 59, 105, 0.3)' }}>
+              <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg, #0284c7, #06b6d4)', display:'flex', alignItems:'center', justifyContent:'center', color:'#ffffff', fontSize:'13px', fontWeight:900, boxShadow:'0 2px 8px rgba(2, 132, 199, 0.3)' }}>
                 👑
               </div>
               <span style={{ fontSize:12, fontWeight:800, color:'#15803d' }}>
@@ -213,8 +225,8 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
               onClick={() => setActiveTab(item.id)} 
               style={{ 
                 display:'flex', alignItems:'center', justifyContent:'center', gap:6, 
-                background: active ? '#ffe4e6' : 'transparent', 
-                border: active ? '1.5px solid #fda4af' : 'none', outline:'none', 
+                background: active ? '#e0f2fe' : 'transparent', 
+                border: active ? '1.5px solid #7dd3fc' : 'none', outline:'none', 
                 padding: active ? '10px 16px' : '10px 0', 
                 borderRadius: '100px',
                 flex: active ? '0 0 auto' : '1 1 0', 
@@ -224,9 +236,9 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
                 overflow: 'hidden'
               }}
             >
-              <span style={{ fontSize: active ? 18 : 20, color: active ? '#ff3b69' : '#94a3b8', fontWeight: active ? 900 : 500, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
+              <span style={{ fontSize: active ? 18 : 20, color: active ? '#0284c7' : '#94a3b8', fontWeight: active ? 900 : 500, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
               {active && (
-                <span style={{ fontSize:13, color: '#ff3b69', fontWeight: 800, whiteSpace: 'nowrap' }}>{item.label}</span>
+                <span style={{ fontSize:13, color: '#0284c7', fontWeight: 800, whiteSpace: 'nowrap' }}>{item.label}</span>
               )}
             </button>
           );
@@ -271,7 +283,7 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
               <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
                 <label style={{ fontSize:12, fontWeight:800, color:'#64748b', textTransform:'uppercase' }}>Leader Full Name</label>
                 <div style={{ display:'flex', alignItems:'center', border:'1.5px solid #e2e8f0', borderRadius:12, padding:'10px 14px', gap:10, background:'#f8fafc' }}>
-                  <span style={{ color:'#ff3b69' }}>👤</span>
+                  <span style={{ color:'#0284c7' }}>👤</span>
                   <input type="text" defaultValue={user?.user_metadata?.full_name || ''} placeholder="Full Name" readOnly style={{ border:'none', outline:'none', width:'100%', fontSize:13.5, background:'transparent', color:'#0f172a', fontWeight:600, cursor:'not-allowed' }}/>
                 </div>
               </div>
@@ -279,7 +291,7 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
               <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
                 <label style={{ fontSize:12, fontWeight:800, color:'#64748b', textTransform:'uppercase' }}>Leader College Email</label>
                 <div style={{ display:'flex', alignItems:'center', border:'1.5px solid #e2e8f0', borderRadius:12, padding:'10px 14px', gap:10, background:'#f8fafc' }}>
-                  <span style={{ color:'#ff3b69' }}>✉️</span>
+                  <span style={{ color:'#0284c7' }}>✉️</span>
                   <input type="email" defaultValue={user?.email || ''} readOnly style={{ border:'none', outline:'none', width:'100%', fontSize:13.5, background:'transparent', color:'#0f172a', fontWeight:600, cursor:'not-allowed' }}/>
                 </div>
               </div>

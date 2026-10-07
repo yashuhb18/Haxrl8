@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 import emitersSeal from '../../assets/logo/emiters-seal.png';
+import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 const MASTER_PASSCODE = 'HAXLR8_COMMAND_2026';
 const ORGANIZER_SESSION_KEY = 'haxlr8_organizer_session';
@@ -97,8 +98,8 @@ export default function AdminAuthGate({ children }) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#fffaf3', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ width: 44, height: 44, border: '4px solid #fed7aa', borderTop: '4px solid #ff3b69', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
-          <div style={{ color: '#ff3b69', fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em' }}>VERIFYING ORGANIZER CLEARANCE...</div>
+          <div style={{ width: 44, height: 44, border: '4px solid #fed7aa', borderTop: '4px solid #0284c7', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+          <div style={{ color: '#0284c7', fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em' }}>VERIFYING ORGANIZER CLEARANCE...</div>
           <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -114,9 +115,12 @@ export default function AdminAuthGate({ children }) {
       <div style={{ width: '100%', maxWidth: 460, background: '#ffffff', borderRadius: 24, border: '2px solid #fed7aa', padding: '36px 32px', boxShadow: '0 12px 40px rgba(251, 146, 60, 0.08)' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '6px 16px', borderRadius: 30, background: '#fff1f2', border: '1.5px solid #fecaca', marginBottom: 14 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+            <AmongUsCrewmate color="red" size={54} hat="cap" speechText="Restricted Admin Sector!" />
+          </div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '6px 16px', borderRadius: 30, background: '#e0f2fe', border: '1.5px solid #bae6fd', marginBottom: 14 }}>
             <span style={{ fontSize: 16 }}>🛡️</span>
-            <span style={{ fontSize: 11, fontWeight: 900, color: '#e11d48', letterSpacing: '0.08em', textTransform: 'uppercase' }}>RESTRICTED ACCESS</span>
+            <span style={{ fontSize: 11, fontWeight: 900, color: '#0369a1', letterSpacing: '0.08em', textTransform: 'uppercase' }}>RESTRICTED ACCESS</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
             <img src={haxlr8LogoDark} alt="HAXLR8 3.0" style={{ height: 32, objectFit: 'contain' }} />
@@ -137,7 +141,7 @@ export default function AdminAuthGate({ children }) {
               borderRadius: 10,
               border: 'none',
               background: mode === 'passcode' ? '#ffffff' : 'transparent',
-              color: mode === 'passcode' ? '#ff3b69' : '#64748b',
+              color: mode === 'passcode' ? '#0284c7' : '#64748b',
               fontWeight: 800,
               fontSize: 12.5,
               cursor: 'pointer',
@@ -155,7 +159,7 @@ export default function AdminAuthGate({ children }) {
               borderRadius: 10,
               border: 'none',
               background: mode === 'supabase' ? '#ffffff' : 'transparent',
-              color: mode === 'supabase' ? '#ff3b69' : '#64748b',
+              color: mode === 'supabase' ? '#0284c7' : '#64748b',
               fontWeight: 800,
               fontSize: 12.5,
               cursor: 'pointer',
@@ -198,7 +202,7 @@ export default function AdminAuthGate({ children }) {
                   fontFamily: 'inherit',
                   transition: 'border-color 0.2s'
                 }}
-                onFocus={e => e.target.style.borderColor = '#ff3b69'}
+                onFocus={e => e.target.style.borderColor = '#0284c7'}
                 onBlur={e => e.target.style.borderColor = '#cbd5e1'}
               />
             </div>
@@ -207,7 +211,7 @@ export default function AdminAuthGate({ children }) {
               <button
                 type="button"
                 onClick={() => setPasscode(MASTER_PASSCODE)}
-                style={{ background: 'none', border: 'none', color: '#ff3b69', fontSize: 12, fontWeight: 800, cursor: 'pointer', padding: 0 }}
+                style={{ background: 'none', border: 'none', color: '#0284c7', fontSize: 12, fontWeight: 800, cursor: 'pointer', padding: 0 }}
               >
                 ⚡ 1-Click Auto-Fill Yash Key
               </button>
@@ -220,12 +224,12 @@ export default function AdminAuthGate({ children }) {
                 padding: '13px',
                 borderRadius: 14,
                 border: 'none',
-                background: '#ff3b69',
+                background: '#0284c7',
                 color: '#ffffff',
                 fontSize: 14.5,
                 fontWeight: 900,
                 cursor: 'pointer',
-                boxShadow: '0 4px 16px rgba(255, 59, 105, 0.35)',
+                boxShadow: '0 4px 16px rgba(2, 132, 199, 0.35)',
                 transition: 'transform 0.15s'
               }}
               onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
@@ -293,12 +297,12 @@ export default function AdminAuthGate({ children }) {
                 padding: '13px',
                 borderRadius: 14,
                 border: 'none',
-                background: '#ff3b69',
+                background: '#0284c7',
                 color: '#ffffff',
                 fontSize: 14.5,
                 fontWeight: 900,
                 cursor: submitting ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 16px rgba(255, 59, 105, 0.35)',
+                boxShadow: '0 4px 16px rgba(2, 132, 199, 0.35)',
                 marginTop: 6
               }}
             >

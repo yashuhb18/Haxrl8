@@ -213,7 +213,7 @@ export default function AdminAnnouncements() {
                       { bg: '#DCFCE7', c: '#16A34A' },
                       { bg: '#DBEAFE', c: '#2563EB' },
                       { bg: '#FEF3C7', c: '#D97706' },
-                      { bg: '#FFE4E6', c: '#E11D48' }
+                      { bg: '#E0F2FE', c: '#0284C7' }
                     ];
                     const ac = iconColors[a.title.length % iconColors.length];
 

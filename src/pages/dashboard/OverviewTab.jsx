@@ -4,6 +4,7 @@ import EventTimeline from '../../components/EventTimeline';
 import { motion, AnimatePresence } from 'framer-motion';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 import ProblemStatementPDF from '../../assets/PS_example/Hackathon Problem Statement 2026.pdf';
+import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 const TIMELINE_STEPS = [
   { title: 'Registration', date: 'Oct 08' },
@@ -31,8 +32,8 @@ const CheckItem = ({ label, status }) => {
     color = '#15803d';
   } else if (status === 'active') {
     icon = null;
-    style = { width: 20, height: 20, borderRadius: '50%', border: '2px dashed #ff3b69', flexShrink: 0, background: '#fff1f2' };
-    color = '#ff3b69';
+    style = { width: 20, height: 20, borderRadius: '50%', border: '2px dashed #0284c7', flexShrink: 0, background: '#e0f2fe' };
+    color = '#0284c7';
   } else {
     icon = null;
     style = { width: 20, height: 20, borderRadius: '50%', border: '2px solid #cbd5e1', flexShrink: 0, background: '#f8fafc' };
@@ -106,12 +107,12 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
       
       {/* Priority Mission Broadcast Banner */}
       {showNotification && (
-        <div style={{ background: '#fee2e2', border: '1.5px solid #fca5a5', borderRadius: 16, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 14, overflow: 'hidden', boxShadow: '0 4px 14px rgba(239, 68, 68, 0.08)' }}>
-          <span style={{ fontSize: 22 }}>🚨</span>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: '#991b1b', flex: 1, letterSpacing: '0.01em', lineHeight: 1.5 }}>
+        <div style={{ background: '#f0f9ff', border: '1.5px solid #bae6fd', borderRadius: 16, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 14, overflow: 'hidden', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.08)' }}>
+          <AmongUsCrewmate color="red" size={32} speechText="Deadline approaching!" />
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0369a1', flex: 1, letterSpacing: '0.01em', lineHeight: 1.5 }}>
             <strong>STARSHIP MISSION ADVISORY:</strong> Registration &amp; Idea Abstract Paper lock on <strong>October 28, 2026 at 11:59 PM IST</strong>. Confirm your 3–4 crew members before lock!
           </div>
-          <button onClick={() => setShowNotification(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#991b1b', opacity: 0.7 }} onMouseEnter={e => e.currentTarget.style.opacity='1'} onMouseLeave={e => e.currentTarget.style.opacity='0.7'}>
+          <button onClick={() => setShowNotification(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#0369a1', opacity: 0.7 }} onMouseEnter={e => e.currentTarget.style.opacity='1'} onMouseLeave={e => e.currentTarget.style.opacity='0.7'}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
@@ -130,22 +131,22 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
             flexDirection: 'column',
             padding: '24px',
             cursor: 'pointer',
-            border: '2px solid #fecaca',
-            background: 'linear-gradient(135deg, #fff1f2 0%, #ffffff 100%)',
+            border: '2px solid #bae6fd',
+            background: 'linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%)',
             transition: 'transform 0.2s, box-shadow 0.2s',
           })}
           onClick={() => setShowRulebook(true)}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(255, 59, 105, 0.12)'; }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(2, 132, 199, 0.15)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.04)'; }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 14, background: '#fee2e2', color: '#ff3b69', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 12px rgba(255, 59, 105, 0.15)' }}>📄</div>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 12px rgba(2, 132, 199, 0.15)' }}>📄</div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', lineHeight: 1.2 }}>Flight Rulebook</div>
-              <div style={{ fontSize: 11, fontWeight: 800, color: '#dc2626', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mandatory Protocols</div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: '#0284c7', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mandatory Protocols</div>
             </div>
           </div>
-          <div style={{ marginTop: 'auto', fontSize: 12.5, fontWeight: 800, color: '#ff3b69', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <div style={{ marginTop: 'auto', fontSize: 12.5, fontWeight: 800, color: '#0284c7', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             View flight protocols →
           </div>
         </div>
@@ -194,7 +195,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
               </div>
             ) : announcements.slice(0, 3).map(a => (
               <div key={a.id} style={{ display: 'flex', gap: 12, background: '#f8fafc', padding: '14px', borderRadius: 14, border: '1px solid #e2e8f0' }}>
-                <span style={{ fontSize: 18, color: '#ff3b69', flexShrink: 0 }}>📢</span>
+                <span style={{ fontSize: 18, color: '#0284c7', flexShrink: 0 }}>📢</span>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{a.title}</div>
                   <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 4, lineHeight: 1.4 }}>{a.message || a.content}</div>
@@ -203,7 +204,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
               </div>
             ))}
           </div>
-          <div onClick={() => setActiveTab('announcements')} style={{ marginTop: 20, textAlign: 'center', fontSize: 12.5, fontWeight: 800, color: '#ff3b69', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <div onClick={() => setActiveTab('announcements')} style={{ marginTop: 20, textAlign: 'center', fontSize: 12.5, fontWeight: 800, color: '#0284c7', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             View all broadcasts →
           </div>
         </div>
@@ -221,10 +222,10 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
             <div style={{ position: 'relative', width: 120, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg viewBox="0 0 36 36" style={{ position: 'absolute', width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f1e7db" strokeWidth="4" />
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ff3b69" strokeWidth="4" strokeDasharray={`${overallProgress}, 100`} />
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#0284c7" strokeWidth="4" strokeDasharray={`${overallProgress}, 100`} />
               </svg>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 26, fontWeight: 900, color: '#ff3b69', lineHeight: 1 }}>{overallProgress}%</div>
+                <div style={{ fontSize: 26, fontWeight: 900, color: '#0284c7', lineHeight: 1 }}>{overallProgress}%</div>
                 <div style={{ fontSize: 10, fontWeight: 800, color: '#64748b', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Readiness</div>
               </div>
             </div>
@@ -261,7 +262,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: '#ff3b69', background: '#ffe4e6', padding: '3px 8px', borderRadius: 100 }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#0284c7', background: '#e0f2fe', border: '1px solid #bae6fd', padding: '3px 8px', borderRadius: 100 }}>
                     {getDaysLeft(m.dateStr)}d left
                   </span>
                 </div>
@@ -292,8 +293,8 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
             download="HAXLR8_3.0_Template.pptx"
             style={{
               textDecoration: 'none',
-              background: '#fef2f2',
-              border: '1.5px solid #fecaca',
+              background: '#f0f9ff',
+              border: '1.5px solid #bae6fd',
               borderRadius: 16,
               padding: '16px',
               display: 'flex',
@@ -306,8 +307,8 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
           >
             <span style={{ fontSize: 28 }}>📊</span>
             <div>
-              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#991b1b' }}>Official PPT Deck</div>
-              <div style={{ fontSize: 11, color: '#b91c1c', fontWeight: 600 }}>Required PPTX Format</div>
+              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0369a1' }}>Official PPT Deck</div>
+              <div style={{ fontSize: 11, color: '#0284c7', fontWeight: 600 }}>Required PPTX Format</div>
             </div>
           </a>
 

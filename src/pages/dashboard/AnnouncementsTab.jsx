@@ -31,7 +31,7 @@ export default function AnnouncementsTab({ announcements = [] }) {
                   </div>
                 </div>
                 {a.tag && (
-                  <span style={{ fontSize: 11, fontWeight: 800, color: '#ff3b69', background: '#ffe4e6', border: '1px solid #fecaca', padding: '4px 12px', borderRadius: 20 }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: '#0284c7', background: '#e0f2fe', border: '1px solid #bae6fd', padding: '4px 12px', borderRadius: 20 }}>
                     {a.tag}
                   </span>
                 )}

@@ -5,6 +5,7 @@ import { sanitizeInput } from '../../lib/security';
 import { Rocket, Users, Flag, ClipboardList, MoreVertical, Info, Target, Calendar, Check, AlertCircle, Clock } from 'lucide-react';
 import { sendParticipantWelcomeEmail } from '../../lib/emailService';
 import { ensureUUID, isUUID } from '../../lib/syncService';
+import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 // import IdCardUpload from '../../components/IdCardUpload';
 
 const INDIA_STATES_CITIES = {
@@ -111,13 +112,13 @@ const styles = {
     padding: '12px 28px', 
     borderRadius: 12, 
     border: 'none', 
-    background: '#ff3b69', 
+    background: '#0284c7', 
     color: '#ffffff', 
     fontSize: 14, 
     fontWeight: 800, 
     cursor: 'pointer', 
     transition: 'transform 0.1s, box-shadow 0.2s', 
-    boxShadow: '0 4px 14px rgba(255, 59, 105, 0.3)' 
+    boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' 
   },
   buttonSecondary: { 
     padding: '12px 24px', 
@@ -507,7 +508,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           <div>
             <label style={styles.label}>Phone Number</label>
             <div style={{ display: 'flex', borderRadius: 12, border: '1.5px solid #cbd5e1', overflow: 'hidden', background: '#fafafa' }}>
-              <span style={{ padding: '12px 14px', background: '#f1f5f9', borderRight: '1.5px solid #cbd5e1', color: '#ff3b69', fontSize: 14, fontWeight: 800 }}>+91</span>
+              <span style={{ padding: '12px 14px', background: '#f1f5f9', borderRight: '1.5px solid #cbd5e1', color: '#0284c7', fontSize: 14, fontWeight: 800 }}>+91</span>
               <input type="tel" value={member.phone_number} onChange={e => updateMember('phone_number', e.target.value.replace(/\D/g, '').slice(0, 10))} style={{ width: '100%', padding: '12px 14px', border: 'none', outline: 'none', fontSize: 14, fontFamily: 'inherit', background: 'transparent', color: '#0f172a' }} placeholder="10-digit mobile number" />
             </div>
           </div>
@@ -616,7 +617,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         <div style={styles.card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', marginBottom: 20 }}>
             <div style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', width: '100%', height: 4, background: '#f1e7db', borderRadius: 10, zIndex: 0 }}></div>
-            <div style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', height: 4, background: 'linear-gradient(90deg, #ff3b69, #f59e0b)', borderRadius: 10, zIndex: 0, transition: 'width 0.3s ease', width: `${(currentStep / (totalSteps - 1)) * 100}%` }}></div>
+            <div style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', height: 4, background: 'linear-gradient(90deg, #0284c7, #06b6d4)', borderRadius: 10, zIndex: 0, transition: 'width 0.3s ease', width: `${(currentStep / (totalSteps - 1)) * 100}%` }}></div>
 
             {Array.from({ length: totalSteps }).map((_, idx) => {
               const isActive = idx === currentStep;
@@ -624,10 +625,10 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
               return (
                 <div key={idx} style={{
                   position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: '50%', fontWeight: 900, fontSize: 13, border: '2.5px solid', transition: 'all 0.3s ease',
-                  background: isPast ? '#16a34a' : isActive ? '#ff3b69' : '#ffffff',
-                  borderColor: isPast ? '#16a34a' : isActive ? '#ff3b69' : '#cbd5e1',
+                  background: isPast ? '#16a34a' : isActive ? '#0284c7' : '#ffffff',
+                  borderColor: isPast ? '#16a34a' : isActive ? '#0284c7' : '#cbd5e1',
                   color: isPast || isActive ? '#ffffff' : '#64748b',
-                  boxShadow: isActive ? '0 0 12px rgba(255, 59, 105, 0.4)' : 'none'
+                  boxShadow: isActive ? '0 0 12px rgba(2, 132, 199, 0.4)' : 'none'
                 }}>
                   {isPast ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4"><polyline points="20 6 9 17 4 12" /></svg> : idx + 1}
                 </div>
@@ -752,7 +753,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
       {/* Top Banner */}
       <div style={{ ...styles.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
-          <div style={{ width: 76, height: 76, borderRadius: 20, background: 'linear-gradient(135deg, #ff3b69, #ea580c)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 24px rgba(255, 59, 105, 0.3)' }}>
+          <div style={{ width: 76, height: 76, borderRadius: 20, background: 'linear-gradient(135deg, #0284c7, #06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 8px 24px rgba(2, 132, 199, 0.3)' }}>
             <Rocket size={34} color="#ffffff" />
           </div>
           <div>
@@ -764,7 +765,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 36, flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Users size={18} color="#ff3b69" />
+                <Users size={18} color="#0284c7" />
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>{teamMembers.length} Crew</div>
                   <div style={{ fontSize: 11.5, fontWeight: 600, color: '#64748b', marginTop: 2 }}>Members</div>
@@ -787,6 +788,9 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
             </div>
           </div>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <AmongUsCrewmate color="lime" size={54} speechText="Squad ready for launch!" />
+        </div>
       </div>
 
       <div className="dash-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, alignItems: 'stretch' }}>
@@ -802,11 +806,11 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
               const isLeader = m.id === teamData.leader_id || m.email === user.email;
               return (
                 <div key={m.id || idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '16px 0', borderBottom: idx !== teamMembers.length - 1 ? '1px solid #f1e7db' : 'none' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isLeader ? '#ff3b69' : '#0284c7', fontWeight: 900, fontSize: 16, flexShrink: 0, background: isLeader ? '#ffe4e6' : '#eff6ff', border: `2px solid ${isLeader ? '#fda4af' : '#bfdbfe'}`, boxShadow: isLeader ? '0 2px 10px rgba(255, 59, 105, 0.2)' : 'none' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isLeader ? '#0284c7' : '#0284c7', fontWeight: 900, fontSize: 16, flexShrink: 0, background: isLeader ? '#e0f2fe' : '#eff6ff', border: `2px solid ${isLeader ? '#7dd3fc' : '#bfdbfe'}`, boxShadow: isLeader ? '0 2px 10px rgba(2, 132, 199, 0.2)' : 'none' }}>
                     {m.full_name ? m.full_name[0].toUpperCase() : '?'}
                   </div>
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <span style={{ display: 'inline-block', fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 12, background: isLeader ? '#ffe4e6' : '#eff6ff', color: isLeader ? '#ff3b69' : '#0284c7', border: `1px solid ${isLeader ? '#fecaca' : '#bfdbfe'}`, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    <span style={{ display: 'inline-block', fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 12, background: isLeader ? '#e0f2fe' : '#eff6ff', color: isLeader ? '#0284c7' : '#0284c7', border: `1px solid ${isLeader ? '#bae6fd' : '#bfdbfe'}`, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       {isLeader ? 'Captain (Lead)' : 'Crewmate'}
                     </span>
                     <div style={{ fontSize: 15.5, fontWeight: 800, color: '#0f172a', marginBottom: 3 }}>
@@ -844,7 +848,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
               { num: 3, title: 'Submit Before Oct 28 Lock', desc: 'Lock in your idea paper to compete for the ₹30,000 bounty.' }
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: 20, position: 'relative', zIndex: 1 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', border: '2px solid #ff3b69', color: '#ff3b69', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, flexShrink: 0, boxShadow: '0 2px 8px rgba(255, 59, 105, 0.2)' }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', border: '2px solid #0284c7', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, flexShrink: 0, boxShadow: '0 2px 8px rgba(2, 132, 199, 0.2)' }}>
                   {step.num}
                 </div>
                 <div style={{ flex: 1, paddingTop: 4 }}>
@@ -875,8 +879,8 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
       {/* Bottom Action Card */}
       <div style={{ ...styles.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-          <div style={{ width: 50, height: 50, borderRadius: 14, background: '#ffe4e6', border: '1.5px solid #fecaca', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Rocket size={24} color="#ff3b69" />
+          <div style={{ width: 50, height: 50, borderRadius: 14, background: '#e0f2fe', border: '1.5px solid #bae6fd', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Rocket size={24} color="#0284c7" />
           </div>
           <div>
             <div style={{ fontSize: 16.5, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>Ready to submit your Idea Abstract?</div>
@@ -885,7 +889,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         </div>
         <button
           onClick={() => { if (setActiveTab) setActiveTab('submission'); }}
-          style={{ padding: '14px 28px', borderRadius: 12, border: 'none', background: '#ff3b69', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 14px rgba(255, 59, 105, 0.3)' }}
+          style={{ padding: '14px 28px', borderRadius: 12, border: 'none', background: '#0284c7', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' }}
         >
           Access Submissions Bay →
         </button>

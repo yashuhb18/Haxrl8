@@ -402,7 +402,7 @@ export default function AdminSubmissions() {
                 <div style={{ display:'flex', alignItems:'center', gap:10 }}>
                   <button
                     onClick={() => openPdfSafe(pdfModal.url)}
-                    style={{ display:'flex', alignItems:'center', gap:6, background:'#ff3b69', color:'#ffffff', border:'none', padding:'8px 14px', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer' }}
+                    style={{ display:'flex', alignItems:'center', gap:6, background:'#0284c7', color:'#ffffff', border:'none', padding:'8px 14px', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer' }}
                   >
                     <ExternalLink size={14}/> Open in New Tab
                   </button>

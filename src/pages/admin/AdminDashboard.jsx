@@ -184,7 +184,7 @@ export default function AdminDashboard() {
               }}
               title="Synchronize database telemetry & local registrations"
             >
-              <RefreshCw size={14} style={{ animation: isRefreshing ? 'spin 0.8s linear infinite' : 'none', color: '#ff3b69' }} />
+              <RefreshCw size={14} style={{ animation: isRefreshing ? 'spin 0.8s linear infinite' : 'none', color: '#0284c7' }} />
               {isRefreshing ? 'Syncing...' : 'Sync & Refresh'}
             </button>
             <div 

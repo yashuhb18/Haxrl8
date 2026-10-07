@@ -5,6 +5,7 @@ import { sanitizeInput } from '../../lib/security';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 import { sendSubmissionConfirmationEmail } from '../../lib/emailService';
 import { ensureUUID, isUUID } from '../../lib/syncService';
+import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 const card = (extra = {}) => ({
   background: '#ffffff',
@@ -39,7 +40,7 @@ function Field({ label, value, onChange, placeholder, type = 'text', hint, error
         value={value} 
         onChange={onChange} 
         placeholder={placeholder}
-        onFocus={e => { e.target.style.borderColor = '#ff3b69'; e.target.style.boxShadow = '0 0 12px rgba(255, 59, 105, 0.2)'; }}
+        onFocus={e => { e.target.style.borderColor = '#0284c7'; e.target.style.boxShadow = '0 0 12px rgba(2, 132, 199, 0.2)'; }}
         onBlur={e => { e.target.style.borderColor = error ? '#dc2626' : '#cbd5e1'; e.target.style.boxShadow = 'none'; }}
         style={{ 
           padding: '12px 14px', 
@@ -244,7 +245,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
           </p>
           <button
             onClick={() => setActiveTab('team')}
-            style={{ padding: '12px 28px', borderRadius: 12, background: '#ff3b69', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 14px rgba(255, 59, 105, 0.3)' }}
+            style={{ padding: '12px 28px', borderRadius: 12, background: '#0284c7', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' }}
           >
             Go to My Team →
           </button>
@@ -302,12 +303,12 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
           {STEPS.map((s, i) => (
             <React.Fragment key={i}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: i < step ? '#16a34a' : i === step ? '#ff3b69' : '#ffffff', border: `2.5px solid ${i < step ? '#16a34a' : i === step ? '#ff3b69' : '#cbd5e1'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', boxShadow: i === step ? '0 0 12px rgba(255, 59, 105, 0.4)' : 'none' }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: i < step ? '#16a34a' : i === step ? '#0284c7' : '#ffffff', border: `2.5px solid ${i < step ? '#16a34a' : i === step ? '#0284c7' : '#cbd5e1'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', boxShadow: i === step ? '0 0 12px rgba(2, 132, 199, 0.4)' : 'none' }}>
                   {i < step
                     ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="4"><polyline points="20 6 9 17 4 12" /></svg>
                     : <span style={{ fontSize: 13, fontWeight: 900, color: i === step ? '#ffffff' : '#64748b' }}>{i + 1}</span>}
                 </div>
-                <span style={{ fontSize: 11, fontWeight: i === step ? 800 : 600, color: i === step ? '#ff3b69' : '#64748b', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s}</span>
+                <span style={{ fontSize: 11, fontWeight: i === step ? 800 : 600, color: i === step ? '#0284c7' : '#64748b', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s}</span>
               </div>
               {i < STEPS.length - 1 && <div style={{ flex: 1, height: 3, background: i < step ? '#16a34a' : '#f1e7db', margin: '0 12px', marginBottom: 24 }} />}
             </React.Fragment>
@@ -349,7 +350,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
                 <li>Export the completed presentation as a <strong>PDF document</strong> (Max 3MB).</li>
                 <li>Submission locks firmly on <strong>October 28, 2026 at 11:59 PM IST</strong>.</li>
               </ul>
-              <a href={OfficialPPT} download="HAXLR8_3.0_Template.pptx" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#ff3b69', color: '#ffffff', borderRadius: 12, fontSize: 13, fontWeight: 800, textDecoration: 'none', marginTop: 8, boxShadow: '0 4px 12px rgba(255, 59, 105, 0.25)' }}>
+              <a href={OfficialPPT} download="HAXLR8_3.0_Template.pptx" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#0284c7', color: '#ffffff', borderRadius: 12, fontSize: 13, fontWeight: 800, textDecoration: 'none', marginTop: 8, boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)' }}>
                 ↓ Download Official PPT Template
               </a>
             </div>
@@ -359,7 +360,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
                 type="checkbox"
                 checked={guidelinesRead}
                 onChange={e => { setGuidelinesRead(e.target.checked); if (e.target.checked) setErrorMsg(''); }}
-                style={{ cursor: 'pointer', width: 18, height: 18, accentColor: '#ff3b69' }}
+                style={{ cursor: 'pointer', width: 18, height: 18, accentColor: '#0284c7' }}
               />
               <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0f172a' }}>
                 I have read and confirmed all submission directives and am ready to configure project information.
@@ -401,8 +402,8 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
                       {SDG_OPTIONS.map(opt => {
                         const isChecked = Array.isArray(form.sdg) ? form.sdg.includes(opt) : (form.sdg || '').includes(opt);
                         return (
-                          <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13.5px', color: '#0f172a', padding: '6px 8px', borderRadius: 8, background: isChecked ? '#fff1f2' : 'transparent' }}>
-                            <input type="checkbox" checked={isChecked} onChange={() => handleSdgToggle(opt)} style={{ cursor: 'pointer', accentColor: '#ff3b69' }} />
+                          <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '13.5px', color: '#0f172a', padding: '6px 8px', borderRadius: 8, background: isChecked ? '#e0f2fe' : 'transparent' }}>
+                            <input type="checkbox" checked={isChecked} onChange={() => handleSdgToggle(opt)} style={{ cursor: 'pointer', accentColor: '#0284c7' }} />
                             {opt}
                           </label>
                         );
@@ -440,7 +441,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
               <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', display: 'flex', justifyContent: 'space-between', alignItems: 'center', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Presentation Deck (PDF)
-                <a href={OfficialPPT} download="HAXLR8_3.0_Template.pptx" style={{ fontSize: 11, color: '#ff3b69', textDecoration: 'none', fontWeight: 800 }}>↓ PPT Template</a>
+                <a href={OfficialPPT} download="HAXLR8_3.0_Template.pptx" style={{ fontSize: 11, color: '#0284c7', textDecoration: 'none', fontWeight: 800 }}>↓ PPT Template</a>
               </label>
               <input type="file" accept=".pdf" onChange={e => setForm({ ...form, pdf: e.target.files[0] })}
                 style={{ padding: '12px 14px', borderRadius: 12, border: fieldErrors.pdf ? '1.5px solid #dc2626' : '1.5px solid #cbd5e1', fontSize: 13, color: '#0f172a', background: '#fafafa' }} />
@@ -475,10 +476,10 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {step < STEPS.length - 1
-            ? <button onClick={handleNext} style={{ padding: '12px 28px', borderRadius: 12, border: 'none', background: '#ff3b69', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 14px rgba(255, 59, 105, 0.25)' }}>Next Step →</button>
-            : <button disabled={submitting || deadlinePassed} onClick={handleSubmit} style={{ padding: '12px 32px', borderRadius: 12, border: 'none', background: '#ff3b69', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: (submitting || deadlinePassed) ? 'not-allowed' : 'pointer', boxShadow: '0 4px 14px rgba(255, 59, 105, 0.35)', opacity: submitting ? 0.7 : 1 }}>
-              {deadlinePassed ? 'Submissions Closed' : (submitting ? 'Uploading to Star Base...' : 'Lock In Submission 🚀')}
-            </button>
+            ? <button onClick={handleNext} style={{ padding: '12px 28px', borderRadius: 12, border: 'none', background: '#0284c7', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.25)' }}>Next Step →</button>
+            : <button disabled={submitting || deadlinePassed} onClick={handleSubmit} style={{ padding: '12px 32px', borderRadius: 12, border: 'none', background: '#0284c7', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: (submitting || deadlinePassed) ? 'not-allowed' : 'pointer', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)', opacity: submitting ? 0.7 : 1 }}>
+                {deadlinePassed ? 'Submissions Closed' : (submitting ? 'Uploading to Star Base...' : 'Lock In Submission 🚀')}
+              </button>
           }
         </div>
       </div>

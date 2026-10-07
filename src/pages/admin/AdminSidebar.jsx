@@ -1,10 +1,12 @@
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Home, Users, Flag, CheckSquare, Bell, LayoutDashboard, LogOut, FileText, TrendingUp, Shield } from 'lucide-react';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
+import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 const S = {
-  card: '#FFFFFF', border: '#FED7AA', primary: '#FF3B69',
-  t1: '#0F172A', t2: '#64748B', t3: '#94A3B8', activeBg: '#FFE4E6',
+  card: '#FFFFFF', border: '#FED7AA', primary: '#0284C7',
+  t1: '#0F172A', t2: '#64748B', t3: '#94A3B8', activeBg: '#E0F2FE',
+  activeBorder: '#7DD3FC',
 };
 
 const navItems = [
@@ -27,7 +29,7 @@ export default function AdminSidebar() {
     <aside style={{ width: 250, minWidth: 250, background: S.card, borderRight: '2px solid ' + S.border, display: 'flex', flexDirection: 'column', flexShrink: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div style={{ height: 68, padding: '0 20px', borderBottom: '1.5px solid #F1E7DB', display: 'flex', alignItems: 'center', gap: 12 }}>
         <img src={haxlr8LogoDark} alt="HAXLR8 3.0" style={{ height: 26, objectFit: 'contain' }} />
-        <div style={{ marginLeft: 'auto', background: '#FFF1F2', border: '1px solid #FECACA', padding: '3px 8px', borderRadius: 8, fontSize: 10, fontWeight: 900, color: '#E11D48', letterSpacing: '0.04em' }}>
+        <div style={{ marginLeft: 'auto', background: '#E0F2FE', border: '1.5px solid #BAE6FD', padding: '3px 8px', borderRadius: 8, fontSize: 10, fontWeight: 900, color: '#0369A1', letterSpacing: '0.04em' }}>
           ORGANIZER
         </div>
       </div>
@@ -54,11 +56,11 @@ export default function AdminSidebar() {
                 fontWeight: isActive ? 800 : 600,
                 color: isActive ? S.primary : S.t2,
                 background: isActive ? S.activeBg : 'transparent',
-                border: isActive ? '1px solid #FECACA' : '1px solid transparent',
+                border: isActive ? '1px solid ' + S.activeBorder : '1px solid transparent',
                 textDecoration: 'none',
                 transition: 'all .15s'
               }}
-              onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#FFF7ED'; }}
+              onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#F0F9FF'; }}
               onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
             >
               <Icon size={17} color={isActive ? S.primary : '#94A3B8'} />
@@ -67,6 +69,15 @@ export default function AdminSidebar() {
           );
         })}
       </nav>
+
+      {/* Admin Among Us Crewmate Indicator */}
+      <div style={{ padding: '10px 12px', margin: '0 12px 10px', background: '#F0F9FF', borderRadius: 14, border: '1.5px solid #BAE6FD', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <AmongUsCrewmate color="red" size={38} hat="cap" speechText="Admin Terminal Active" />
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 900, color: '#0369A1', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Admin Room</div>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#0284C7' }}>● Clearance Verified</div>
+        </div>
+      </div>
 
       <div style={{ padding: '16px 12px', borderTop: '1.5px solid #F1E7DB', display: 'flex', flexDirection: 'column', gap: 8 }}>
         <button

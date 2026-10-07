@@ -7,6 +7,7 @@ import TeamTab        from './TeamTab';
 import SubmissionTab  from './SubmissionTab';
 import ResourcesTab   from './ResourcesTab';
 import AnnouncementsTab from './AnnouncementsTab';
+import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -162,8 +163,8 @@ export default function DashboardPage() {
     return (
       <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', background:'#fffaf3', fontFamily:"'Fredoka', 'Plus Jakarta Sans', sans-serif" }}>
         <div style={{ textAlign:'center' }}>
-           <div style={{ width:48, height:48, border:'4px solid #fed7aa', borderTop:'4px solid #ff3b69', borderRadius:'50%', animation:'spin 0.8s linear infinite', margin:'0 auto 16px' }} />
-           <div style={{ color:'#ff3b69', fontSize:'14px', fontWeight:900, letterSpacing:'0.04em', textTransform:'uppercase' }}>CONNECTING TO FLIGHT DECK...</div>
+           <div style={{ width:48, height:48, border:'4px solid #fed7aa', borderTop:'4px solid #0284c7', borderRadius:'50%', animation:'spin 0.8s linear infinite', margin:'0 auto 16px' }} />
+           <div style={{ color:'#0284c7', fontSize:'14px', fontWeight:900, letterSpacing:'0.04em', textTransform:'uppercase' }}>CONNECTING TO FLIGHT DECK...</div>
            <p style={{ color:'#64748b', fontSize:'12px', marginTop:'6px', fontWeight:600 }}>Syncing mission telemetry &amp; squad credentials</p>
            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
         </div>
@@ -176,7 +177,9 @@ export default function DashboardPage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#fffaf3', fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 20 }}>
         <div style={{ maxWidth: 480, width: '100%', background: '#ffffff', borderRadius: 24, padding: '40px 32px', textAlign: 'center', border: '2px solid #fed7aa', boxShadow: '0 12px 36px rgba(0,0,0,0.06)' }}>
-          <div style={{ fontSize: 44, marginBottom: 12 }}>🚀</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+            <AmongUsCrewmate color="red" size={68} hat="cap" speechText="Identify yourself, Captain!" />
+          </div>
           <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>Commander Login Required</h2>
           <p style={{ fontSize: 13.5, color: '#64748b', margin: '0 0 24px', lineHeight: 1.5 }}>
             To access your squad manifest, presentation decks, and technical submission vault, please verify your commander credentials.
@@ -184,7 +187,7 @@ export default function DashboardPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <button
               onClick={() => navigate('/login')}
-              style={{ padding: '14px 20px', borderRadius: 12, background: '#ff3b69', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 14px rgba(255, 59, 105, 0.3)' }}
+              style={{ padding: '14px 20px', borderRadius: 12, background: '#0284c7', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' }}
             >
               Sign In to Flight Deck →
             </button>
