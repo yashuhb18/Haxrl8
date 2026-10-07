@@ -98,6 +98,11 @@ CREATE TABLE IF NOT EXISTS public.admins (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Seed Super Admin
+INSERT INTO public.admins (email, role)
+VALUES ('yashuhb18@gmail.com', 'super_admin')
+ON CONFLICT (email) DO NOTHING;
+
 -- ------------------------------------------------------------------------------
 -- 8. INITIAL ANNOUNCEMENTS SEED
 -- ------------------------------------------------------------------------------

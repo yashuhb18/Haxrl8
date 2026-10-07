@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
+import { isOrganizerAuthorized } from './adminAuth';
 import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight } from 'lucide-react';
 
 // Style constants
@@ -42,11 +43,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) { navigate('/register'); return; }
-      const { data: adminList } = await supabase.from('admins').select('email');
-      setAdminEmail(user.email);
-      if (adminList && adminList.length > 0) { setIsAdmin(true); fetchData(); } else { alert("Not admin!"); navigate('/dashboard'); }
+      const authorized = await isOrganizerAuthorized();
+      if (authorized) {
+        setIsAdmin(true);
+        fetchData();
+      } else {
+        navigate('/admin');
+      }
       setLoadingAuth(false);
     };
     checkAuth();

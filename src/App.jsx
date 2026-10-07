@@ -113,6 +113,18 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
 
           {/* Admin Dashboard */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="teams" element={<AdminTeams />} />
+            <Route path="evaluations" element={<AdminEvaluations />} />
+            <Route path="evaluations/:id" element={<AdminEvaluateSubmission />} />
+            <Route path="jury" element={<AdminJury />} />
+            <Route path="submissions" element={<AdminSubmissions />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="announcements" element={<AdminAnnouncements />} />
+          </Route>
+
           <Route path="/udview" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />

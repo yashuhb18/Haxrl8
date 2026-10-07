@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
+import { isOrganizerAuthorized } from './adminAuth';
 import { FileText, Search, ChevronDown, Download, ChevronRight, MoreVertical, ChevronLeft, Star, Clock, XCircle, Eye, Calendar as CalendarIcon, ClipboardCheck, Filter } from 'lucide-react';
 
 const S = {
@@ -56,10 +57,13 @@ export default function AdminEvaluations() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) { navigate('/register'); return; }
-      const { data: adminList } = await supabase.from('admins').select('email');
-      if (adminList && adminList.length > 0) { setIsAdmin(true); fetchData(); } else { alert("Not admin!"); navigate('/dashboard'); }
+      const authorized = await isOrganizerAuthorized();
+      if (authorized) {
+        setIsAdmin(true);
+        fetchData();
+      } else {
+        navigate('/admin');
+      }
     };
     checkAuth();
   }, [navigate, fetchData]);
