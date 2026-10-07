@@ -314,8 +314,18 @@ export default function PlayfulNavbar() {
             justifyContent: 'space-between',
           }}
         >
-          {/* Brand Logo: Extracted HAXLR8 3.0 Official Logotype - Big & Prominent */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {/* Brand Logo: Hidden at top of homepage to prevent visual duplication with the Hero logotype, smoothly fades in on scroll */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              transition: 'opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+              opacity: (location.pathname !== '/' || scrolled) ? 1 : 0,
+              transform: (location.pathname !== '/' || scrolled) ? 'translateY(0)' : 'translateY(-6px)',
+              pointerEvents: (location.pathname !== '/' || scrolled) ? 'auto' : 'none',
+            }}
+          >
             <Link
               to="/"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
