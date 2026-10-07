@@ -189,7 +189,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
       }
       setSuccess(true);
 
-      // Automated email dispatch from haxlr83.o@gmail.com
+      // Automated email dispatch from haxlr8ecemitm@gmail.com
       try {
         const leader = teamMembers?.find(m => m.is_leader) || teamMembers?.[0];
         const leaderEmail = leader?.email;

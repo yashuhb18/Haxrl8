@@ -108,7 +108,7 @@ export default function AuthPage() {
         });
         if (error) throw error;
 
-        // Automated Welcome Email from haxlr83.o@gmail.com
+        // Automated Welcome Email from haxlr8ecemitm@gmail.com
         sendParticipantWelcomeEmail({
           recipientEmail: cleanEmail,
           leaderName: cleanName,

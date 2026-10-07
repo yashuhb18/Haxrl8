@@ -1,10 +1,10 @@
 /**
  * HAXLR8 3.0 - Automated Participant Email Dispatch Service
- * Official Host Sender: haxlr83.o@gmail.com
+ * Official Host Sender: haxlr8ecemitm@gmail.com
  * Maharaja Institute of Technology, Mysore
  */
 
-export const HAXLR8_HOST_EMAIL = 'haxlr83.o@gmail.com';
+export const HAXLR8_HOST_EMAIL = 'haxlr8ecemitm@gmail.com';
 
 /**
  * Generate rich, warm-themed HTML welcome email for newly registered squad leaders & crewmates
@@ -88,7 +88,7 @@ export function generateWelcomeEmailHtml({ leaderName, teamName, teamId, crewCou
 
     <div class="footer">
       Sent automatically by <strong>HAXLR8 3.0 Space Command</strong><br>
-      Host Mailbox: <a href="mailto:haxlr83.o@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr83.o@gmail.com</a><br>
+      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a><br>
       Maharaja Institute of Technology Mysore, Belagola, Srirangapatna Taluk, Mandya - 571438
     </div>
   </div>
@@ -155,7 +155,7 @@ export function generateSubmissionEmailHtml({ leaderName, teamName, trackName, p
 
     <div class="footer">
       Sent automatically by <strong>HAXLR8 3.0 Space Command</strong><br>
-      Host Mailbox: <a href="mailto:haxlr83.o@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr83.o@gmail.com</a>
+      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a>
     </div>
   </div>
 </body>

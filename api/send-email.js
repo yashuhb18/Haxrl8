@@ -25,18 +25,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Recipient email address (to) is required.' });
     }
 
-    const hostEmail = process.env.HOST_EMAIL || process.env.VITE_HOST_EMAIL || 'haxlr83.o@gmail.com';
-    const hostPassword = process.env.HOST_EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD;
-
-    // If host password is not yet configured in environment, return graceful simulated success
-    if (!hostPassword) {
-      console.warn(`[HAXLR8 Email Warning] GMAIL_APP_PASSWORD / HOST_EMAIL_PASSWORD not set in environment. Simulated dispatch to ${to}`);
-      return res.status(200).json({
-        success: true,
-        simulated: true,
-        message: `Simulation: Email dispatched to ${to}. To enable real Gmail delivery, add HOST_EMAIL_PASSWORD (16-char Google App Password) in your Vercel Environment Variables.`
-      });
-    }
+    const hostEmail = process.env.HOST_EMAIL || process.env.VITE_HOST_EMAIL || 'haxlr8ecemitm@gmail.com';
+    const hostPassword = process.env.HOST_EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD || 'fbrnlnfiilorsdzk';
 
     // Configure Nodemailer for Gmail SMTP
     const transporter = nodemailer.createTransport({

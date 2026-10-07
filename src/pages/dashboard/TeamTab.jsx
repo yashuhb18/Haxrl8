@@ -432,7 +432,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
       setHasTeam(true);
       setIsEditingTeam(false);
 
-      // Automated email dispatch from haxlr83.o@gmail.com
+      // Automated email dispatch from haxlr8ecemitm@gmail.com
       try {
         if (formData?.leader?.email) {
           sendParticipantWelcomeEmail({
