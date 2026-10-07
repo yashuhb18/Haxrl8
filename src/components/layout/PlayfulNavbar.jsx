@@ -165,7 +165,7 @@ export default function PlayfulNavbar() {
               style={{ width: '1.5px', height: '36px', background: '#cbd5e1' }}
             />
 
-            {/* Right: Department of ECE & EMITERS Seal - Big & Prominent */}
+            {/* Right: Department of ECE & MIT Mysore Crest - Big & Prominent */}
             <div
               style={{
                 display: 'flex',
@@ -174,15 +174,15 @@ export default function PlayfulNavbar() {
               }}
             >
               <img
-                src={emitersSeal}
-                alt="EMITERS - Department of ECE"
+                src={mitMysoreLogo}
+                alt="Maharaja Institute of Technology Mysore"
                 className="institutional-seal-img"
                 style={{
-                  width: 'clamp(44px, 5vw, 56px)',
-                  height: 'clamp(44px, 5vw, 56px)',
+                  width: 'clamp(44px, 5vw, 54px)',
+                  height: 'clamp(44px, 5vw, 54px)',
                   borderRadius: '50%',
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 8px rgba(147, 51, 234, 0.25))',
+                  filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12))',
                   flexShrink: 0,
                   userSelect: 'none',
                 }}
@@ -190,7 +190,7 @@ export default function PlayfulNavbar() {
               <div className="masthead-dept-text" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <span
                   style={{
-                    fontSize: 'clamp(11.5px, 1.1vw, 13.5px)',
+                    fontSize: 'clamp(12px, 1.15vw, 14px)',
                     fontWeight: 900,
                     color: '#0f172a',
                     letterSpacing: '0.02em',
@@ -201,15 +201,15 @@ export default function PlayfulNavbar() {
                 </span>
                 <span
                   style={{
-                    fontSize: 'clamp(10px, 0.95vw, 11px)',
+                    fontSize: 'clamp(10.5px, 0.95vw, 11.5px)',
                     fontWeight: 800,
-                    color: '#ff3b69',
-                    letterSpacing: '0.06em',
+                    color: '#0284c7',
+                    letterSpacing: '0.04em',
                     textTransform: 'uppercase',
                     lineHeight: 1.25,
                   }}
                 >
-                  EMITERS Student Forum · Maharaja Institute of Technology Mysore
+                  Maharaja Institute of Technology Mysore
                 </span>
               </div>
             </div>
@@ -249,7 +249,7 @@ export default function PlayfulNavbar() {
               />
             </a>
 
-            {/* Department of ECE & Forum Institutional Typography */}
+            {/* Department of ECE & Institution Typography */}
             <div
               style={{
                 display: 'flex',
@@ -259,12 +259,12 @@ export default function PlayfulNavbar() {
                 flex: 1,
                 minWidth: 0,
                 lineHeight: 1.25,
-                padding: '0 2px',
+                padding: '0 4px',
               }}
             >
               <span
                 style={{
-                  fontSize: 'clamp(9px, 2.5vw, 10.5px)',
+                  fontSize: 'clamp(9.5px, 2.6vw, 11px)',
                   fontWeight: 900,
                   color: '#0f172a',
                   letterSpacing: '0.01em',
@@ -275,7 +275,7 @@ export default function PlayfulNavbar() {
               </span>
               <span
                 style={{
-                  fontSize: 'clamp(8.5px, 2.3vw, 9.8px)',
+                  fontSize: 'clamp(9px, 2.4vw, 10.2px)',
                   fontWeight: 800,
                   color: '#0284c7',
                   letterSpacing: '0.01em',
@@ -284,31 +284,19 @@ export default function PlayfulNavbar() {
               >
                 Department of Electronics & Communication Engineering
               </span>
-              <span
-                style={{
-                  fontSize: 'clamp(8px, 2.1vw, 9px)',
-                  fontWeight: 800,
-                  color: '#ff3b69',
-                  letterSpacing: '0.04em',
-                  textTransform: 'uppercase',
-                  lineHeight: 1.2,
-                }}
-              >
-                EMITERS Student Forum
-              </span>
             </div>
 
-            {/* EMITERS Circular Seal */}
+            {/* MIT Mysore Crest on Right for Visual Balance */}
             <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
               <img
-                src={emitersSeal}
-                alt="EMITERS Seal"
+                src={mitMysoreLogo}
+                alt="MIT Mysore Crest"
                 style={{
                   width: '32px',
                   height: '32px',
                   borderRadius: '50%',
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 6px rgba(147, 51, 234, 0.25))',
+                  filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.12))',
                 }}
               />
             </div>
@@ -326,7 +314,7 @@ export default function PlayfulNavbar() {
             justifyContent: 'space-between',
           }}
         >
-          {/* Brand Logo: Extracted HAXLR8 3.0 Official Logotype */}
+          {/* Brand Logo: Extracted HAXLR8 3.0 Official Logotype - Big & Prominent */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <Link
               to="/"
@@ -344,10 +332,10 @@ export default function PlayfulNavbar() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: 'spring', stiffness: 300 }}
                 style={{
-                  height: '38px',
+                  height: 'clamp(44px, 5.2vw, 54px)',
                   width: 'auto',
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 6px rgba(255, 59, 105, 0.2))',
+                  filter: 'drop-shadow(0 3px 10px rgba(255, 59, 105, 0.25))',
                 }}
               />
             </Link>
@@ -511,9 +499,6 @@ export default function PlayfulNavbar() {
                   </span>
                   <span style={{ fontSize: '10px', fontWeight: 800, color: '#0284c7', lineHeight: 1.25 }}>
                     Department of Electronics & Communication Engineering
-                  </span>
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#ff3b69', lineHeight: 1.25, textTransform: 'uppercase' }}>
-                    EMITERS Student Forum
                   </span>
                 </div>
               </div>

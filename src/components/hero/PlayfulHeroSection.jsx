@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, ArrowRight } from 'lucide-react';
 import HeroCliffIllustration from './HeroCliffIllustration';
-import ChalkboardSignpost from './ChalkboardSignpost';
 import DomainWheel from '../ui/DomainWheel';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 
@@ -80,40 +79,33 @@ export default function PlayfulHeroSection() {
         >
           {/* ═══ LEFT COLUMN: Editorial Content & Badges ═══ */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }} className="hero-left-content">
-            {/* Headline Area: Chalkboard Signpost + Extracted HAXLR8 3.0 Official Logotype */}
+            {/* Headline Area: Extracted HAXLR8 3.0 Official Logotype - Giant & Centerpiece */}
             <div
               className="hero-headline-row"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'clamp(14px, 3vw, 24px)',
                 marginBottom: '14px',
-                flexWrap: 'wrap',
               }}
             >
-              {/* Wooden Chalkboard Signpost */}
-              <div style={{ flexShrink: 0 }} className="hero-chalkboard-wrapper">
-                <ChalkboardSignpost />
-              </div>
-
               {/* Official Extracted HAXLR8 3.0 Logotype */}
               <div style={{ display: 'flex', flexDirection: 'column' }} className="hero-logo-col">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9, y: 15 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 0.6, type: 'spring', stiffness: 180 }}
-                  whileHover={{ scale: 1.03 }}
+                  whileHover={{ scale: 1.04 }}
                 >
                   <img
                     src={haxlr8LogoDark}
                     alt="HAXLR8 3.0"
                     className="hero-logo-img"
                     style={{
-                      height: 'clamp(95px, 15vw, 150px)',
+                      height: 'clamp(120px, 18vw, 175px)',
                       width: 'auto',
                       maxWidth: '100%',
                       objectFit: 'contain',
-                      filter: 'drop-shadow(0 8px 24px rgba(255, 59, 105, 0.18))',
+                      filter: 'drop-shadow(0 10px 30px rgba(255, 59, 105, 0.22))',
                       userSelect: 'none',
                     }}
                   />
@@ -128,7 +120,7 @@ export default function PlayfulHeroSection() {
               transition={{ delay: 0.15, duration: 0.5 }}
               className="hero-slogan"
               style={{
-                fontSize: 'clamp(1.15rem, 2.2vw, 1.55rem)',
+                fontSize: 'clamp(1.2rem, 2.3vw, 1.6rem)',
                 fontWeight: 900,
                 color: '#1e293b',
                 letterSpacing: '0.04em',
@@ -146,7 +138,7 @@ export default function PlayfulHeroSection() {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="hero-subhead"
               style={{
-                fontSize: 'clamp(0.85rem, 1.3vw, 1.05rem)',
+                fontSize: 'clamp(0.88rem, 1.35vw, 1.1rem)',
                 fontWeight: 800,
                 color: '#ff3b69',
                 letterSpacing: '0.12em',
@@ -157,7 +149,7 @@ export default function PlayfulHeroSection() {
               A NATIONAL LEVEL 24-HOUR HACKATHON
             </motion.div>
 
-            {/* Organizer Pill: Department of Electronics & Communication Engineering (ECE) & EMITERS */}
+            {/* Organizer Pill: Department of Electronics & Communication Engineering (ECE) */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -168,17 +160,17 @@ export default function PlayfulHeroSection() {
                 alignItems: 'center',
                 gap: '8px',
                 background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(255, 59, 105, 0.08) 100%)',
-                border: '1.5px solid rgba(2, 132, 199, 0.22)',
+                border: '1.5px solid rgba(2, 132, 199, 0.25)',
                 borderRadius: '100px',
-                padding: '7px 18px',
+                padding: '8px 20px',
                 marginBottom: '20px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
               }}
             >
-              <span style={{ fontSize: '15px' }}>🎓</span>
+              <span style={{ fontSize: '16px' }}>🎓</span>
               <span
                 style={{
-                  fontSize: 'clamp(11.5px, 1.15vw, 13.5px)',
+                  fontSize: 'clamp(12px, 1.15vw, 14px)',
                   fontWeight: 800,
                   color: '#0f172a',
                   letterSpacing: '0.01em',
@@ -186,7 +178,6 @@ export default function PlayfulHeroSection() {
               >
                 Organized by{' '}
                 <strong style={{ color: '#0284c7' }}>Department of Electronics & Communication Engineering (ECE)</strong>
-                {' '}& <strong style={{ color: '#ea580c' }}>EMITERS</strong>
               </span>
             </motion.div>
 
@@ -396,25 +387,18 @@ export default function PlayfulHeroSection() {
 
         @media (max-width: 768px) {
           .hero-headline-row {
-            flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 12px !important;
             margin-bottom: 12px !important;
             width: 100% !important;
-          }
-          .hero-chalkboard-wrapper {
-            transform: scale(0.9) !important;
-            transform-origin: center !important;
-            margin: -4px 0 !important;
           }
           .hero-logo-col {
             align-items: center !important;
             width: 100% !important;
           }
           .hero-logo-img {
-            height: 92px !important;
-            max-width: 82vw !important;
+            height: clamp(105px, 25vw, 138px) !important;
+            max-width: 88vw !important;
           }
           .hero-slogan {
             font-size: 1.25rem !important;
