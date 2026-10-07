@@ -202,17 +202,19 @@ export async function sendParticipantWelcomeEmail({ recipientEmail, leaderName, 
 
   // Record dispatch in local log cache for Organizer Admin Panel audit trail
   try {
-    const existingLogs = JSON.parse(localStorage.getItem('haxlr8_email_dispatch_logs') || '[]');
-    existingLogs.unshift({
-      id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-      recipient: recipientEmail,
-      team_name: teamName || 'Squad',
-      subject: emailPayload.subject,
-      status: deliveryStatus,
-      sender: HAXLR8_HOST_EMAIL,
-      created_at: new Date().toISOString()
-    });
-    localStorage.setItem('haxlr8_email_dispatch_logs', JSON.stringify(existingLogs.slice(0, 150)));
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const existingLogs = JSON.parse(localStorage.getItem('haxlr8_email_dispatch_logs') || '[]');
+      existingLogs.unshift({
+        id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        recipient: recipientEmail,
+        team_name: teamName || 'Squad',
+        subject: emailPayload.subject,
+        status: deliveryStatus,
+        sender: HAXLR8_HOST_EMAIL,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('haxlr8_email_dispatch_logs', JSON.stringify(existingLogs.slice(0, 150)));
+    }
   } catch (e) {
     console.warn('Local email log save error:', e);
   }
@@ -257,17 +259,19 @@ export async function sendSubmissionConfirmationEmail({ recipientEmail, leaderNa
   }
 
   try {
-    const existingLogs = JSON.parse(localStorage.getItem('haxlr8_email_dispatch_logs') || '[]');
-    existingLogs.unshift({
-      id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-      recipient: recipientEmail,
-      team_name: teamName || 'Squad',
-      subject: emailPayload.subject,
-      status: deliveryStatus,
-      sender: HAXLR8_HOST_EMAIL,
-      created_at: new Date().toISOString()
-    });
-    localStorage.setItem('haxlr8_email_dispatch_logs', JSON.stringify(existingLogs.slice(0, 150)));
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const existingLogs = JSON.parse(localStorage.getItem('haxlr8_email_dispatch_logs') || '[]');
+      existingLogs.unshift({
+        id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        recipient: recipientEmail,
+        team_name: teamName || 'Squad',
+        subject: emailPayload.subject,
+        status: deliveryStatus,
+        sender: HAXLR8_HOST_EMAIL,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('haxlr8_email_dispatch_logs', JSON.stringify(existingLogs.slice(0, 150)));
+    }
   } catch (e) {
     console.warn('Local email log save error:', e);
   }
@@ -276,6 +280,125 @@ export async function sendSubmissionConfirmationEmail({ recipientEmail, leaderNa
     success: true,
     status: deliveryStatus
   };
+}
+
+/**
+ * Generate HTML email for user login notification
+ */
+export function generateLoginEmailHtml({ leaderName, recipientEmail }) {
+  const timeStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fffaf3; margin: 0; padding: 20px; color: #0f172a; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; border: 2px solid #fed7aa; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+    .header { background: linear-gradient(135deg, #a8262a 0%, #ea580c 100%); padding: 36px 30px; text-align: center; color: #ffffff; }
+    .header h1 { margin: 0; font-size: 24px; font-weight: 900; }
+    .content { padding: 32px 30px; line-height: 1.6; }
+    .card { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 18px 20px; margin: 20px 0; }
+    .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13.5px; }
+    .label { color: #ea580c; font-weight: 800; text-transform: uppercase; font-size: 11px; }
+    .val { font-weight: 700; color: #0f172a; }
+    .cta-btn { display: inline-block; background: #a8262a; color: #ffffff !important; padding: 13px 26px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; margin-top: 16px; }
+    .footer { background: #fdf4e7; border-top: 1.5px solid #fed7aa; padding: 20px 30px; text-align: center; font-size: 12px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div style="font-size: 36px; margin-bottom: 6px;">🚀</div>
+      <h1>HAXLR8 3.0 Space Command</h1>
+      <p style="margin: 4px 0 0; opacity: 0.95; font-size: 13.5px;">Flight Deck Authentication Notice</p>
+    </div>
+    <div class="content">
+      <h2 style="font-size: 19px; color: #0f172a; margin-top: 0;">Welcome Back, Commander ${leaderName || 'Participant'}!</h2>
+      <p style="font-size: 14px; color: #334155;">
+        You have successfully logged in to the <strong>HAXLR8 3.0 Candidate Dashboard</strong>.
+      </p>
+      <div class="card">
+        <div class="row">
+          <span class="label">Commander Account:</span>
+          <span class="val">${recipientEmail}</span>
+        </div>
+        <div class="row">
+          <span class="label">Access Timestamp:</span>
+          <span class="val">${timeStr} IST</span>
+        </div>
+        <div class="row" style="margin-bottom: 0;">
+          <span class="label">Event Venue:</span>
+          <span class="val">Maharaja Institute of Technology Mysore</span>
+        </div>
+      </div>
+      <p style="font-size: 13.5px; color: #475569;">
+        You can now manage your 3–4 crewmates, review guidelines, and prepare your project submission abstract before October 28, 2026.
+      </p>
+      <div style="text-align: center;">
+        <a href="https://haxlr8.vercel.app/dashboard" class="cta-btn">Access Candidate Flight Deck →</a>
+      </div>
+    </div>
+    <div class="footer">
+      Sent automatically by <strong>HAXLR8 3.0 Space Command</strong> • Dept of ECE, MIT Mysore<br>
+      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
+/**
+ * Send automated email notification upon user login
+ */
+export async function sendLoginNotificationEmail({ recipientEmail, leaderName }) {
+  if (!recipientEmail) return { success: false, error: 'Recipient email is required' };
+
+  console.log(`[HAXLR8 Email Automation] Dispatching login notification from ${HAXLR8_HOST_EMAIL} to ${recipientEmail}...`);
+
+  const emailPayload = {
+    to: recipientEmail,
+    subject: `🚀 HAXLR8 3.0 Flight Deck Access Confirmed for ${leaderName || 'Commander'}`,
+    html: generateLoginEmailHtml({ leaderName, recipientEmail }),
+    leaderName
+  };
+
+  let deliveryStatus = 'Dispatched (Cloud SMTP)';
+
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(emailPayload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      deliveryStatus = data.simulated ? 'Simulated (Dev)' : 'Delivered via Gmail SMTP';
+    }
+  } catch (err) {
+    deliveryStatus = 'Dispatched (App Fallback)';
+  }
+
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const existingLogs = JSON.parse(localStorage.getItem('haxlr8_email_dispatch_logs') || '[]');
+      existingLogs.unshift({
+        id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        recipient: recipientEmail,
+        team_name: 'Squad Access',
+        subject: emailPayload.subject,
+        status: deliveryStatus,
+        sender: HAXLR8_HOST_EMAIL,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('haxlr8_email_dispatch_logs', JSON.stringify(existingLogs.slice(0, 150)));
+    }
+  } catch (e) {
+    console.warn('Local email log save error:', e);
+  }
+
+  return { success: true, status: deliveryStatus };
 }
 
 /**

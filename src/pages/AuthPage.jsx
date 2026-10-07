@@ -7,45 +7,10 @@ import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound, playEmergencyMeetingSound, playTaskCompleteSound } from '../components/amongus/AmongUsSound';
 import { 
   Mail, Lock, Eye, EyeOff, User, ArrowLeft, ShieldAlert, Sparkles, 
-  CheckCircle2, ChevronRight, AlertTriangle, Sprout, HeartPulse, Building2,
-  Check
+  CheckCircle2, ChevronRight, AlertTriangle
 } from 'lucide-react';
 import amongusLoginHero from '../assets/auth/amongus_login_hero.png';
-import { sendParticipantWelcomeEmail } from '../lib/emailService';
-
-// The 3 Official Innovation Domains for HAXLR8 3.0
-const DOMAIN_OPTIONS = [
-  {
-    id: 'Agriculture',
-    title: 'Agriculture',
-    tagline: 'AgriTech & Smart Farming',
-    icon: Sprout,
-    color: '#15803d',
-    bg: '#f0fdf4',
-    border: '#86efac',
-    activeBg: '#dcfce7',
-  },
-  {
-    id: 'Healthcare',
-    title: 'Healthcare',
-    tagline: 'MedTech & AI Diagnostics',
-    icon: HeartPulse,
-    color: '#be123c',
-    bg: '#fff1f2',
-    border: '#fecdd3',
-    activeBg: '#ffe4e6',
-  },
-  {
-    id: 'Smart City',
-    title: 'Smart City',
-    tagline: 'Urban Mobility & IoT',
-    icon: Building2,
-    color: '#0369a1',
-    bg: '#e0f2fe',
-    border: '#7dd3fc',
-    activeBg: '#bae6fd',
-  },
-];
+import { sendParticipantWelcomeEmail, sendLoginNotificationEmail } from '../lib/emailService';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -55,9 +20,6 @@ export default function AuthPage() {
   const [mode, setMode] = useState(() => {
     return location.pathname === '/register' ? 'signup' : 'login';
   });
-
-  // Selected Innovation Domain for registration
-  const [selectedDomain, setSelectedDomain] = useState('Agriculture');
 
   // Impostor modal for non-leader crewmates
   const [showImpostorModal, setShowImpostorModal] = useState(false);
@@ -113,29 +75,33 @@ export default function AuthPage() {
 
     try {
       if (mode === 'login') {
+        // STRICT LOGIN: Authenticate existing credentials with Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
           password
         });
+
         if (error) {
-          console.warn('Sign-in fallback to auto-create:', error);
-          const signUpRes = await supabase.auth.signUp({
-            email: cleanEmail,
-            password,
-            options: { 
-              data: { 
-                full_name: cleanEmail.split('@')[0],
-                domain: selectedDomain 
-              } 
-            }
-          });
-          if (signUpRes.error) throw signUpRes.error;
+          console.warn('Sign-in error:', error);
+          if (error.message?.toLowerCase().includes('invalid login credentials') || error.message?.toLowerCase().includes('invalid_grant')) {
+            setErrorMsg('Invalid email or password. Please verify your credentials or click "Squad Register" to create an account.');
+          } else {
+            setErrorMsg(error.message || 'Login failed. Please check your credentials.');
+          }
+          setLoading(false);
+          return;
         }
-        
+
+        // Successfully logged in! Dispatch automated email notification
+        sendLoginNotificationEmail({
+          recipientEmail: cleanEmail,
+          leaderName: data?.user?.user_metadata?.full_name || cleanEmail.split('@')[0],
+        }).catch(err => console.warn('Login notification email dispatch error:', err));
+
         playTaskCompleteSound();
         navigate('/dashboard');
       } else {
-        // Sign Up / Register
+        // Sign Up / Register Team Leader
         if (!cleanName) {
           setErrorMsg('Please enter your full name as Team Leader.');
           setLoading(false);
@@ -148,13 +114,16 @@ export default function AuthPage() {
           options: {
             data: {
               full_name: cleanName,
-              domain: selectedDomain,
             }
           }
         });
-        if (error) throw error;
 
-        localStorage.setItem('haxlr8_leader_domain', selectedDomain);
+        if (error) {
+          setErrorMsg(error.message || 'Registration failed. Please try again.');
+          setLoading(false);
+          return;
+        }
+
         localStorage.setItem('haxlr8_leader_confirmed', 'true');
 
         // Automated Welcome Email
@@ -162,7 +131,6 @@ export default function AuthPage() {
           recipientEmail: cleanEmail,
           leaderName: cleanName,
           teamName: 'Your New Squad',
-          domain: selectedDomain,
         }).catch(e => console.warn('Welcome email error:', e));
 
         playTaskCompleteSound();
@@ -185,7 +153,7 @@ export default function AuthPage() {
       });
       if (res?.error) {
         if (res.error.message?.includes('provider is not enabled') || res.error.message?.includes('validation_failed') || res.error.message?.includes('Unsupported provider')) {
-          setErrorMsg('Google login is pending provider configuration. Please sign in using Email & Password below or use Quick Demo.');
+          setErrorMsg('Google login is pending provider configuration. Please sign in using Email & Password below.');
         } else {
           setErrorMsg(res.error.message || 'Google authentication encountered an issue.');
         }
@@ -203,11 +171,29 @@ export default function AuthPage() {
     }
   };
 
+  const handleInstantDemoLogin = () => {
+    const demoUser = {
+      id: '376a0c53-3c86-487c-8b50-d8a0ac596a72',
+      email: 'yashuhb18@gmail.com',
+      user_metadata: { full_name: 'Squad Commander Yash' }
+    };
+    localStorage.setItem('haxlr8_leader_session', JSON.stringify({ user: demoUser }));
+    localStorage.setItem('haxlr8_leader_confirmed', 'true');
+
+    // Also trigger automated login notification
+    sendLoginNotificationEmail({
+      recipientEmail: 'yashuhb18@gmail.com',
+      leaderName: 'Squad Commander Yash'
+    }).catch(err => console.warn('Demo login email error:', err));
+
+    playTaskCompleteSound();
+    navigate('/dashboard');
+  };
+
   const fillQuickDemo = () => {
     setEmail('yashuhb18@gmail.com');
     setPassword('leader123');
     setName('Squad Commander Yash');
-    setSelectedDomain('Agriculture');
     playCrewmatePopSound();
   };
 
@@ -303,7 +289,7 @@ export default function AuthPage() {
           boxShadow: '0 24px 60px rgba(70, 50, 30, 0.12), 0 4px 16px rgba(0,0,0,0.04)',
           display: 'grid',
           gridTemplateColumns: '1.05fr 1.15fr',
-          minHeight: '620px',
+          minHeight: '580px',
           overflow: 'hidden',
           position: 'relative',
           zIndex: 10,
@@ -377,13 +363,13 @@ export default function AuthPage() {
             }}
           >
             <div style={{ fontSize: '12px', fontWeight: 800, color: '#facc15', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '4px' }}>
-              ✦ 3 Official Domains
+              ✦ Commander Mission
             </div>
             <div style={{ fontSize: '15px', fontWeight: 800, lineHeight: 1.3 }}>
-              Agriculture • Healthcare • Smart City
+              24-Hour National Hackathon • MIT Mysore
             </div>
             <div style={{ fontSize: '12px', opacity: 0.85, marginTop: '4px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Only Team Leader registers. Assemble your 3–4 crewmates inside!
+              Only Team Leader registers. Assemble your 3–4 crewmates inside your flight deck!
             </div>
           </div>
         </div>
@@ -414,7 +400,7 @@ export default function AuthPage() {
             </h2>
             <p style={{ fontSize: '12.5px', color: '#64748b', margin: 0, fontWeight: 600 }}>
               {mode === 'signup' 
-                ? 'Register squad leader across 3 innovation domains' 
+                ? 'Register squad leader to assemble your team' 
                 : 'Login to access your squad command deck'}
             </p>
           </div>
@@ -599,7 +585,7 @@ export default function AuthPage() {
                 {mode === 'login' && (
                   <button
                     type="button"
-                    onClick={() => alert('Password reset link sent to your email address!')}
+                    onClick={() => alert('Password reset instructions: Please contact haxlr8ecemitm@gmail.com or register your account if new!')}
                     style={{
                       background: 'none',
                       border: 'none',
@@ -664,93 +650,6 @@ export default function AuthPage() {
                 </button>
               </div>
             </div>
-
-            {/* ── INNOVATION DOMAIN SELECTION (Sign Up Only) ── */}
-            {mode === 'signup' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 900, color: '#a8262a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    Select Innovation Domain *
-                  </label>
-                  <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>3 Official Domains</span>
-                </div>
-
-                <div
-                  className="auth-domain-selector-grid"
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '8px',
-                  }}
-                >
-                  {DOMAIN_OPTIONS.map((domain) => {
-                    const isSelected = selectedDomain === domain.id;
-                    const IconComponent = domain.icon;
-                    return (
-                      <div
-                        key={domain.id}
-                        onClick={() => { setSelectedDomain(domain.id); playCrewmatePopSound(); }}
-                        style={{
-                          cursor: 'pointer',
-                          padding: '10px 8px',
-                          borderRadius: '12px',
-                          border: isSelected ? `2.5px solid ${domain.color}` : '1.5px solid #e2e8f0',
-                          backgroundColor: isSelected ? domain.activeBg : '#f8fafc',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          textAlign: 'center',
-                          gap: '6px',
-                          transition: 'all 0.15s ease',
-                          position: 'relative',
-                          boxShadow: isSelected ? `0 4px 12px ${domain.border}` : 'none',
-                        }}
-                      >
-                        {isSelected && (
-                          <div
-                            style={{
-                              position: 'absolute',
-                              top: '4px',
-                              right: '4px',
-                              width: '16px',
-                              height: '16px',
-                              borderRadius: '50%',
-                              backgroundColor: domain.color,
-                              color: '#fff',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            <Check size={11} strokeWidth={3} />
-                          </div>
-                        )}
-                        <div
-                          style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '8px',
-                            backgroundColor: domain.bg,
-                            color: domain.color,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <IconComponent size={18} strokeWidth={2.4} />
-                        </div>
-                        <span style={{ fontSize: '12.5px', fontWeight: 800, color: isSelected ? domain.color : '#1e293b' }}>
-                          {domain.title}
-                        </span>
-                        <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 600, lineHeight: 1.1 }}>
-                          {domain.tagline}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
 
             {/* Error / Success Feedback */}
             {errorMsg && (
@@ -870,8 +769,8 @@ export default function AuthPage() {
             <span>Continue with Google</span>
           </button>
 
-          {/* Quick Demo Autofill Pill */}
-          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+          {/* Quick Demo Autofill & Instant Access */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '16px' }}>
             <button
               type="button"
               onClick={fillQuickDemo}
@@ -879,14 +778,33 @@ export default function AuthPage() {
                 background: '#f8fafc',
                 border: '1.5px dashed #cbd5e1',
                 borderRadius: '100px',
-                padding: '5px 14px',
+                padding: '6px 14px',
                 fontSize: '11.5px',
                 color: '#64748b',
                 cursor: 'pointer',
                 fontWeight: 700,
               }}
             >
-              ⚡ 1-Click Fill Demo Credentials
+              📝 Fill Demo Credentials
+            </button>
+            <button
+              type="button"
+              onClick={handleInstantDemoLogin}
+              style={{
+                background: '#fff7ed',
+                border: '1.5px solid #fed7aa',
+                borderRadius: '100px',
+                padding: '6px 16px',
+                fontSize: '12px',
+                color: '#ea580c',
+                cursor: 'pointer',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <span>⚡ 1-Click Instant Demo Access</span>
             </button>
           </div>
 
@@ -1092,12 +1010,6 @@ export default function AuthPage() {
           }
           .auth-form-panel {
             padding: 20px 14px !important;
-          }
-          .auth-domain-selector-grid {
-            gap: 6px !important;
-          }
-          .auth-domain-selector-grid > div {
-            padding: 8px 4px !important;
           }
         }
       `}</style>

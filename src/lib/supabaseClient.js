@@ -3,6 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 const isUUID = (str) => typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
 
+const withTimeout = (promise, ms = 2000) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Auth request timeout')), ms))
+  ]);
+
 const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder-project.supabase.co';
 const rawSupabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key';
 
@@ -60,7 +66,58 @@ function setLocalSession(user) {
 
 function clearLocalSession() {
   localStorage.removeItem(LOCAL_SESSION_KEY);
+  localStorage.removeItem('haxlr8_leader_confirmed');
   notifyAuthListeners('SIGNED_OUT', null);
+}
+
+// Storage key for locally registered accounts in demo / offline resilience mode
+const LOCAL_USERS_KEY = 'haxlr8_registered_accounts';
+
+function getRegisteredUsers() {
+  try {
+    const raw = localStorage.getItem(LOCAL_USERS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveRegisteredUser(email, password, fullName, id) {
+  try {
+    const users = getRegisteredUsers();
+    users[email.toLowerCase()] = {
+      id: id || uuidv4(),
+      email: email.toLowerCase(),
+      password,
+      fullName: fullName || email.split('@')[0],
+      createdAt: new Date().toISOString()
+    };
+    localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+  } catch (e) {}
+}
+
+function verifyRegisteredCredentials(email, password) {
+  const cleanEmail = email.toLowerCase().trim();
+  // 1. Built-in Demo Commander account
+  if (cleanEmail === 'yashuhb18@gmail.com' && password === 'leader123') {
+    return {
+      id: '376a0c53-3c86-487c-8b50-d8a0ac596a72',
+      email: 'yashuhb18@gmail.com',
+      fullName: 'Squad Commander Yash',
+    };
+  }
+
+  // 2. Check locally registered accounts
+  const users = getRegisteredUsers();
+  const found = users[cleanEmail];
+  if (found && found.password === password) {
+    return {
+      id: found.id,
+      email: found.email,
+      fullName: found.fullName,
+    };
+  }
+  return null;
 }
 
 /**
@@ -76,51 +133,75 @@ export const supabase = {
     async signInWithPassword({ email, password }) {
       const cleanEmail = (email || '').trim().toLowerCase();
 
-      // If real credentials are provided, attempt real Supabase first
+      // 1. If Supabase is configured, attempt real Supabase authentication first
       if (!isPlaceholder) {
         try {
-          const res = await rawSupabase.auth.signInWithPassword({ email: cleanEmail, password });
+          const res = await withTimeout(rawSupabase.auth.signInWithPassword({ email: cleanEmail, password }), 2000);
           if (!res.error && res.data?.user) {
             setLocalSession(res.data.user);
+            saveRegisteredUser(cleanEmail, password, res.data.user.user_metadata?.full_name, res.data.user.id);
             return res;
           }
-
-          // If user doesn't exist yet in Supabase, attempt instant sign up on Supabase
-          if (res.error?.message?.includes('Invalid login credentials') || res.error?.code === 'invalid_credentials') {
-            try {
-              const signUpRes = await rawSupabase.auth.signUp({
-                email: cleanEmail,
-                password,
-                options: { data: { full_name: cleanEmail.split('@')[0] } }
-              });
-              if (!signUpRes.error && signUpRes.data?.user) {
-                setLocalSession(signUpRes.data.user);
-                return { data: { user: signUpRes.data.user, session: signUpRes.data.session || { user: signUpRes.data.user } }, error: null };
-              }
-            } catch (signupErr) {
-              console.warn('Auto sign up attempt notice:', signupErr);
+          if (res.error) {
+            const localUser = verifyRegisteredCredentials(cleanEmail, password);
+            if (localUser) {
+              const user = {
+                id: localUser.id,
+                email: localUser.email,
+                user_metadata: {
+                  full_name: localUser.fullName,
+                  role: 'team_leader',
+                },
+                role: 'authenticated',
+                aud: 'authenticated',
+                created_at: new Date().toISOString(),
+              };
+              const session = setLocalSession(user);
+              return { data: { user, session }, error: null };
             }
+
+            // Real credential mismatch: strictly reject
+            return {
+              data: { user: null, session: null },
+              error: {
+                name: 'AuthApiError',
+                message: 'Invalid email or password. Please verify your credentials or click "Squad Register" to create an account.',
+                status: 400
+              }
+            };
           }
         } catch (err) {
-          console.warn('Real Supabase fetch notice, using fallback session:', err);
+          console.warn('Real Supabase fetch notice:', err);
         }
       }
 
-      // Resilient Squad Leader Session (guaranteed to log in commander so they can access their dashboard)
-      const user = {
-        id: uuidv4(),
-        email: cleanEmail,
-        user_metadata: {
-          full_name: cleanEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          role: 'team_leader',
-        },
-        role: 'authenticated',
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      };
+      // 2. Strict credential verification against registered accounts & demo account
+      const matchedUser = verifyRegisteredCredentials(cleanEmail, password);
+      if (matchedUser) {
+        const user = {
+          id: matchedUser.id,
+          email: matchedUser.email,
+          user_metadata: {
+            full_name: matchedUser.fullName,
+            role: 'team_leader',
+          },
+          role: 'authenticated',
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+        };
+        const session = setLocalSession(user);
+        return { data: { user, session }, error: null };
+      }
 
-      const session = setLocalSession(user);
-      return { data: { user, session }, error: null };
+      // 3. Strict Rejection: Never allow random passwords or unauthorized accounts
+      return {
+        data: { user: null, session: null },
+        error: {
+          name: 'AuthApiError',
+          message: 'Invalid email or password. Please verify your credentials or click "Squad Register" to create an account.',
+          status: 400
+        }
+      };
     },
 
     async signUp({ email, password, options }) {
@@ -129,18 +210,39 @@ export const supabase = {
 
       if (!isPlaceholder) {
         try {
-          const res = await rawSupabase.auth.signUp({ email: cleanEmail, password, options });
+          const res = await withTimeout(rawSupabase.auth.signUp({ email: cleanEmail, password, options }), 2000);
           if (!res.error && res.data?.user) {
             setLocalSession(res.data.user);
+            saveRegisteredUser(cleanEmail, password, fullName, res.data.user.id);
             return res;
           }
+          if (res.error) {
+            console.warn('Supabase sign-up response notice:', res.error);
+            if (res.error.message?.toLowerCase().includes('already registered')) {
+              return res;
+            }
+          }
         } catch (err) {
-          console.warn('Real Supabase signup failed, using local session:', err);
+          console.warn('Real Supabase signup network error:', err);
         }
       }
 
+      // Check if already registered locally
+      const existing = getRegisteredUsers();
+      if (existing[cleanEmail]) {
+        return {
+          data: { user: null, session: null },
+          error: {
+            name: 'AuthApiError',
+            message: 'An account with this email address is already registered. Please login instead.',
+            status: 400
+          }
+        };
+      }
+
+      const userId = uuidv4();
       const user = {
-        id: uuidv4(),
+        id: userId,
         email: cleanEmail,
         user_metadata: {
           full_name: fullName,
@@ -151,6 +253,7 @@ export const supabase = {
         created_at: new Date().toISOString(),
       };
 
+      saveRegisteredUser(cleanEmail, password, fullName, userId);
       const session = setLocalSession(user);
       return { data: { user, session }, error: null };
     },
@@ -188,12 +291,12 @@ export const supabase = {
       if (!isPlaceholder) {
         try {
           // Check session first (which automatically parses URL hash after OAuth redirect)
-          const sessionRes = await rawSupabase.auth.getSession();
+          const sessionRes = await withTimeout(rawSupabase.auth.getSession(), 1500);
           if (sessionRes.data?.session?.user) {
             setLocalSession(sessionRes.data.session.user);
             return { data: { user: sessionRes.data.session.user }, error: null };
           }
-          const res = await rawSupabase.auth.getUser();
+          const res = await withTimeout(rawSupabase.auth.getUser(), 1500);
           if (res.data?.user) {
             setLocalSession(res.data.user);
             return res;
@@ -215,7 +318,7 @@ export const supabase = {
     async getSession() {
       if (!isPlaceholder) {
         try {
-          const res = await rawSupabase.auth.getSession();
+          const res = await withTimeout(rawSupabase.auth.getSession(), 1500);
           if (res.data?.session) return res;
         } catch (e) {}
       }
