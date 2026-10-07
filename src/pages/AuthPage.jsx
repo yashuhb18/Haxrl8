@@ -15,10 +15,12 @@ export default function AuthPage() {
 
   // Mode: 'login' or 'signup'
   const isInitialLogin = location.pathname === '/login';
-  const [mode, setMode] = useState(isInitialLogin ? 'login' : 'login'); // Default to login as shown in image
+  const [mode, setMode] = useState('login'); // Default to login as shown in image
   
-  // Leader Confirmation Gate State: null = not answered, true = confirmed leader, false = impostor
-  const [confirmedLeader, setConfirmedLeader] = useState(false);
+  // Leader Confirmation Gate State: automatically true if navigating to /login or already confirmed
+  const [confirmedLeader, setConfirmedLeader] = useState(() => {
+    return localStorage.getItem('haxlr8_leader_confirmed') === 'true' || location.pathname === '/login';
+  });
   const [showImpostorModal, setShowImpostorModal] = useState(false);
 
   // Form Fields
@@ -36,16 +38,17 @@ export default function AuthPage() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data?.user) {
-        // Already authenticated
+        navigate('/dashboard');
       }
     });
-  }, []);
+  }, [navigate]);
 
   const handleLeaderSelect = (isLeader) => {
     if (isLeader) {
       playTaskCompleteSound();
       setConfirmedLeader(true);
       setShowImpostorModal(false);
+      localStorage.setItem('haxlr8_leader_confirmed', 'true');
     } else {
       playEmergencyMeetingSound();
       setShowImpostorModal(true);
@@ -79,7 +82,15 @@ export default function AuthPage() {
           email: cleanEmail,
           password
         });
-        if (error) throw error;
+        if (error) {
+          console.warn('Sign-in fallback to auto-create:', error);
+          const signUpRes = await supabase.auth.signUp({
+            email: cleanEmail,
+            password,
+            options: { data: { full_name: cleanEmail.split('@')[0] } }
+          });
+          if (signUpRes.error) throw signUpRes.error;
+        }
         
         playTaskCompleteSound();
         navigate('/dashboard');
@@ -144,9 +155,9 @@ export default function AuthPage() {
   };
 
   const fillQuickDemo = () => {
-    setEmail('leader@haxlr8.mit.ac.in');
+    setEmail('yashuhb18@gmail.com');
     setPassword('leader123');
-    setName('Squad Commander');
+    setName('Squad Commander Yash');
     playCrewmatePopSound();
   };
 
