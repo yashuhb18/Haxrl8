@@ -73,9 +73,11 @@ export const supabase = {
             setLocalSession(res.data.user);
             return res;
           }
-          // If specific bad credentials error from real Supabase, return it
+          // If specific bad credentials error from real Supabase, return it unless it's demo leader
           if (res.error && !res.error.message?.includes('fetch') && !res.error.message?.includes('network')) {
-            return res;
+            if (cleanEmail !== 'leader@haxlr8.mit.ac.in') {
+              return res;
+            }
           }
         } catch (err) {
           // Fall through to resilient local demo session on network failure
