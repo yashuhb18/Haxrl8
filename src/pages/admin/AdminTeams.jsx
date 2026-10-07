@@ -49,11 +49,11 @@ export default function AdminTeams() {
         setIsAdmin(true);
         fetchData();
       } else {
-        navigate('/admin');
+        window.dispatchEvent(new Event('haxlr8_organizer_logout'));
       }
     };
     checkAuth();
-  }, [navigate, fetchData]);
+  }, [fetchData]);
 
   const buildQuery = (isExport = false) => {
     let query = supabase.from('teams').select('*', { count: 'exact' });
@@ -94,7 +94,16 @@ export default function AdminTeams() {
   }, [loading, isAdmin, currentPage, searchTerm]);
 
   if (loading) return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:S.bg}}><div style={{width:40,height:40,border:'3px solid '+S.primary,borderTopColor:'transparent',borderRadius:'50%',animation:'spin 1s linear infinite'}}/></div>;
-  if (!isAdmin) return null;
+  if (!isAdmin) {
+    return (
+      <div style={{minHeight:'60vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12,padding:24}}>
+        <div style={{fontSize:16,fontWeight:800,color:'#b91c1c'}}>Organizer Clearance Required</div>
+        <button onClick={() => window.dispatchEvent(new Event('haxlr8_organizer_logout'))} style={{padding:'10px 18px',borderRadius:10,background:'#0284c7',color:'#fff',border:'none',fontWeight:800,cursor:'pointer'}}>
+          Unlock Master Command Deck 🚀
+        </button>
+      </div>
+    );
+  }
 
   const toggleShortlist = async (teamId, currentStatus) => {
     const newStatus = currentStatus === 'Shortlisted' ? 'Pending' : 'Shortlisted';

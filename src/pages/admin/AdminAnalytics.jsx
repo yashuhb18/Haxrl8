@@ -194,11 +194,11 @@ export default function AdminAnalytics() {
         setIsAdmin(true);
         fetchAll();
       } else {
-        navigate('/admin');
+        window.dispatchEvent(new Event('haxlr8_organizer_logout'));
       }
     };
     checkAuth();
-  }, [navigate, fetchAll]);
+  }, [fetchAll]);
 
   const subRate = counts.teams ? ((counts.subs / counts.teams) * 100).toFixed(1) : 0;
 
@@ -209,7 +209,16 @@ export default function AdminAnalytics() {
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
-  if (!isAdmin) return null;
+  if (!isAdmin) {
+    return (
+      <div style={{minHeight:'60vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12,padding:24}}>
+        <div style={{fontSize:16,fontWeight:800,color:'#b91c1c'}}>Organizer Clearance Required</div>
+        <button onClick={() => window.dispatchEvent(new Event('haxlr8_organizer_logout'))} style={{padding:'10px 18px',borderRadius:10,background:'#0284c7',color:'#fff',border:'none',fontWeight:800,cursor:'pointer'}}>
+          Unlock Master Command Deck 🚀
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>

@@ -2,6 +2,8 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Home, Users, Flag, CheckSquare, Bell, LayoutDashboard, LogOut, FileText, TrendingUp, Shield } from 'lucide-react';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
+import { useAdminAuth } from './AdminAuthGate';
+import { organizerLogout } from './adminAuth';
 
 const S = {
   card: '#FFFFFF', border: '#FED7AA', primary: '#0284C7',
@@ -23,6 +25,7 @@ const navItems = [
 export default function AdminSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAdminAuth();
   const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/udview';
 
   return (
@@ -100,10 +103,12 @@ export default function AdminSidebar() {
         </button>
 
         <button
-          onClick={() => {
-            sessionStorage.removeItem('haxlr8_organizer_session');
-            localStorage.removeItem('haxlr8_organizer_session');
-            navigate('/admin');
+          onClick={async () => {
+            if (logout) {
+              await logout();
+            } else {
+              await organizerLogout();
+            }
           }}
           style={{
             display: 'flex',

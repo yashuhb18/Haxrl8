@@ -7,6 +7,13 @@ import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 const MASTER_PASSCODE = 'HAXLR8_COMMAND_2026';
 const ORGANIZER_SESSION_KEY = 'haxlr8_organizer_session';
 
+export const AdminAuthContext = React.createContext({
+  isAuthenticated: false,
+  logout: () => {},
+});
+
+export const useAdminAuth = () => React.useContext(AdminAuthContext);
+
 export default function AdminAuthGate({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -16,6 +23,18 @@ export default function AdminAuthGate({ children }) {
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState('passcode'); // 'passcode' or 'supabase'
   const [submitting, setSubmitting] = useState(false);
+
+  const handleLogout = async () => {
+    sessionStorage.removeItem(ORGANIZER_SESSION_KEY);
+    localStorage.removeItem(ORGANIZER_SESSION_KEY);
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {}
+    setIsAuthenticated(false);
+    setPasscode('');
+    setErrorMsg('');
+    setLoading(false);
+  };
 
   useEffect(() => {
     const checkSession = async () => {
@@ -27,32 +46,18 @@ export default function AdminAuthGate({ children }) {
         return;
       }
 
-      // 2. Check Supabase user
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          if (user.email === 'yashuhb18@gmail.com') {
-            sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-            setIsAuthenticated(true);
-            setLoading(false);
-            return;
-          }
-          const { data: adminList } = await supabase.from('admins').select('email').eq('email', user.email);
-          if (adminList && adminList.length > 0) {
-            sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-            setIsAuthenticated(true);
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn('Admin check error:', err);
-      }
-
+      setIsAuthenticated(false);
       setLoading(false);
     };
 
     checkSession();
+
+    const onLogoutEvent = () => {
+      handleLogout();
+    };
+
+    window.addEventListener('haxlr8_organizer_logout', onLogoutEvent);
+    return () => window.removeEventListener('haxlr8_organizer_logout', onLogoutEvent);
   }, []);
 
   const handlePasscodeLogin = (e) => {
@@ -77,11 +82,13 @@ export default function AdminAuthGate({ children }) {
       const user = res.data?.user;
       if (user?.email === 'yashuhb18@gmail.com') {
         sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+        localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
         setIsAuthenticated(true);
       } else {
         const { data: adminList } = await supabase.from('admins').select('email').eq('email', user.email);
         if (adminList && adminList.length > 0) {
           sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+          localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
           setIsAuthenticated(true);
         } else {
           setErrorMsg('Account authenticated, but this email is not in the authorized Organizers roster.');
@@ -107,7 +114,11 @@ export default function AdminAuthGate({ children }) {
   }
 
   if (isAuthenticated) {
-    return children;
+    return (
+      <AdminAuthContext.Provider value={{ isAuthenticated, logout: handleLogout }}>
+        {children}
+      </AdminAuthContext.Provider>
+    );
   }
 
   return (
@@ -210,10 +221,15 @@ export default function AdminAuthGate({ children }) {
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 type="button"
-                onClick={() => setPasscode(MASTER_PASSCODE)}
+                onClick={() => {
+                  setPasscode(MASTER_PASSCODE);
+                  sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+                  localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+                  setIsAuthenticated(true);
+                }}
                 style={{ background: 'none', border: 'none', color: '#0284c7', fontSize: 12, fontWeight: 800, cursor: 'pointer', padding: 0 }}
               >
-                ⚡ 1-Click Auto-Fill Yash Key
+                ⚡ 1-Click Auto-Unlock Yash Key
               </button>
             </div>
 
