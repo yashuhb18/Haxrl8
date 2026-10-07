@@ -4,34 +4,74 @@ import { Camera, Sparkles, Heart, Trophy, Users, X, ZoomIn, ArrowRight } from 'l
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
 
-// Highlight photos
-import img1 from '../assets/highlights/highlights_image/IMG_0073.JPG';
-import img2 from '../assets/highlights/highlights_image/IMG_0078.JPG';
-import img3 from '../assets/highlights/highlights_image/IMG_0079.JPG';
-import img4 from '../assets/highlights/highlights_image/IMG_0080.JPG';
-import img5 from '../assets/highlights/highlights_image/IMG_0083.JPG';
-import img6 from '../assets/highlights/highlights_image/IMG_0094.JPG';
-import img7 from '../assets/highlights/highlights_image/IMG_0099.JPG';
-import img8 from '../assets/highlights/highlights_image/IMG_0545.JPG';
-import img9 from '../assets/highlights/highlights_image/IMG_0547.JPG';
-import img10 from '../assets/highlights/highlights_image/IMG_0550.JPG';
-import img11 from '../assets/highlights/highlights_image/IMG_0555.JPG';
-import img12 from '../assets/highlights/highlights_image/IMG_0558.JPG';
-import crewImage from '../assets/highlights/crew.png';
+// Highlight photos (HAXLR8 Real Edition)
+import imgMentorship from '../assets/highlights/haxlr8_mentorship.png';
+import imgCrewGroup from '../assets/highlights/haxlr8_crew_group.jpg';
+import imgSmartDemo from '../assets/highlights/haxlr8_smart_demo.png';
+import imgJuryPitch from '../assets/highlights/haxlr8_jury_pitch.png';
+import imgTeamDefense from '../assets/highlights/haxlr8_team_defense.png';
 
 const GALLERY = [
-  { id: 1, title: 'Inauguration & Keynote', category: 'ceremony', tag: 'KICKOFF', src: img1, rotate: -1.5, bg: '#ffe4e6', border: '#fda4af' },
-  { id: 2, title: 'Deep Prototyping Mode', category: 'sprint', tag: 'ZERO-G CODE', src: img2, rotate: 1.8, bg: '#fef9c3', border: '#fde047' },
-  { id: 3, title: 'Faculty Mentorship Rounds', category: 'sprint', tag: 'MENTORSHIP', src: img3, rotate: -2, bg: '#e0f2fe', border: '#7dd3fc' },
-  { id: 4, title: 'Hardware & IoT Testing', category: 'sprint', tag: 'CIRCUITS LIVE', src: img4, rotate: 1.2, bg: '#dcfce7', border: '#86efac' },
-  { id: 5, title: 'Midnight Brainstorming', category: 'sprint', tag: '2:00 AM SPRINT', src: img5, rotate: -1.8, bg: '#f3e8ff', border: '#d8b4fe' },
-  { id: 6, title: 'Team Coordination & Sync', category: 'sprint', tag: 'CREW CHAT', src: img6, rotate: 2.2, bg: '#ffedd5', border: '#fed7aa' },
-  { id: 7, title: 'Jury Evaluation & Pitching', category: 'ceremony', tag: 'DEMO DAY', src: img7, rotate: -1.2, bg: '#ffe4e6', border: '#fda4af' },
-  { id: 8, title: 'Live Project Demonstration', category: 'sprint', tag: 'SHOWCASE', src: img8, rotate: 1.5, bg: '#e0f2fe', border: '#7dd3fc' },
-  { id: 9, title: 'Auditorium Celebrations', category: 'ceremony', tag: 'CHEERS', src: img9, rotate: -2.1, bg: '#fef9c3', border: '#fde047' },
-  { id: 10, title: 'Victory Trophies Awarded', category: 'ceremony', tag: 'CHAMPIONS', src: img10, rotate: 1.7, bg: '#dcfce7', border: '#86efac' },
-  { id: 11, title: 'Participant Squad Memories', category: 'sprint', tag: 'TEAM SPIRIT', src: img11, rotate: -1.4, bg: '#f3e8ff', border: '#d8b4fe' },
-  { id: 12, title: 'Grand Finale Group Shot', category: 'ceremony', tag: 'FINALE', src: img12, rotate: 2.0, bg: '#ffedd5', border: '#fed7aa' },
+  {
+    id: 1,
+    title: 'HAXLR8 2.0 Grand Cohort & Crew',
+    subtitle: 'Maharaja Institute of Technology Mysore • ECE Department',
+    category: 'ceremony',
+    tag: 'GRAND COHORT',
+    src: imgCrewGroup,
+    rotate: -1.2,
+    bg: '#ffedd5',
+    border: '#fed7aa',
+    description: 'The complete HAXLR8 2.0 student participants, faculty advisors, and organizing committee assembled at the main arena.'
+  },
+  {
+    id: 2,
+    title: 'Faculty Mentorship & Architecture Review',
+    subtitle: 'Hands-on mentorship from experienced professors',
+    category: 'sprint',
+    tag: 'MENTORSHIP',
+    src: imgMentorship,
+    rotate: 1.5,
+    bg: '#e0f2fe',
+    border: '#7dd3fc',
+    description: 'Professors and technical mentors evaluating code logic, system architecture, and evaluation criteria with participating squads.'
+  },
+  {
+    id: 3,
+    title: 'Interactive Project Demonstration',
+    subtitle: 'Microsoft Innovation Lab smart screen display',
+    category: 'ceremony',
+    tag: 'LIVE PROTOTYPE',
+    src: imgSmartDemo,
+    rotate: -1.8,
+    bg: '#dcfce7',
+    border: '#86efac',
+    description: 'Squad demonstrating live patient telemetry and connected smart dashboards on high-resolution interactive displays.'
+  },
+  {
+    id: 4,
+    title: 'Jury Evaluation & Pitch Defense',
+    subtitle: 'HAXLR8 2.0 Hackathon stage presentations',
+    category: 'ceremony',
+    tag: 'JURY PITCH',
+    src: imgJuryPitch,
+    rotate: 1.2,
+    bg: '#ffe4e6',
+    border: '#fda4af',
+    description: 'Teams pitching their working solutions, fielding tough technical questions, and demonstrating system viability to the jury panel.'
+  },
+  {
+    id: 5,
+    title: 'Hands-on Technical Prototype Defense',
+    subtitle: 'Sprint review with evaluators at workstation stations',
+    category: 'sprint',
+    tag: 'TECH DEFENSE',
+    src: imgTeamDefense,
+    rotate: -1.4,
+    bg: '#f3e8ff',
+    border: '#d8b4fe',
+    description: 'Intense technical interrogation and code validation directly on laptops and test benches during the final prototype evaluation rounds.'
+  },
 ];
 
 export default function HighlightsPage() {
@@ -181,9 +221,9 @@ export default function HighlightsPage() {
             }}
           >
             {[
-              { id: 'all', label: 'All Moments (12)', icon: Sparkles },
-              { id: 'sprint', label: '🔥 Hackathon Sprint', icon: Heart },
-              { id: 'ceremony', label: '🏆 Trophies & Demos', icon: Trophy },
+              { id: 'all', label: 'All Moments (5)', icon: Sparkles },
+              { id: 'sprint', label: '🔥 Hackathon Sprint (2)', icon: Heart },
+              { id: 'ceremony', label: '🏆 Demos & Jury (3)', icon: Trophy },
             ].map(tab => {
               const active = filter === tab.id;
               return (
@@ -227,7 +267,7 @@ export default function HighlightsPage() {
           layout
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '28px',
             marginBottom: '80px',
           }}
@@ -277,7 +317,7 @@ export default function HighlightsPage() {
                   style={{
                     position: 'relative',
                     width: '100%',
-                    height: '220px',
+                    height: '240px',
                     borderRadius: '16px',
                     overflow: 'hidden',
                     backgroundColor: photo.bg,
@@ -343,7 +383,7 @@ export default function HighlightsPage() {
                     {photo.title}
                   </h4>
                   <p style={{ fontSize: '12px', color: '#64748b', margin: 0, fontWeight: 600 }}>
-                    HAXLR8 Edition // MIT Mysore
+                    {photo.subtitle || 'HAXLR8 Edition // MIT Mysore'}
                   </p>
                 </div>
               </motion.div>
@@ -390,7 +430,7 @@ export default function HighlightsPage() {
             }}
           >
             <img
-              src={crewImage}
+              src={imgCrewGroup}
               alt="HAXLR8 Committee Crew"
               style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }}
             />
@@ -477,13 +517,13 @@ export default function HighlightsPage() {
                 />
               </div>
 
-              <div style={{ padding: '16px 8px 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ padding: '16px 8px 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
                 <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
+                  <h3 style={{ fontSize: '19px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
                     {lightbox.title}
                   </h3>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
-                    HAXLR8 Hackathon • MIT Mysore
+                  <p style={{ fontSize: '13px', color: '#64748b', margin: 0, lineHeight: 1.45 }}>
+                    {lightbox.description || lightbox.subtitle || 'HAXLR8 Hackathon • MIT Mysore'}
                   </p>
                 </div>
                 <span
@@ -495,6 +535,7 @@ export default function HighlightsPage() {
                     borderRadius: '9999px',
                     fontSize: '12px',
                     fontWeight: 800,
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {lightbox.tag}

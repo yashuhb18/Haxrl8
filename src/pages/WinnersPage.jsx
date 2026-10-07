@@ -5,9 +5,9 @@ import sdgLogoCircle from '../assets/logo/sdg-logo-circle.png';
 import goldenTrophyImg from '../assets/logo/golden-trophy-3d.png';
 
 // Import Winner Photos
-import winnerPhoto1 from '../assets/Winners/1.JPG';
-import winnerPhoto2 from '../assets/Winners/2.JPG';
-import winnerPhoto3 from '../assets/Winners/3.JPG';
+import winnerPhoto1 from '../assets/highlights/haxlr8_crew_group.jpg';
+import winnerPhoto2 from '../assets/highlights/haxlr8_smart_demo.png';
+import winnerPhoto3 from '../assets/highlights/haxlr8_jury_pitch.png';
 
 // Official UN SDG Image Icons
 const SDG_IMAGES = {
@@ -1080,7 +1080,7 @@ export default function WinnersPage() {
                             padding: '6px 18px', fontSize: 13, color: '#374151', fontWeight: 600
                         }}>
                             <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e' }} />
-                            SRCAS Hackathon 3.0
+                            HAXLR8 2.0 • MIT Mysore
                             <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e' }} />
                         </div>
                     </motion.div>
