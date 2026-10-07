@@ -170,14 +170,14 @@ export default function AdminDashboard() {
   return (
     <>
         {/* TOP NAV */}
-        <header style={{ height:64, background:S.card, borderBottom:'1px solid '+S.border, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 28px', flexShrink:0 }}>
+        <header style={{ minHeight:60, background:S.card, borderBottom:'1px solid '+S.border, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px clamp(14px, 3vw, 28px)', flexShrink:0, flexWrap:'wrap', gap:12 }}>
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             <div>
               <h1 style={{ fontSize:18, fontWeight:700, margin:0, color:S.t1 }}>Dashboard</h1>
               <div style={{ fontSize:11, fontWeight:500, color:S.t2, display:'flex', alignItems:'center', gap:4 }}>Home <ChevronRight size={12}/> <span style={{color:S.t1}}>Dashboard</span></div>
             </div>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:14, flexWrap:'wrap' }}>
             <button
               onClick={async () => {
                 setIsRefreshing(true);
@@ -198,7 +198,7 @@ export default function AdminDashboard() {
             </button>
             <div 
               onClick={() => setShowEmail(!showEmail)}
-              style={{ display:'flex', alignItems:'center', gap:10, borderLeft:'1px solid '+S.border, paddingLeft:20, cursor:'pointer' }}
+              style={{ display:'flex', alignItems:'center', gap:10, borderLeft:'1px solid '+S.border, paddingLeft:14, cursor:'pointer' }}
             >
               <div style={{ width:34, height:34, borderRadius:'50%', background:'#059669', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:700, fontSize:14 }}>
                 {adminEmail ? adminEmail.charAt(0).toUpperCase() : 'A'}
@@ -212,11 +212,11 @@ export default function AdminDashboard() {
         </header>
 
         {/* SCROLLABLE CONTENT */}
-        <div style={{ flex:1, overflowY:'auto', padding:S.pad }}>
+        <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', padding:'clamp(14px, 3vw, 24px)' }}>
           <div style={{ display:'flex', flexDirection:'column', gap:S.gap }}>
 
             {/* STAT CARDS */}
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:S.gap }}>
+            <div className="admin-stat-cards-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:S.gap }}>
               {statCards.map((c, i) => (
                 <div key={i} style={{ background:S.card, border:'1px solid '+S.border, borderRadius:S.radius, padding:'20px 22px', boxShadow:'0 1px 3px rgba(0,0,0,.04)' }}>
                   <div style={{ width:44, height:44, borderRadius:12, background:c.bg, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
@@ -230,7 +230,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* CHARTS ROW */}
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:S.gap, minHeight:380 }}>
+            <div className="admin-charts-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:S.gap, minHeight:380 }}>
               {/* Registration Chart */}
               <div style={{ background:S.card, border:'1px solid '+S.border, borderRadius:S.radius, padding:S.pad, boxShadow:'0 1px 3px rgba(0,0,0,.04)', display:'flex', flexDirection:'column' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
                     {chartsData.labels.map((d, i) => <span key={i}>{d}</span>)}
                   </div>
                 </div>
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginTop:16 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(110px, 1fr))', gap:10, marginTop:16 }}>
                   {[
                     { dot:'#6C4EFF', label:'Total Users', val: exactCounts.members },
                     { dot:'#D97706', label:'Total Teams', val: exactCounts.teams },
@@ -293,7 +293,7 @@ export default function AdminDashboard() {
                     {chartsData.labels.map((d, i) => <span key={i}>{d}</span>)}
                   </div>
                 </div>
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginTop:16 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(110px, 1fr))', gap:10, marginTop:16 }}>
                   {[
                     { dot:'#3b82f6', label:'Submitted', val: exactCounts.subs },
                     { dot:'#eab308', label:'Pending', val: teams.filter(t => t.status === 'Pending').length },
@@ -313,45 +313,47 @@ export default function AdminDashboard() {
             </div>
 
             {/* BOTTOM ROW */}
-            <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:S.gap }}>
+            <div className="admin-bottom-grid" style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:S.gap }}>
               {/* Recent Submissions */}
               <div style={{ background:S.card, border:'1px solid '+S.border, borderRadius:S.radius, boxShadow:'0 1px 3px rgba(0,0,0,.04)', overflow:'hidden' }}>
                 <div style={{ padding:'18px 22px', borderBottom:'1px solid #F1F5F9', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                   <h3 style={{ fontSize:15, fontWeight:700, margin:0 }}>Recently Created Team</h3>
                 </div>
-                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
-                  <thead>
-                    <tr style={{ background:'#FAFAFA', borderBottom:'1px solid #F1F5F9' }}>
-                      {['Team Name','Track','Submission Title','Submitted On','Status'].map(h => (
-                        <th key={h} style={{ padding:'12px 18px', fontWeight:600, color:S.t2, textAlign: h==='Action' ? 'center' : 'left' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {teams.slice(0,5).map(team => {
-                      const sub = submissions.find(s => s.team_id === team.id);
-                      const st = statusStyle(team.status);
-                      return (
-                        <tr key={team.id} style={{ borderBottom:'1px solid #F8FAFC' }}>
-                          <td style={{ padding:'14px 18px' }}>
-                            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                              <div style={{ width:28, height:28, borderRadius:6, background:'#D1FAE5', color:'#059669', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, fontSize:11 }}>{team.team_name.charAt(0)}</div>
-                              <span style={{ fontWeight:700, color:S.t1 }}>{team.team_name}</span>
-                            </div>
-                          </td>
-                          <td style={{ padding:'14px 18px', color:S.t2 }}>{sub?.category || 'General'}</td>
-                          <td style={{ padding:'14px 18px', color:S.t2, maxWidth:140, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub?.project_title || '-'}</td>
-                          <td style={{ padding:'14px 18px', color:S.t3 }}>{team.created_at ? new Date(team.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-'}</td>
-                          <td style={{ padding:'14px 18px' }}>
-                            <span style={{ ...st, padding:'4px 10px', borderRadius:6, fontSize:10, fontWeight:700, display:'inline-block' }}>
-                              {team.status === 'Pending' ? 'Under Review' : team.status || 'Submitted'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div style={{ width:'100%', overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
+                  <table style={{ width:'100%', minWidth:540, borderCollapse:'collapse', fontSize:12 }}>
+                    <thead>
+                      <tr style={{ background:'#FAFAFA', borderBottom:'1px solid #F1F5F9' }}>
+                        {['Team Name','Track','Submission Title','Submitted On','Status'].map(h => (
+                          <th key={h} style={{ padding:'12px 18px', fontWeight:600, color:S.t2, textAlign: h==='Action' ? 'center' : 'left' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teams.slice(0,5).map(team => {
+                        const sub = submissions.find(s => s.team_id === team.id);
+                        const st = statusStyle(team.status);
+                        return (
+                          <tr key={team.id} style={{ borderBottom:'1px solid #F8FAFC' }}>
+                            <td style={{ padding:'14px 18px' }}>
+                              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                                <div style={{ width:28, height:28, borderRadius:6, background:'#D1FAE5', color:'#059669', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:700, fontSize:11 }}>{team.team_name.charAt(0)}</div>
+                                <span style={{ fontWeight:700, color:S.t1 }}>{team.team_name}</span>
+                              </div>
+                            </td>
+                            <td style={{ padding:'14px 18px', color:S.t2 }}>{sub?.category || 'General'}</td>
+                            <td style={{ padding:'14px 18px', color:S.t2, maxWidth:140, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub?.project_title || '-'}</td>
+                            <td style={{ padding:'14px 18px', color:S.t3 }}>{team.created_at ? new Date(team.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-'}</td>
+                            <td style={{ padding:'14px 18px' }}>
+                              <span style={{ ...st, padding:'4px 10px', borderRadius:6, fontSize:10, fontWeight:700, display:'inline-block' }}>
+                                {team.status === 'Pending' ? 'Under Review' : team.status || 'Submitted'}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
                 <div style={{ padding:'14px 22px', borderTop:'1px solid #F1F5F9', textAlign:'center' }}>
                   <button onClick={() => navigate(`${basePath}/submissions`)} style={{ background:'none', border:'none', fontSize:12, fontWeight:700, color:S.primary, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4 }}>
                     View all submissions <ChevronRight size={14}/>
@@ -408,7 +410,23 @@ export default function AdminDashboard() {
 
           </div>
         </div>
-      
+
+        <style>{`
+          @media (max-width: 900px) {
+            .admin-charts-grid {
+              grid-template-columns: 1fr !important;
+              min-height: auto !important;
+            }
+            .admin-bottom-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+          @media (max-width: 520px) {
+            .admin-stat-cards-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
     </>
   );
 }
