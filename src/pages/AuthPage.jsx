@@ -10,7 +10,7 @@ import {
   CheckCircle2, ChevronRight, AlertTriangle
 } from 'lucide-react';
 import amongusLoginHero from '../assets/auth/amongus_login_hero.png';
-import { sendParticipantWelcomeEmail, sendLoginNotificationEmail } from '../lib/emailService';
+import { sendAccountWelcomeEmail, sendParticipantWelcomeEmail, sendLoginNotificationEmail } from '../lib/emailService';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -92,6 +92,13 @@ export default function AuthPage() {
           return;
         }
 
+        // Clean up legacy global caches to protect account isolation
+        try {
+          localStorage.removeItem('haxlr8_teams_db');
+          localStorage.removeItem('haxlr8_members_db');
+          localStorage.removeItem('haxlr8_submissions_db');
+        } catch (e) {}
+
         // Successfully logged in! Dispatch automated email notification
         sendLoginNotificationEmail({
           recipientEmail: cleanEmail,
@@ -124,13 +131,19 @@ export default function AuthPage() {
           return;
         }
 
+        // Clean up legacy global caches so new user never sees previous user's team
+        try {
+          localStorage.removeItem('haxlr8_teams_db');
+          localStorage.removeItem('haxlr8_members_db');
+          localStorage.removeItem('haxlr8_submissions_db');
+        } catch (e) {}
+
         localStorage.setItem('haxlr8_leader_confirmed', 'true');
 
-        // Automated Welcome Email
-        sendParticipantWelcomeEmail({
+        // Automated Account Creation Welcome Email
+        sendAccountWelcomeEmail({
           recipientEmail: cleanEmail,
           leaderName: cleanName,
-          teamName: 'Your New Squad',
         }).catch(e => console.warn('Welcome email error:', e));
 
         playTaskCompleteSound();

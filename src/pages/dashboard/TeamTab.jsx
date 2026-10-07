@@ -333,7 +333,8 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           }).select().single();
           if (teamErr) throw teamErr;
           team = createdTeam;
-          localStorage.setItem('haxlr8_teams_db', JSON.stringify(team));
+          localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(team));
+          localStorage.removeItem('haxlr8_teams_db');
         } catch (tErr) {
           console.warn('Supabase teams insert notice:', tErr);
           team = {
@@ -342,7 +343,8 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
             team_name: cleanTeamName,
             created_at: new Date().toISOString()
           };
-          localStorage.setItem('haxlr8_teams_db', JSON.stringify(team));
+          localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(team));
+          localStorage.removeItem('haxlr8_teams_db');
         }
         currentTeamId = team.id;
         finalTeamData = team;
@@ -427,11 +429,13 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         const { data: members, error: memErr } = await supabase.from('team_members').upsert(allMembers).select();
         if (memErr) throw memErr;
         if (members) savedMembers = members;
-        localStorage.setItem('haxlr8_members_db', JSON.stringify(savedMembers));
+        localStorage.setItem(`haxlr8_members_${validLeaderId}`, JSON.stringify(savedMembers));
+        localStorage.removeItem('haxlr8_members_db');
       } catch (mErr) {
         console.warn('Supabase members upsert notice:', mErr);
         savedMembers = allMembers.map((m) => ({ ...m, id: ensureUUID(m.id) }));
-        localStorage.setItem('haxlr8_members_db', JSON.stringify(savedMembers));
+        localStorage.setItem(`haxlr8_members_${validLeaderId}`, JSON.stringify(savedMembers));
+        localStorage.removeItem('haxlr8_members_db');
       }
 
       setTeamData(finalTeamData);

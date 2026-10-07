@@ -350,6 +350,143 @@ export function generateLoginEmailHtml({ leaderName, recipientEmail }) {
 }
 
 /**
+ * Generate rich HTML email for newly registered leader accounts (prior to team creation)
+ */
+export function generateAccountWelcomeEmailHtml({ leaderName, recipientEmail }) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fffaf3; margin: 0; padding: 20px; color: #0f172a; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; border: 2px solid #fed7aa; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+    .header { background: linear-gradient(135deg, #ff3b69 0%, #ea580c 100%); padding: 36px 30px; text-align: center; color: #ffffff; }
+    .header h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
+    .header p { margin: 6px 0 0; font-size: 14px; opacity: 0.95; font-weight: 600; }
+    .content { padding: 32px 30px; line-height: 1.6; }
+    .highlight-card { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 18px 20px; margin: 24px 0; }
+    .field-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+    .field-label { color: #ea580c; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+    .field-val { font-weight: 800; color: #0f172a; }
+    .cta-btn { display: inline-block; background: #ff3b69; color: #ffffff !important; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; margin-top: 20px; text-align: center; }
+    .timeline-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin: 20px 0; font-size: 13px; color: #475569; }
+    .footer { background: #fdf4e7; border-top: 1.5px solid #fed7aa; padding: 20px 30px; text-align: center; font-size: 12px; color: #64748b; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div style="font-size: 40px; margin-bottom: 8px;">🚀</div>
+      <h1>HAXLR8 3.0 Space Command</h1>
+      <p>National Level 24-Hour Hackathon • MIT Mysore</p>
+    </div>
+
+    <div class="content">
+      <h2 style="font-size: 20px; color: #0f172a; margin-top: 0;">Welcome Aboard, Commander ${leaderName || 'Participant'}!</h2>
+      <p>
+        Your Commander Account for <strong>HAXLR8 3.0</strong> has been successfully created with the Department of Electronics &amp; Communication Engineering at Maharaja Institute of Technology Mysore.
+      </p>
+
+      <div class="highlight-card">
+        <div style="font-size: 12px; font-weight: 900; color: #ea580c; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">
+          ⭐ Commander Profile Activated
+        </div>
+        <div class="field-row">
+          <span class="field-label">Account Leader:</span>
+          <span class="field-val">${leaderName || 'Squad Commander'}</span>
+        </div>
+        <div class="field-row" style="margin-bottom: 0;">
+          <span class="field-label">Commander Email:</span>
+          <span class="field-val">${recipientEmail}</span>
+        </div>
+      </div>
+
+      <h3 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;">Next Steps to Lock In Your Squad:</h3>
+      <ol style="padding-left: 20px; margin: 0 0 20px; font-size: 14px; color: #334155;">
+        <li style="margin-bottom: 6px;">Log in to your <strong>Candidate Flight Deck Dashboard</strong>.</li>
+        <li style="margin-bottom: 6px;">Go to the <strong>Team</strong> tab and click <strong>Squad Configuration</strong>.</li>
+        <li style="margin-bottom: 6px;">Choose your squad name and register your <strong>3 to 4 crewmates</strong> (inter-college allowed).</li>
+        <li style="margin-bottom: 6px;">Download the official PPT template and upload your idea abstract before <strong>October 28, 2026</strong>.</li>
+      </ol>
+
+      <div class="timeline-box">
+        <strong>🗓️ Mission Milestones:</strong><br>
+        • Oct 09: Registrations Open<br>
+        • Oct 28: Registration &amp; Idea Submission Lock<br>
+        • Nov 02: Shortlisted Squads Announced<br>
+        • Nov 06–07: 24-Hour Offline Finale at MIT Mysore Campus (₹33,333 Bounty Pool)
+      </div>
+
+      <div style="text-align: center;">
+        <a href="https://haxrl8.vercel.app/dashboard" class="cta-btn">Open Candidate Flight Deck →</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      Sent automatically by <strong>HAXLR8 3.0 Space Command</strong><br>
+      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a><br>
+      Maharaja Institute of Technology Mysore, Belagola, Srirangapatna Taluk, Mandya - 571438
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
+/**
+ * Send welcome email when a participant creates an account
+ */
+export async function sendAccountWelcomeEmail({ recipientEmail, leaderName }) {
+  if (!recipientEmail) return { success: false, error: 'Recipient email is required' };
+
+  console.log(`[HAXLR8 Email Automation] Dispatching account created welcome email to ${recipientEmail}...`);
+
+  const emailPayload = {
+    to: recipientEmail,
+    subject: `🚀 Welcome to HAXLR8 3.0, Commander ${leaderName || 'Participant'}!`,
+    html: generateAccountWelcomeEmailHtml({ leaderName, recipientEmail }),
+    leaderName
+  };
+
+  let deliveryStatus = 'Dispatched (Cloud SMTP)';
+
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(emailPayload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      deliveryStatus = data.simulated ? 'Simulated (Dev)' : 'Delivered via Gmail SMTP';
+    }
+  } catch (err) {
+    deliveryStatus = 'Dispatched (App Fallback)';
+  }
+
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const existingLogs = JSON.parse(localStorage.getItem('haxlr8_email_dispatch_logs') || '[]');
+      existingLogs.unshift({
+        id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        recipient: recipientEmail,
+        team_name: 'Account Setup',
+        subject: emailPayload.subject,
+        status: deliveryStatus,
+        sender: HAXLR8_HOST_EMAIL,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('haxlr8_email_dispatch_logs', JSON.stringify(existingLogs.slice(0, 150)));
+    }
+  } catch (e) {
+    console.warn('Local email log save error:', e);
+  }
+
+  return { success: true, status: deliveryStatus };
+}
+
+/**
  * Send automated email notification upon user login
  */
 export async function sendLoginNotificationEmail({ recipientEmail, leaderName }) {
@@ -359,7 +496,7 @@ export async function sendLoginNotificationEmail({ recipientEmail, leaderName })
 
   const emailPayload = {
     to: recipientEmail,
-    subject: `🚀 HAXLR8 3.0 Flight Deck Access Confirmed for ${leaderName || 'Commander'}`,
+    subject: `🔐 HAXLR8 3.0 Flight Deck Login Detected: Commander ${leaderName || 'Participant'}`,
     html: generateLoginEmailHtml({ leaderName, recipientEmail }),
     leaderName
   };
@@ -411,3 +548,4 @@ export function getEmailDispatchLogs() {
     return [];
   }
 }
+

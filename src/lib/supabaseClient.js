@@ -65,8 +65,13 @@ function setLocalSession(user) {
 }
 
 function clearLocalSession() {
-  localStorage.removeItem(LOCAL_SESSION_KEY);
-  localStorage.removeItem('haxlr8_leader_confirmed');
+  try {
+    localStorage.removeItem(LOCAL_SESSION_KEY);
+    localStorage.removeItem('haxlr8_leader_confirmed');
+    localStorage.removeItem(LOCAL_TEAMS_KEY);
+    localStorage.removeItem(LOCAL_MEMBERS_KEY);
+    localStorage.removeItem(LOCAL_SUBMISSIONS_KEY);
+  } catch (e) {}
   notifyAuthListeners('SIGNED_OUT', null);
 }
 

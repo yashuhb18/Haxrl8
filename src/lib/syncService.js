@@ -24,9 +24,28 @@ export function ensureUUID(val) {
  */
 export async function syncLocalDataToSupabase() {
   try {
-    const rawTeam = localStorage.getItem('haxlr8_teams_db');
-    const rawMembers = localStorage.getItem('haxlr8_members_db');
-    const rawSubs = localStorage.getItem('haxlr8_submissions_db');
+    // Purge legacy global keys to prevent data contamination across users
+    try {
+      localStorage.removeItem('haxlr8_teams_db');
+      localStorage.removeItem('haxlr8_members_db');
+      localStorage.removeItem('haxlr8_submissions_db');
+    } catch (e) {}
+
+    // Find any active session user
+    const sessionRaw = localStorage.getItem('haxlr8_leader_session');
+    let userId = null;
+    if (sessionRaw) {
+      try {
+        const parsed = JSON.parse(sessionRaw);
+        userId = parsed?.user?.id || parsed?.id;
+      } catch (e) {}
+    }
+
+    if (!userId) return { synced: false, message: 'No authenticated user session to sync' };
+
+    const rawTeam = localStorage.getItem(`haxlr8_team_${userId}`);
+    const rawMembers = localStorage.getItem(`haxlr8_members_${userId}`);
+    const rawSubs = localStorage.getItem(`haxlr8_subs_${userId}`);
 
     if (!rawTeam) return { synced: false, message: 'No local team to sync' };
 
@@ -50,7 +69,7 @@ export async function syncLocalDataToSupabase() {
     } else if (dbTeam) {
       localTeam.id = dbTeam.id;
       localTeam.leader_id = dbTeam.leader_id;
-      localStorage.setItem('haxlr8_teams_db', JSON.stringify(localTeam));
+      localStorage.setItem(`haxlr8_team_${userId}`, JSON.stringify(localTeam));
     }
 
     // 2. Sync Members
@@ -80,7 +99,7 @@ export async function syncLocalDataToSupabase() {
         if (memErr) {
           console.warn('Sync members error:', memErr);
         } else if (dbMembers) {
-          localStorage.setItem('haxlr8_members_db', JSON.stringify(dbMembers));
+          localStorage.setItem(`haxlr8_members_${userId}`, JSON.stringify(dbMembers));
         }
       }
     }
@@ -107,7 +126,7 @@ export async function syncLocalDataToSupabase() {
         if (subErr) {
           console.warn('Sync submissions error:', subErr);
         } else if (dbSubs) {
-          localStorage.setItem('haxlr8_submissions_db', JSON.stringify(dbSubs));
+          localStorage.setItem(`haxlr8_subs_${userId}`, JSON.stringify(dbSubs));
         }
       }
     }

@@ -24,6 +24,25 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
   const [showProfile, setShowProfile] = useState(false);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
 
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem('haxlr8_leader_session');
+      localStorage.removeItem('haxlr8_leader_confirmed');
+      localStorage.removeItem('haxlr8_teams_db');
+      localStorage.removeItem('haxlr8_members_db');
+      localStorage.removeItem('haxlr8_submissions_db');
+      if (user?.id) {
+        localStorage.removeItem(`haxlr8_team_${user.id}`);
+        localStorage.removeItem(`haxlr8_members_${user.id}`);
+        localStorage.removeItem(`haxlr8_subs_${user.id}`);
+      }
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn('Logout notice:', e);
+    }
+    navigate('/login');
+  };
+
   return (
     <div style={{ display:'flex', minHeight:'100vh', fontFamily:"'Plus Jakarta Sans', sans-serif", background:'#fffaf3', color:'#0f172a' }}>
       {/* Sidebar */}
@@ -123,7 +142,7 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
           </button>
 
           <button
-            onClick={async () => { await supabase.auth.signOut(); navigate('/'); }}
+            onClick={handleLogout}
             style={{
               display:'flex',
               alignItems:'center',
@@ -296,7 +315,7 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
               <button onClick={() => navigate('/')} style={{ padding:'12px 18px', borderRadius:12, border:'1.5px solid #cbd5e1', background:'#ffffff', fontWeight:800, color:'#334155', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, width:'100%', transition:'all 0.2s' }}>
                 <span>← Return to Mothership</span>
               </button>
-              <button onClick={async () => { await supabase.auth.signOut(); navigate('/'); }} style={{ padding:'12px 18px', borderRadius:12, border:'1.5px solid #fecaca', background:'#fef2f2', fontWeight:800, color:'#b91c1c', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, width:'100%', transition:'all 0.2s' }}>
+              <button onClick={handleLogout} style={{ padding:'12px 18px', borderRadius:12, border:'1.5px solid #fecaca', background:'#fef2f2', fontWeight:800, color:'#b91c1c', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, width:'100%', transition:'all 0.2s' }}>
                 <span>🚪 Log Out</span>
               </button>
             </div>
