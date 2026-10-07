@@ -97,7 +97,7 @@ export default function PlayfulHeroSection() {
               </div>
 
               {/* Official Extracted HAXLR8 3.0 Logotype */}
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }} className="hero-logo-col">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9, y: 15 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -107,6 +107,7 @@ export default function PlayfulHeroSection() {
                   <img
                     src={haxlr8LogoDark}
                     alt="HAXLR8 3.0"
+                    className="hero-logo-img"
                     style={{
                       height: 'clamp(95px, 15vw, 150px)',
                       width: 'auto',
@@ -125,6 +126,7 @@ export default function PlayfulHeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.5 }}
+              className="hero-slogan"
               style={{
                 fontSize: 'clamp(1.15rem, 2.2vw, 1.55rem)',
                 fontWeight: 900,
@@ -142,16 +144,50 @@ export default function PlayfulHeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
+              className="hero-subhead"
               style={{
                 fontSize: 'clamp(0.85rem, 1.3vw, 1.05rem)',
                 fontWeight: 800,
                 color: '#ff3b69',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                marginBottom: '22px',
+                marginBottom: '14px',
               }}
             >
               A NATIONAL LEVEL 24-HOUR HACKATHON
+            </motion.div>
+
+            {/* Organizer Pill: Department of Electronics & Communication Engineering (ECE) & EMITERS */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.22, duration: 0.5 }}
+              className="hero-organizer-badge"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(255, 59, 105, 0.08) 100%)',
+                border: '1.5px solid rgba(2, 132, 199, 0.22)',
+                borderRadius: '100px',
+                padding: '7px 18px',
+                marginBottom: '20px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+              }}
+            >
+              <span style={{ fontSize: '15px' }}>🎓</span>
+              <span
+                style={{
+                  fontSize: 'clamp(11.5px, 1.15vw, 13.5px)',
+                  fontWeight: 800,
+                  color: '#0f172a',
+                  letterSpacing: '0.01em',
+                }}
+              >
+                Organized by{' '}
+                <strong style={{ color: '#0284c7' }}>Department of Electronics & Communication Engineering (ECE)</strong>
+                {' '}& <strong style={{ color: '#ea580c' }}>EMITERS</strong>
+              </span>
             </motion.div>
 
             {/* Event Info Badges (Date & Location) */}
@@ -159,6 +195,7 @@ export default function PlayfulHeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25, duration: 0.5 }}
+              className="hero-info-badges"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -169,6 +206,7 @@ export default function PlayfulHeroSection() {
             >
               {/* Date Badge */}
               <div
+                className="hero-badge-pill"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -189,6 +227,7 @@ export default function PlayfulHeroSection() {
 
               {/* Location Badge */}
               <div
+                className="hero-badge-pill"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -213,6 +252,7 @@ export default function PlayfulHeroSection() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
+              className="hero-cta-row"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -223,6 +263,7 @@ export default function PlayfulHeroSection() {
             >
               <Link to="/register" style={{ textDecoration: 'none' }}>
                 <button
+                  className="hero-primary-cta"
                   style={{
                     background: '#ff3b69',
                     color: '#ffffff',
@@ -255,6 +296,7 @@ export default function PlayfulHeroSection() {
 
               <button
                 onClick={handleScrollToAbout}
+                className="hero-secondary-cta"
                 style={{
                   background: '#ffffff',
                   color: '#0f172a',
@@ -347,21 +389,71 @@ export default function PlayfulHeroSection() {
           .hero-left-content {
             align-items: center !important;
           }
-          .hero-headline-row {
-            justify-content: center !important;
-          }
           .hero-hide-mobile {
             display: none !important;
           }
         }
-        @media (max-width: 640px) {
-          .hero-chalkboard-wrapper {
-            transform: scale(0.85);
-            transform-origin: center;
-            margin: -6px 0;
-          }
+
+        @media (max-width: 768px) {
           .hero-headline-row {
-            gap: 10px !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+            margin-bottom: 12px !important;
+            width: 100% !important;
+          }
+          .hero-chalkboard-wrapper {
+            transform: scale(0.9) !important;
+            transform-origin: center !important;
+            margin: -4px 0 !important;
+          }
+          .hero-logo-col {
+            align-items: center !important;
+            width: 100% !important;
+          }
+          .hero-logo-img {
+            height: 92px !important;
+            max-width: 82vw !important;
+          }
+          .hero-slogan {
+            font-size: 1.25rem !important;
+            text-align: center !important;
+            margin: 6px 0 2px !important;
+          }
+          .hero-subhead {
+            font-size: 0.9rem !important;
+            text-align: center !important;
+            margin-bottom: 14px !important;
+          }
+          .hero-organizer-badge {
+            margin: 0 auto 18px auto !important;
+            text-align: center !important;
+            padding: 6px 14px !important;
+            max-width: 96% !important;
+          }
+          .hero-info-badges {
+            justify-content: center !important;
+            gap: 8px !important;
+            margin-bottom: 20px !important;
+            width: 100% !important;
+          }
+          .hero-badge-pill {
+            font-size: 12px !important;
+            padding: 7px 14px !important;
+          }
+          .hero-cta-row {
+            justify-content: center !important;
+            gap: 12px !important;
+            width: 100% !important;
+          }
+          .hero-primary-cta {
+            padding: 14px 28px !important;
+            font-size: 15px !important;
+          }
+          .hero-secondary-cta {
+            padding: 12px 24px !important;
+            font-size: 14.5px !important;
           }
         }
       `}</style>

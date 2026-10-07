@@ -6,6 +6,7 @@ import { Menu, X, ArrowRight } from 'lucide-react';
 import { playCrewmatePopSound } from '../amongus/AmongUsSound';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 import emitersSeal from '../../assets/logo/emiters-seal.png';
+import mitMysoreLogo from '../../assets/logo/mit-mysore-logo.png';
 import mitMysoreBanner from '../../assets/logo/mit-mysore-banner.png';
 
 const NAV_ITEMS = [
@@ -123,7 +124,9 @@ export default function PlayfulNavbar() {
             transform: scrolled ? 'translateY(-12px)' : 'translateY(0)',
           }}
         >
+          {/* Desktop Masthead View (Screens > 768px) */}
           <div
+            className="institutional-desktop-view"
             style={{
               maxWidth: '1360px',
               margin: '0 auto',
@@ -209,6 +212,105 @@ export default function PlayfulNavbar() {
                   EMITERS Student Forum · Maharaja Institute of Technology Mysore
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Dedicated Mobile Masthead View (Screens <= 768px: Crisp & Prominent) */}
+          <div
+            className="institutional-mobile-view"
+            style={{
+              padding: '6px 12px',
+              display: 'none',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '10px',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            {/* MIT Mysore Circular Crest */}
+            <a
+              href="https://mitmysore.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', flexShrink: 0, textDecoration: 'none' }}
+              title="Maharaja Institute of Technology Mysore"
+            >
+              <img
+                src={mitMysoreLogo}
+                alt="MIT Mysore Crest"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  objectFit: 'contain',
+                  borderRadius: '50%',
+                  filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.12))',
+                }}
+              />
+            </a>
+
+            {/* Department of ECE & Forum Institutional Typography */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                flex: 1,
+                minWidth: 0,
+                lineHeight: 1.25,
+                padding: '0 2px',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 'clamp(9px, 2.5vw, 10.5px)',
+                  fontWeight: 900,
+                  color: '#0f172a',
+                  letterSpacing: '0.01em',
+                  lineHeight: 1.2,
+                }}
+              >
+                MAHARAJA INSTITUTE OF TECHNOLOGY MYSORE
+              </span>
+              <span
+                style={{
+                  fontSize: 'clamp(8.5px, 2.3vw, 9.8px)',
+                  fontWeight: 800,
+                  color: '#0284c7',
+                  letterSpacing: '0.01em',
+                  lineHeight: 1.2,
+                }}
+              >
+                Department of Electronics & Communication Engineering
+              </span>
+              <span
+                style={{
+                  fontSize: 'clamp(8px, 2.1vw, 9px)',
+                  fontWeight: 800,
+                  color: '#ff3b69',
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  lineHeight: 1.2,
+                }}
+              >
+                EMITERS Student Forum
+              </span>
+            </div>
+
+            {/* EMITERS Circular Seal */}
+            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+              <img
+                src={emitersSeal}
+                alt="EMITERS Seal"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 2px 6px rgba(147, 51, 234, 0.25))',
+                }}
+              />
             </div>
           </div>
         </div>
@@ -379,12 +481,43 @@ export default function PlayfulNavbar() {
               style={{
                 background: '#fffaf3',
                 borderBottom: '1px solid rgba(226, 232, 240, 0.9)',
-                padding: '16px 24px 24px',
+                padding: '16px 20px 24px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
               }}
             >
+              {/* Mobile Drawer Institutional Attribution */}
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.06) 0%, rgba(255, 59, 105, 0.06) 100%)',
+                  border: '1.5px solid rgba(2, 132, 199, 0.18)',
+                  borderRadius: '12px',
+                  padding: '10px 12px',
+                  marginBottom: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                }}
+              >
+                <img
+                  src={mitMysoreLogo}
+                  alt="MIT Mysore"
+                  style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'contain', flexShrink: 0 }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                  <span style={{ fontSize: '11px', fontWeight: 900, color: '#0f172a', lineHeight: 1.25 }}>
+                    Maharaja Institute of Technology Mysore
+                  </span>
+                  <span style={{ fontSize: '10px', fontWeight: 800, color: '#0284c7', lineHeight: 1.25 }}>
+                    Department of Electronics & Communication Engineering
+                  </span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#ff3b69', lineHeight: 1.25, textTransform: 'uppercase' }}>
+                    EMITERS Student Forum
+                  </span>
+                </div>
+              </div>
+
               {NAV_ITEMS.map((item) => (
                 <button
                   key={item.id}
@@ -451,26 +584,11 @@ export default function PlayfulNavbar() {
           }
         }
         @media (max-width: 768px) {
-          .masthead-divider {
+          .institutional-desktop-view {
             display: none !important;
           }
-          .masthead-dept-text {
-            display: none !important;
-          }
-          .institutional-top-masthead {
-            padding: 6px 0 !important;
-          }
-          .institutional-top-masthead > div {
-            padding: 4px 14px !important;
-            gap: 12px !important;
-          }
-          .institutional-banner-img {
-            height: 32px !important;
-            max-width: calc(100vw - 78px) !important;
-          }
-          .institutional-seal-img {
-            width: 36px !important;
-            height: 36px !important;
+          .institutional-mobile-view {
+            display: flex !important;
           }
         }
       `}</style>
