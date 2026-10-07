@@ -7,6 +7,7 @@ import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound, playEmergencyMeetingSound, playTaskCompleteSound } from '../components/amongus/AmongUsSound';
 import { Mail, Lock, Eye, EyeOff, User, ArrowLeft, ShieldAlert, Sparkles, CheckCircle2, ChevronRight, AlertTriangle } from 'lucide-react';
 import amongusLoginHero from '../assets/auth/amongus_login_hero.png';
+import { sendParticipantWelcomeEmail } from '../lib/emailService';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -95,6 +96,13 @@ export default function AuthPage() {
           options: { data: { full_name: cleanName } }
         });
         if (error) throw error;
+
+        // Automated Welcome Email from haxlr83.o@gmail.com
+        sendParticipantWelcomeEmail({
+          recipientEmail: cleanEmail,
+          leaderName: cleanName,
+          teamName: 'Your New Squad'
+        }).catch(e => console.warn('Welcome email error:', e));
 
         playTaskCompleteSound();
         navigate('/dashboard');

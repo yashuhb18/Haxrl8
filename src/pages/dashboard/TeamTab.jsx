@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
 import { Rocket, Users, Flag, ClipboardList, MoreVertical, Info, Target, Calendar, Check, AlertCircle, Clock } from 'lucide-react';
+import { sendParticipantWelcomeEmail } from '../../lib/emailService';
 // import IdCardUpload from '../../components/IdCardUpload';
 
 const INDIA_STATES_CITIES = {
@@ -430,7 +431,35 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
       setTeamMembers(savedMembers);
       setHasTeam(true);
       setIsEditingTeam(false);
-      setToastMsg(isEditingTeam ? '🎉 Crew roster updated successfully!' : '🎉 Squad manifest locked in successfully!');
+
+      // Automated email dispatch from haxlr83.o@gmail.com
+      try {
+        if (formData?.leader?.email) {
+          sendParticipantWelcomeEmail({
+            recipientEmail: formData.leader.email,
+            leaderName: formData.leader.full_name,
+            teamName: finalTeamData.team_name,
+            teamId: finalTeamData.id,
+            crewCount: savedMembers.length
+          }).catch(e => console.warn('Leader email notification log:', e));
+        }
+        // Also dispatch confirmation to all teammates
+        formData?.teammates?.forEach(tm => {
+          if (tm?.email && tm.email.trim()) {
+            sendParticipantWelcomeEmail({
+              recipientEmail: tm.email.trim(),
+              leaderName: tm.full_name || 'Crewmate',
+              teamName: finalTeamData.team_name,
+              teamId: finalTeamData.id,
+              crewCount: savedMembers.length
+            }).catch(e => console.warn('Teammate email notification log:', e));
+          }
+        });
+      } catch (emailErr) {
+        console.warn('Squad email dispatch notice:', emailErr);
+      }
+
+      setToastMsg(isEditingTeam ? '🎉 Crew roster updated successfully!' : '🎉 Squad manifest locked in successfully! Confirmation email dispatched.');
       setTimeout(() => setToastMsg(''), 4000);
     } catch (err) {
       setErrorMsg(err.message);

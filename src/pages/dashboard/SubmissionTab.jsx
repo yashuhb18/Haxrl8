@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
+import { sendSubmissionConfirmationEmail } from '../../lib/emailService';
 
 const card = (extra = {}) => ({
   background: '#ffffff',
@@ -187,7 +188,25 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
         if (setSubmissions) setSubmissions([submissionPayload]);
       }
       setSuccess(true);
-      setToastMsg('Idea Abstract Locked In Successfully! 🚀');
+
+      // Automated email dispatch from haxlr83.o@gmail.com
+      try {
+        const leader = teamMembers?.find(m => m.is_leader) || teamMembers?.[0];
+        const leaderEmail = leader?.email;
+        if (leaderEmail) {
+          sendSubmissionConfirmationEmail({
+            recipientEmail: leaderEmail,
+            leaderName: leader.full_name || 'Team Leader',
+            teamName: teamData?.team_name || 'Squad',
+            trackName: sdgValue,
+            projectTitle: cleanTitle
+          }).catch(e => console.warn('Submission email log notice:', e));
+        }
+      } catch (emailErr) {
+        console.warn('Submission email notification notice:', emailErr);
+      }
+
+      setToastMsg('Idea Abstract Locked In Successfully! Confirmation email dispatched. 🚀');
       setTimeout(() => setToastMsg(''), 4000);
     } catch (err) {
       setErrorMsg(err.message || 'Error saving submission.');

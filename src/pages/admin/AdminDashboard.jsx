@@ -2,7 +2,8 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
-import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight } from 'lucide-react';
+import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight, Mail, Send, CheckCircle2 } from 'lucide-react';
+import { getEmailDispatchLogs, HAXLR8_HOST_EMAIL } from '../../lib/emailService';
 
 // Style constants
 const S = {
@@ -21,6 +22,7 @@ export default function AdminDashboard() {
   const [adminEmail, setAdminEmail] = useState('');
   const [showEmail, setShowEmail] = useState(false);
   const [exactCounts, setExactCounts] = useState({ teams: 0, members: 0, subs: 0, evals: 0 });
+  const [emailLogs, setEmailLogs] = useState([]);
 
   const fetchData = useCallback(async () => {
     // 1. Fetch exact counts (instant, no data download)
@@ -39,6 +41,7 @@ export default function AdminDashboard() {
       supabase.from('submissions').select('*').order('created_at', { ascending: false }),
     ]);
     if (t) setTeams(t); if (m) setMembers(m); if (s) setSubmissions(s);
+    setEmailLogs(getEmailDispatchLogs());
   }, []);
 
   useEffect(() => {
@@ -337,6 +340,32 @@ export default function AdminDashboard() {
                     </button>
                   ))}
                 </div>
+
+                {/* Host Email Automation Card */}
+                <div style={{ marginTop: 20, background: '#FFF7ED', border: '1.5px solid #FED7AA', borderRadius: 14, padding: '18px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ padding: 6, borderRadius: 8, background: '#FFEDD5', color: '#EA580C' }}>
+                        <Mail size={16} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 900, color: '#0F172A' }}>Host Email Automation</div>
+                        <div style={{ fontSize: 11, color: '#EA580C', fontWeight: 700 }}>{HAXLR8_HOST_EMAIL}</div>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: 10, fontWeight: 800, background: '#DCFCE7', color: '#15803D', padding: '3px 8px', borderRadius: 6, border: '1px solid #86EFAC' }}>
+                      Active
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#475569', lineHeight: 1.5, marginBottom: 12 }}>
+                    Automated flight manifests &amp; notifications are dispatched directly to every registering commander and crewmate upon signup.
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #FED7AA', paddingTop: 10, fontSize: 11 }}>
+                    <span style={{ color: '#64748B', fontWeight: 600 }}>Total Logs Recorded:</span>
+                    <span style={{ fontWeight: 800, color: '#0F172A' }}>{emailLogs.length} transmissions</span>
+                  </div>
+                </div>
+
               </div>
             </div>
 
