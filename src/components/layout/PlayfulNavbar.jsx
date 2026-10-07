@@ -165,7 +165,7 @@ export default function PlayfulNavbar() {
               style={{ width: '1.5px', height: '36px', background: '#cbd5e1' }}
             />
 
-            {/* Right: Department of ECE & MIT Mysore Crest - Big & Prominent */}
+            {/* Right: Department of ECE & ECE Seal - Big & Prominent */}
             <div
               style={{
                 display: 'flex',
@@ -174,15 +174,15 @@ export default function PlayfulNavbar() {
               }}
             >
               <img
-                src={mitMysoreLogo}
-                alt="Maharaja Institute of Technology Mysore"
+                src={emitersSeal}
+                alt="Department of Electronics & Communication Engineering"
                 className="institutional-seal-img"
                 style={{
-                  width: 'clamp(44px, 5vw, 54px)',
-                  height: 'clamp(44px, 5vw, 54px)',
+                  width: 'clamp(48px, 5.2vw, 56px)',
+                  height: 'clamp(48px, 5.2vw, 56px)',
                   borderRadius: '50%',
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12))',
+                  filter: 'drop-shadow(0 2px 10px rgba(0, 0, 0, 0.14))',
                   flexShrink: 0,
                   userSelect: 'none',
                 }}
@@ -228,7 +228,7 @@ export default function PlayfulNavbar() {
               boxSizing: 'border-box',
             }}
           >
-            {/* MIT Mysore Circular Crest */}
+            {/* Left: MIT Mysore Circular Crest (Big, Clean & Crisp) */}
             <a
               href="https://mitmysore.in"
               target="_blank"
@@ -240,16 +240,16 @@ export default function PlayfulNavbar() {
                 src={mitMysoreLogo}
                 alt="MIT Mysore Crest"
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '44px',
+                  height: '44px',
                   objectFit: 'contain',
                   borderRadius: '50%',
-                  filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.12))',
+                  filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))',
                 }}
               />
             </a>
 
-            {/* Department of ECE & Institution Typography */}
+            {/* Center: Department of ECE & Institution Typography */}
             <div
               style={{
                 display: 'flex',
@@ -286,17 +286,17 @@ export default function PlayfulNavbar() {
               </span>
             </div>
 
-            {/* MIT Mysore Crest on Right for Visual Balance */}
-            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+            {/* Right: Department of ECE Official Seal (Big, Clean & Crisp) */}
+            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }} title="Department of Electronics & Communication Engineering">
               <img
-                src={mitMysoreLogo}
-                alt="MIT Mysore Crest"
+                src={emitersSeal}
+                alt="ECE Department Seal"
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.12))',
+                  filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))',
                 }}
               />
             </div>
@@ -481,19 +481,20 @@ export default function PlayfulNavbar() {
                   background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.06) 0%, rgba(255, 59, 105, 0.06) 100%)',
                   border: '1.5px solid rgba(2, 132, 199, 0.18)',
                   borderRadius: '12px',
-                  padding: '10px 12px',
+                  padding: '10px 14px',
                   marginBottom: '6px',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
                   gap: '12px',
                 }}
               >
                 <img
                   src={mitMysoreLogo}
                   alt="MIT Mysore"
-                  style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'contain', flexShrink: 0 }}
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'contain', flexShrink: 0 }}
                 />
-                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, textAlign: 'center', flex: 1 }}>
                   <span style={{ fontSize: '11px', fontWeight: 900, color: '#0f172a', lineHeight: 1.25 }}>
                     Maharaja Institute of Technology Mysore
                   </span>
@@ -501,6 +502,11 @@ export default function PlayfulNavbar() {
                     Department of Electronics & Communication Engineering
                   </span>
                 </div>
+                <img
+                  src={emitersSeal}
+                  alt="ECE Department"
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'contain', flexShrink: 0 }}
+                />
               </div>
 
               {NAV_ITEMS.map((item) => (
