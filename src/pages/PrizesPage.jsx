@@ -56,7 +56,7 @@ export default function PrizesPage() {
     {
       rank: '01',
       title: 'Grand Champion',
-      amount: '₹18,000',
+      amount: '₹15,111',
       desc: 'Top honor for the most innovative, scalable, and well-executed solution overall.',
       suitColor: 'yellow',
       hat: 'crown',
@@ -69,7 +69,7 @@ export default function PrizesPage() {
     {
       rank: '02',
       title: 'First Runner Up',
-      amount: '₹10,000',
+      amount: '₹10,111',
       desc: 'Awarded for exceptional technical depth, prototype quality, and clear domain impact.',
       suitColor: 'cyan',
       hat: 'pilot',
@@ -82,7 +82,7 @@ export default function PrizesPage() {
     {
       rank: '03',
       title: 'Second Runner Up',
-      amount: '₹5,333',
+      amount: '₹8,111',
       desc: 'Recognizing ingenuity, creative architecture, and effective implementation.',
       suitColor: 'lime',
       hat: 'sprout',

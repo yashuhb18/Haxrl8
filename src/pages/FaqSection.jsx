@@ -39,7 +39,7 @@ const FAQS = [
     id: 6,
     category: 'logistics',
     question: "What is the prize pool?",
-    answer: "HAXLR8 3.0 features a confirmed cash prize pool of ₹33,333 (1st Prize: ₹18,000, 2nd Prize: ₹10,000, 3rd Prize: ₹5,333), along with official trophies, certificates, and mentorship opportunities.",
+    answer: "HAXLR8 3.0 features a confirmed cash prize pool of ₹33,333 (1st Prize: ₹15,111, 2nd Prize: ₹10,111, 3rd Prize: ₹8,111), along with official trophies, certificates, and mentorship opportunities.",
   },
   {
     id: 7,

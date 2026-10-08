@@ -6,21 +6,21 @@ import { Award } from 'lucide-react';
 const PRIZE_TIERS = [
   {
     rank: 'WINNERS',
-    amount: '₹15,000',
+    amount: '₹15,111',
     badgeColor: '#eab308', // Gold
     badgeBorder: 'rgba(234, 179, 8, 0.4)',
     glow: 'rgba(234, 179, 8, 0.25)',
   },
   {
     rank: 'RUNNERS UP',
-    amount: '₹10,000',
+    amount: '₹10,111',
     badgeColor: '#0284c7', // Cyan / Blue
     badgeBorder: 'rgba(2, 132, 199, 0.4)',
     glow: 'rgba(2, 132, 199, 0.25)',
   },
   {
     rank: 'SECOND RUNNERS UP',
-    amount: '₹5,000',
+    amount: '₹8,111',
     badgeColor: '#ef4444', // Red
     badgeBorder: 'rgba(239, 68, 68, 0.4)',
     glow: 'rgba(239, 68, 68, 0.25)',
