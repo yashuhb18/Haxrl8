@@ -27,10 +27,11 @@ export default function PlayfulNavbar() {
   const [activeItem, setActiveItem] = useState('home');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const isHomepage = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 40);
 
       // On subpages, match by pathname
       const pathMap = {
@@ -103,10 +104,12 @@ export default function PlayfulNavbar() {
           left: 0,
           right: 0,
           zIndex: 9999,
-          background: scrolled ? 'rgba(255, 250, 243, 0.94)' : 'rgba(255, 250, 243, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: scrolled ? '1.5px solid rgba(226, 232, 240, 0.8)' : '1.5px solid transparent',
+          background: scrolled
+            ? 'rgba(255, 250, 243, 0.95)'
+            : (isHomepage ? 'transparent' : 'rgba(255, 250, 243, 0.95)'),
+          backdropFilter: (scrolled || !isHomepage) ? 'blur(20px)' : 'none',
+          WebkitBackdropFilter: (scrolled || !isHomepage) ? 'blur(20px)' : 'none',
+          borderBottom: (scrolled || !isHomepage) ? '1.5px solid rgba(226, 232, 240, 0.8)' : 'none',
           boxShadow: scrolled ? '0 10px 30px rgba(0, 0, 0, 0.04)' : 'none',
           transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
@@ -223,7 +226,7 @@ export default function PlayfulNavbar() {
               display: 'none',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '10px',
+              gap: '8px',
               width: '100%',
               boxSizing: 'border-box',
             }}
@@ -240,8 +243,8 @@ export default function PlayfulNavbar() {
                 src={mitMysoreLogo}
                 alt="MIT Mysore Crest"
                 style={{
-                  width: '44px',
-                  height: '44px',
+                  width: '38px',
+                  height: '38px',
                   objectFit: 'contain',
                   borderRadius: '50%',
                   filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))',
@@ -258,72 +261,106 @@ export default function PlayfulNavbar() {
                 textAlign: 'center',
                 flex: 1,
                 minWidth: 0,
-                lineHeight: 1.25,
+                lineHeight: 1.2,
                 padding: '0 4px',
               }}
             >
               <span
                 style={{
-                  fontSize: 'clamp(9.5px, 2.6vw, 11px)',
+                  fontSize: 'clamp(9px, 2.5vw, 10.5px)',
                   fontWeight: 900,
                   color: '#0f172a',
                   letterSpacing: '0.01em',
-                  lineHeight: 1.2,
+                  lineHeight: 1.15,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%',
                 }}
               >
                 MAHARAJA INSTITUTE OF TECHNOLOGY MYSORE
               </span>
               <span
                 style={{
-                  fontSize: 'clamp(9px, 2.4vw, 10.2px)',
+                  fontSize: 'clamp(8.5px, 2.3vw, 9.8px)',
                   fontWeight: 800,
                   color: '#0284c7',
                   letterSpacing: '0.01em',
-                  lineHeight: 1.2,
+                  lineHeight: 1.15,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%',
                 }}
               >
                 Department of Electronics & Communication Engineering
               </span>
             </div>
 
-            {/* Right: Department of ECE Official Seal (Big, Clean & Crisp) */}
-            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }} title="Department of Electronics & Communication Engineering">
+            {/* Right: Department of ECE Official Seal + Mobile Menu Toggle */}
+            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '8px' }} title="Department of Electronics & Communication Engineering">
               <img
                 src={emitersSeal}
                 alt="ECE Department Seal"
                 style={{
-                  width: '44px',
-                  height: '44px',
+                  width: '36px',
+                  height: '36px',
                   borderRadius: '50%',
                   objectFit: 'contain',
                   filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.14))',
                 }}
               />
+              <button
+                onClick={() => {
+                  playCrewmatePopSound();
+                  setMobileOpen(!mobileOpen);
+                }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '10px',
+                  padding: '6px 8px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#0f172a',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+                }}
+                aria-label="Toggle navigation menu"
+              >
+                {mobileOpen ? <X size={19} /> : <Menu size={19} />}
+              </button>
             </div>
           </div>
         </div>
 
         {/* ═══ PRIMARY HACKATHON NAVIGATION BAR ═══ */}
         <div
+          className={`primary-hackathon-nav-bar ${isHomepage && !scrolled ? 'nav-bar-hidden-mobile-top' : ''}`}
           style={{
             maxWidth: '1360px',
             margin: '0 auto',
-            padding: '10px 28px',
+            padding: '8px 24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
           {/* Brand Logo: Hidden at top of homepage to prevent visual duplication with the Hero logotype, smoothly fades in on scroll */}
           <div
+            className="navbar-brand-logo-wrap"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '14px',
-              transition: 'opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
-              opacity: (location.pathname !== '/' || scrolled) ? 1 : 0,
-              transform: (location.pathname !== '/' || scrolled) ? 'translateY(0)' : 'translateY(-6px)',
-              pointerEvents: (location.pathname !== '/' || scrolled) ? 'auto' : 'none',
+              transition: 'opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+              opacity: (!isHomepage || scrolled) ? 1 : 0,
+              transform: (!isHomepage || scrolled) ? 'translateY(0)' : 'translateY(-6px)',
+              pointerEvents: (!isHomepage || scrolled) ? 'auto' : 'none',
+              width: (!isHomepage || scrolled) ? 'auto' : (isHomepage ? '0px' : 'auto'),
+              overflow: 'hidden',
             }}
           >
             <Link
@@ -342,7 +379,7 @@ export default function PlayfulNavbar() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: 'spring', stiffness: 300 }}
                 style={{
-                  height: 'clamp(44px, 5.2vw, 54px)',
+                  height: 'clamp(42px, 5vw, 50px)',
                   width: 'auto',
                   objectFit: 'contain',
                   filter: 'drop-shadow(0 3px 10px rgba(255, 59, 105, 0.25))',
@@ -358,6 +395,8 @@ export default function PlayfulNavbar() {
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
+              margin: (isHomepage && !scrolled) ? '0 auto' : '0',
+              transition: 'margin 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
             {NAV_ITEMS.map((item) => {
@@ -590,6 +629,9 @@ export default function PlayfulNavbar() {
           }
           .institutional-mobile-view {
             display: flex !important;
+          }
+          .primary-hackathon-nav-bar.nav-bar-hidden-mobile-top {
+            display: none !important;
           }
         }
       `}</style>

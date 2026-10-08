@@ -21,7 +21,7 @@ export default function PlayfulHeroSection() {
         width: '100%',
         backgroundColor: '#fffaf3',
         overflow: 'hidden',
-        paddingTop: 'clamp(140px, 14vw, 175px)',
+        paddingTop: 'clamp(118px, 11vw, 148px)',
         paddingBottom: 'clamp(40px, 6vw, 70px)',
         fontFamily: "'Fredoka', 'Plus Jakarta Sans', sans-serif",
       }}
@@ -428,6 +428,9 @@ export default function PlayfulHeroSection() {
         }
 
         @media (max-width: 768px) {
+          #hero {
+            padding-top: clamp(68px, 9vw, 82px) !important;
+          }
           .hero-headline-row {
             align-items: center !important;
             justify-content: center !important;
