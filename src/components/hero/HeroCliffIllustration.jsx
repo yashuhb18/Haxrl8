@@ -80,6 +80,7 @@ export default function HeroCliffIllustration() {
         title="Click to Overclock the Coder!"
       >
         <div
+          className="hero-speech-bubble-card"
           style={{
             background: turboMode
               ? 'linear-gradient(135deg, #ff007a 0%, #7928ca 100%)'
@@ -100,6 +101,7 @@ export default function HeroCliffIllustration() {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span
+              className="hero-speech-bubble-loc"
               style={{
                 fontSize: '10px',
                 fontWeight: 900,
@@ -113,6 +115,7 @@ export default function HeroCliffIllustration() {
           </div>
 
           <span
+            className="hero-speech-bubble-quote"
             style={{
               fontSize: '12px',
               fontWeight: 900,
@@ -125,6 +128,7 @@ export default function HeroCliffIllustration() {
           </span>
 
           <span
+            className="hero-speech-bubble-tap"
             style={{
               fontSize: '9px',
               fontWeight: 700,
@@ -827,6 +831,20 @@ export default function HeroCliffIllustration() {
         @media (max-width: 640px) {
           .hero-annotation-group {
             display: none !important;
+          }
+          .hero-speech-bubble-card {
+            padding: 5px 12px !important;
+            border-radius: 14px !important;
+            border-width: 2px !important;
+          }
+          .hero-speech-bubble-loc {
+            font-size: 8px !important;
+          }
+          .hero-speech-bubble-quote {
+            font-size: 10.5px !important;
+          }
+          .hero-speech-bubble-tap {
+            font-size: 7.5px !important;
           }
         }
       `}</style>

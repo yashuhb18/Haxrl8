@@ -149,12 +149,12 @@ export default function PlayfulHeroSection() {
               A NATIONAL LEVEL 24-HOUR HACKATHON
             </motion.div>
 
-            {/* Organizer Pill: Department of Electronics & Communication Engineering (ECE) */}
+            {/* Organizer Pill: Department of Electronics & Communication Engineering (ECE) - Desktop only to save space on mobile */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.22, duration: 0.5 }}
-              className="hero-organizer-badge"
+              className="hero-organizer-badge hero-hide-mobile"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -162,26 +162,26 @@ export default function PlayfulHeroSection() {
                 background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(255, 59, 105, 0.08) 100%)',
                 border: '1.5px solid rgba(2, 132, 199, 0.25)',
                 borderRadius: '100px',
-                padding: '8px 20px',
-                marginBottom: '20px',
+                padding: '6px 18px',
+                marginBottom: '16px',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
               }}
             >
-              <span style={{ fontSize: '16px' }}>🎓</span>
+              <span style={{ fontSize: '15px' }}>🎓</span>
               <span
                 style={{
-                  fontSize: 'clamp(12px, 1.15vw, 14px)',
+                  fontSize: '13px',
                   fontWeight: 800,
                   color: '#0f172a',
                   letterSpacing: '0.01em',
                 }}
               >
                 Organized by{' '}
-                <strong style={{ color: '#0284c7' }}>Department of Electronics & Communication Engineering (ECE)</strong>
+                <strong style={{ color: '#0284c7' }}>Department of Electronics &amp; Communication Engineering</strong>
               </span>
             </motion.div>
 
-            {/* Event Info Badges (Date & Location) */}
+            {/* Event Info Badges (Clean, Compact & High-Impact) */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -190,50 +190,29 @@ export default function PlayfulHeroSection() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
+                gap: '10px',
                 flexWrap: 'wrap',
-                marginBottom: '24px',
+                marginBottom: '20px',
               }}
             >
-              {/* Registration Starts Badge */}
-              <div
-                className="hero-badge-pill"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'rgba(234, 88, 12, 0.08)',
-                  border: '2px solid rgba(234, 88, 12, 0.35)',
-                  borderRadius: '100px',
-                  padding: '8px 18px',
-                  fontSize: '13.5px',
-                  fontWeight: 800,
-                  color: '#c2410c',
-                  boxShadow: '0 4px 12px rgba(234, 88, 12, 0.08)',
-                }}
-              >
-                <Sparkles size={16} color="#ea580c" strokeWidth={2.5} />
-                <span>REGISTRATION STARTS: OCT 9, 2026</span>
-              </div>
-
               {/* Prize Pool Badge */}
               <div
                 className="hero-badge-pill"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '7px',
                   background: 'rgba(245, 158, 11, 0.1)',
                   border: '2px solid rgba(245, 158, 11, 0.4)',
                   borderRadius: '100px',
-                  padding: '8px 18px',
-                  fontSize: '13.5px',
+                  padding: '7px 16px',
+                  fontSize: '13px',
                   fontWeight: 800,
                   color: '#b45309',
                   boxShadow: '0 4px 12px rgba(245, 158, 11, 0.08)',
                 }}
               >
-                <Trophy size={16} color="#d97706" strokeWidth={2.5} />
+                <Trophy size={15} color="#d97706" strokeWidth={2.5} />
                 <span>₹33,333 PRIZE POOL</span>
               </div>
 
@@ -243,40 +222,40 @@ export default function PlayfulHeroSection() {
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '7px',
                   background: 'rgba(255, 255, 255, 0.95)',
                   border: '2px solid #e2e8f0',
                   borderRadius: '100px',
-                  padding: '8px 18px',
-                  fontSize: '13.5px',
+                  padding: '7px 16px',
+                  fontSize: '13px',
                   fontWeight: 800,
                   color: '#0f172a',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                 }}
               >
-                <Calendar size={16} color="#ff3b69" strokeWidth={2.5} />
-                <span>FINALE: NOV 6 – 7, 2026</span>
+                <Calendar size={15} color="#ff3b69" strokeWidth={2.5} />
+                <span>FINALE: NOV 6 – 7</span>
               </div>
 
-              {/* Location Badge */}
+              {/* Team Fee Badge */}
               <div
                 className="hero-badge-pill"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  border: '2px solid #e2e8f0',
+                  gap: '7px',
+                  background: 'rgba(234, 88, 12, 0.08)',
+                  border: '2px solid rgba(234, 88, 12, 0.35)',
                   borderRadius: '100px',
-                  padding: '8px 18px',
-                  fontSize: '13.5px',
+                  padding: '7px 16px',
+                  fontSize: '13px',
                   fontWeight: 800,
-                  color: '#334155',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                  color: '#c2410c',
+                  boxShadow: '0 4px 12px rgba(234, 88, 12, 0.08)',
                 }}
               >
-                <MapPin size={16} color="#0284c7" strokeWidth={2.5} />
-                <span>Maharaja Institute of Technology Mysore</span>
+                <Sparkles size={15} color="#ea580c" strokeWidth={2.5} />
+                <span>₹1,200 / SQUAD</span>
               </div>
             </motion.div>
 
@@ -356,9 +335,10 @@ export default function PlayfulHeroSection() {
               </button>
             </motion.div>
 
-            {/* Scroll Indicator Prompt */}
+            {/* Scroll Indicator Prompt - Desktop only */}
             <div
               onClick={handleScrollToAbout}
+              className="hero-scroll-prompt hero-hide-mobile"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -401,6 +381,7 @@ export default function PlayfulHeroSection() {
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="hero-cliff-col"
             style={{ width: '100%', position: 'relative' }}
           >
             <HeroCliffIllustration />
@@ -418,6 +399,7 @@ export default function PlayfulHeroSection() {
           .hero-main-grid {
             grid-template-columns: 1fr !important;
             text-align: center;
+            gap: 16px !important;
           }
           .hero-left-content {
             align-items: center !important;
@@ -425,16 +407,24 @@ export default function PlayfulHeroSection() {
           .hero-hide-mobile {
             display: none !important;
           }
+          .hero-cliff-col {
+            max-width: 460px !important;
+            margin: 0 auto !important;
+          }
         }
 
         @media (max-width: 768px) {
           #hero {
-            padding-top: clamp(68px, 9vw, 82px) !important;
+            padding-top: 64px !important;
+            padding-bottom: 20px !important;
+          }
+          .hero-main-grid {
+            gap: 8px !important;
           }
           .hero-headline-row {
             align-items: center !important;
             justify-content: center !important;
-            margin-bottom: 12px !important;
+            margin-bottom: 4px !important;
             width: 100% !important;
           }
           .hero-logo-col {
@@ -442,47 +432,50 @@ export default function PlayfulHeroSection() {
             width: 100% !important;
           }
           .hero-logo-img {
-            height: clamp(105px, 25vw, 138px) !important;
-            max-width: 88vw !important;
+            height: clamp(68px, 16vw, 88px) !important;
+            max-width: 78vw !important;
           }
           .hero-slogan {
-            font-size: 1.25rem !important;
+            font-size: 1.05rem !important;
             text-align: center !important;
-            margin: 6px 0 2px !important;
+            margin: 3px 0 1px !important;
+            letter-spacing: 0.03em !important;
           }
           .hero-subhead {
-            font-size: 0.9rem !important;
+            font-size: 0.76rem !important;
+            letter-spacing: 0.07em !important;
             text-align: center !important;
-            margin-bottom: 14px !important;
-          }
-          .hero-organizer-badge {
-            margin: 0 auto 18px auto !important;
-            text-align: center !important;
-            padding: 6px 14px !important;
-            max-width: 96% !important;
+            margin-bottom: 8px !important;
           }
           .hero-info-badges {
             justify-content: center !important;
-            gap: 8px !important;
-            margin-bottom: 20px !important;
+            gap: 6px !important;
+            margin-bottom: 12px !important;
             width: 100% !important;
           }
           .hero-badge-pill {
-            font-size: 12px !important;
-            padding: 7px 14px !important;
+            font-size: 11px !important;
+            padding: 5px 12px !important;
+            gap: 5px !important;
+            border-radius: 20px !important;
           }
           .hero-cta-row {
             justify-content: center !important;
-            gap: 12px !important;
+            gap: 10px !important;
             width: 100% !important;
+            margin-bottom: 6px !important;
           }
           .hero-primary-cta {
-            padding: 14px 28px !important;
-            font-size: 15px !important;
+            padding: 10px 22px !important;
+            font-size: 14px !important;
           }
           .hero-secondary-cta {
-            padding: 12px 24px !important;
-            font-size: 14.5px !important;
+            padding: 9px 20px !important;
+            font-size: 13.5px !important;
+          }
+          .hero-cliff-col {
+            max-width: 360px !important;
+            margin: 0 auto !important;
           }
         }
       `}</style>
