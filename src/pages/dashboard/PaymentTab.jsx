@@ -19,9 +19,11 @@ import {
   Ticket as TicketIcon,
   HelpCircle,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from 'lucide-react';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
+import googleFormQr from '../../assets/logo/google-form-qr.png';
 
 // ── Configurable Google Form & Payment Credentials ──
 // Event Coordinators can update this link directly anytime:
@@ -138,6 +140,17 @@ export default function PaymentTab({
       console.warn('Error reading payment state:', e);
     }
   }, [user, teamData]);
+
+  const [copiedUrl, setCopiedUrl] = useState(false);
+  const copyFormUrl = () => {
+    navigator.clipboard.writeText(GOOGLE_FORM_PAYMENT_URL);
+    setCopiedUrl(true);
+    setToastMsg('Google Form link copied to clipboard!');
+    setTimeout(() => {
+      setCopiedUrl(false);
+      setToastMsg('');
+    }, 2500);
+  };
 
   const copyUpi = () => {
     navigator.clipboard.writeText(OFFICIAL_UPI_ID);
@@ -519,123 +532,44 @@ export default function PaymentTab({
         /* Payment Two-Step Guide & Verification Form */
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'start' }}>
           
-          {/* LEFT COLUMN: How to Pay (UPI QR & Google Form Link) */}
+          {/* LEFT COLUMN: How to Pay (Big Official Google Form Hero & Link Scanner) */}
           <div style={styles.card}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <div style={{ width: 34, height: 34, borderRadius: 10, background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>
+              <div style={{ width: 34, height: 34, borderRadius: 10, background: '#ffedd5', color: '#ea580c', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>
                 1
               </div>
-              <h3 style={{ fontSize: 17, fontWeight: 900, color: '#0f172a', margin: 0 }}>
-                Step 1: Pay via UPI & Google Form
+              <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                Step 1: Open Official Google Form
               </h3>
             </div>
 
-            <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.5, marginBottom: 20 }}>
-              Scan the official QR scanner below using Google Pay, PhonePe, Paytm, or BHIM to pay <strong>₹{REGISTRATION_FEE_INR}</strong> for your entire team. Then fill out the official Google Form.
+            <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.5, marginBottom: 18 }}>
+              Open the official department registration form to review payment instructions, transfer <strong>₹{REGISTRATION_FEE_INR}</strong> for your team, and upload your payment receipt.
             </p>
 
-            {/* Official UPI QR Box */}
+            {/* BIG PROMINENT GOOGLE FORM HERO CARD */}
             <div style={{
-              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-              border: '2px solid #e2e8f0',
+              background: 'linear-gradient(145deg, #fff7ed 0%, #ffedd5 100%)',
+              border: '2px solid #fed7aa',
               borderRadius: 20,
               padding: '24px 20px',
               textAlign: 'center',
-              marginBottom: 20,
-              position: 'relative'
+              boxShadow: '0 8px 24px rgba(234, 88, 12, 0.08)',
+              marginBottom: 18
             }}>
-              <div style={{ display: 'inline-block', background: '#ffffff', padding: 14, borderRadius: 16, border: '2px solid #fed7aa', boxShadow: '0 8px 24px rgba(0,0,0,0.06)', marginBottom: 14 }}>
-                {/* Embedded High-Resolution Scan QR */}
-                <svg width="170" height="170" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="200" height="200" fill="white" rx="12"/>
-                  {/* Outer Pos Marks */}
-                  <rect x="20" y="20" width="46" height="46" rx="8" fill="#0f172a"/>
-                  <rect x="28" y="28" width="30" height="30" rx="4" fill="white"/>
-                  <rect x="34" y="34" width="18" height="18" rx="2" fill="#0284c7"/>
-
-                  <rect x="134" y="20" width="46" height="46" rx="8" fill="#0f172a"/>
-                  <rect x="142" y="28" width="30" height="30" rx="4" fill="white"/>
-                  <rect x="148" y="34" width="18" height="18" rx="2" fill="#0284c7"/>
-
-                  <rect x="20" y="134" width="46" height="46" rx="8" fill="#0f172a"/>
-                  <rect x="28" y="142" width="30" height="30" rx="4" fill="white"/>
-                  <rect x="34" y="148" width="18" height="18" rx="2" fill="#0284c7"/>
-
-                  {/* QR Pattern Blocks */}
-                  <rect x="76" y="24" width="12" height="12" fill="#0f172a"/>
-                  <rect x="96" y="24" width="12" height="22" fill="#0f172a"/>
-                  <rect x="114" y="32" width="12" height="12" fill="#0f172a"/>
-                  <rect x="76" y="46" width="22" height="12" fill="#0284c7"/>
-                  <rect x="106" y="56" width="14" height="14" fill="#0f172a"/>
-
-                  <rect x="24" y="76" width="12" height="22" fill="#0f172a"/>
-                  <rect x="44" y="76" width="14" height="14" fill="#0284c7"/>
-                  <rect x="68" y="76" width="28" height="14" fill="#0f172a"/>
-                  <rect x="104" y="76" width="16" height="16" fill="#0284c7"/>
-                  <rect x="130" y="76" width="14" height="24" fill="#0f172a"/>
-                  <rect x="154" y="76" width="22" height="12" fill="#0f172a"/>
-
-                  <rect x="24" y="106" width="24" height="14" fill="#0f172a"/>
-                  <rect x="58" y="100" width="14" height="18" fill="#0284c7"/>
-                  <rect x="80" y="100" width="14" height="36" fill="#0f172a"/>
-                  <rect x="104" y="102" width="22" height="12" fill="#0f172a"/>
-                  <rect x="136" y="108" width="14" height="14" fill="#0284c7"/>
-                  <rect x="160" y="98" width="16" height="24" fill="#0f172a"/>
-
-                  <rect x="76" y="144" width="14" height="14" fill="#0f172a"/>
-                  <rect x="98" y="144" width="22" height="12" fill="#0284c7"/>
-                  <rect x="128" y="132" width="14" height="24" fill="#0f172a"/>
-                  <rect x="152" y="132" width="24" height="14" fill="#0f172a"/>
-                  <rect x="104" y="164" width="24" height="14" fill="#0f172a"/>
-                  <rect x="136" y="164" width="14" height="14" fill="#0284c7"/>
-                  <rect x="158" y="156" width="18" height="22" fill="#0f172a"/>
-
-                  {/* Centered HAXLR8 Emblem */}
-                  <rect x="84" y="84" width="32" height="32" rx="8" fill="#ea580c"/>
-                  <text x="100" y="104" fill="white" fontSize="12" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">₹1.2K</text>
-                </svg>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#ea580c', color: '#ffffff', fontSize: 11, fontWeight: 800, padding: '4px 12px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 12 }}>
+                <Sparkles size={13} />
+                <span>Official Registration Form · ₹{REGISTRATION_FEE_INR}</span>
               </div>
 
-              <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginBottom: 2 }}>
-                Scan to Pay ₹{REGISTRATION_FEE_INR} via UPI
-              </div>
-              <div style={{ fontSize: 11.5, color: '#64748b', marginBottom: 12 }}>
-                ECE Department · Maharaja Institute of Technology Mysore
-              </div>
-
-              {/* UPI ID copy pill */}
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                background: '#ffffff',
-                border: '1.5px solid #cbd5e1',
-                borderRadius: 100,
-                padding: '6px 14px',
-                fontSize: 12.5,
-                fontWeight: 700,
-                color: '#0f172a'
-              }}>
-                <span>UPI: <strong>{OFFICIAL_UPI_ID}</strong></span>
-                <button
-                  type="button"
-                  onClick={copyUpi}
-                  title="Copy UPI ID"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center', color: copiedUpi ? '#16a34a' : '#0284c7' }}
-                >
-                  {copiedUpi ? <Check size={16} /> : <Copy size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Google Form Link Button */}
-            <div style={{ background: '#fff7ed', border: '1.5px solid #fed7aa', borderRadius: 16, padding: 18, marginBottom: 10 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#9a3412', marginBottom: 4 }}>
-                📄 Official Google Form Registration
-              </div>
-              <p style={{ fontSize: 12.5, color: '#7c2d12', margin: '0 0 14px', lineHeight: 1.5 }}>
-                After paying, submit your details and upload payment receipt screenshot in the official Google Form provided by the organizing department:
+              <h4 style={{ fontSize: 19, fontWeight: 900, color: '#0f172a', margin: '0 0 6px 0', letterSpacing: '-0.01em' }}>
+                HAXLR8 3.0 Registration &amp; Fee Form
+              </h4>
+              <p style={{ fontSize: 12.5, color: '#7c2d12', margin: '0 auto 16px', maxWidth: 360, lineHeight: 1.5 }}>
+                Department of ECE · Maharaja Institute of Technology Mysore
               </p>
+
+              {/* HUGE ACTION BUTTON */}
               <a
                 href={GOOGLE_FORM_PAYMENT_URL}
                 target="_blank"
@@ -644,21 +578,101 @@ export default function PaymentTab({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 8,
-                  padding: '12px 20px',
-                  background: '#ea580c',
+                  gap: 10,
+                  width: '100%',
+                  padding: '16px 24px',
+                  background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
                   color: '#ffffff',
-                  borderRadius: 12,
+                  borderRadius: 14,
                   textDecoration: 'none',
-                  fontWeight: 800,
-                  fontSize: 13.5,
-                  boxShadow: '0 4px 14px rgba(234, 88, 12, 0.25)',
-                  transition: 'all 0.2s'
+                  fontWeight: 900,
+                  fontSize: 16,
+                  boxShadow: '0 6px 20px rgba(234, 88, 12, 0.35)',
+                  transition: 'all 0.2s',
+                  marginBottom: 14
                 }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(234, 88, 12, 0.45)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(234, 88, 12, 0.35)'; }}
               >
-                <span>Open Payment Google Form</span>
-                <ExternalLink size={16} />
+                <span>OPEN OFFICIAL GOOGLE FORM</span>
+                <ExternalLink size={18} />
               </a>
+
+              {/* Direct Link & Copy Helper */}
+              <div style={{
+                background: '#ffffff',
+                border: '1.5px solid #fed7aa',
+                borderRadius: 12,
+                padding: '8px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 8,
+                fontSize: 12,
+                color: '#475569'
+              }}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600, color: '#0f172a' }}>
+                  {GOOGLE_FORM_PAYMENT_URL}
+                </span>
+                <button
+                  type="button"
+                  onClick={copyFormUrl}
+                  style={{
+                    background: '#fff7ed',
+                    border: '1px solid #fed7aa',
+                    borderRadius: 8,
+                    padding: '4px 10px',
+                    fontSize: 11.5,
+                    fontWeight: 800,
+                    color: '#ea580c',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    flexShrink: 0
+                  }}
+                >
+                  {copiedUrl ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
+                  <span>{copiedUrl ? 'Copied' : 'Copy'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* SCAN TO OPEN GOOGLE FORM (Clean Scanner linked directly to the form) */}
+            <div style={{
+              background: '#f8fafc',
+              border: '1.5px solid #e2e8f0',
+              borderRadius: 16,
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16
+            }}>
+              <div style={{
+                background: '#ffffff',
+                padding: 6,
+                borderRadius: 12,
+                border: '1.5px solid #cbd5e1',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                flexShrink: 0
+              }}>
+                <img
+                  src={googleFormQr}
+                  alt="Scan to open Google Form"
+                  style={{ width: 88, height: 88, display: 'block', borderRadius: 6 }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginBottom: 3 }}>
+                  📱 Scan to Open on Mobile
+                </div>
+                <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.4, marginBottom: 6 }}>
+                  Scan with your phone camera to open and fill the Google Form directly on your phone.
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 800, color: '#0284c7', background: '#e0f2fe', padding: '2px 8px', borderRadius: 6, display: 'inline-block' }}>
+                  Google Form Link QR
+                </span>
+              </div>
             </div>
           </div>
 
