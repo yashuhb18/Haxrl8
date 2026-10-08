@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient';
 import { sanitizeInput, isValidEmail } from '../lib/security';
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound, playEmergencyMeetingSound, playTaskCompleteSound } from '../components/amongus/AmongUsSound';
 import { 
-  Mail, Lock, Eye, EyeOff, User, ArrowLeft, ShieldAlert, Sparkles, 
-  CheckCircle2, ChevronRight, AlertTriangle
+  Mail, Lock, Eye, EyeOff, User, ArrowLeft, Trophy, Zap, 
+  Users, CheckCircle2, AlertTriangle, ShieldCheck, Sparkles, HelpCircle
 } from 'lucide-react';
-import amongusLoginHero from '../assets/auth/amongus_login_hero.png';
-import { sendAccountWelcomeEmail, sendParticipantWelcomeEmail, sendLoginNotificationEmail } from '../lib/emailService';
+import haxlr8LogoDark from '../assets/logo/haxlr8-logo-dark.png';
+import { sendAccountWelcomeEmail, sendLoginNotificationEmail } from '../lib/emailService';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -29,6 +29,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   // Status & Feedback
   const [loading, setLoading] = useState(false);
@@ -166,7 +167,7 @@ export default function AuthPage() {
       });
       if (res?.error) {
         if (res.error.message?.includes('provider is not enabled') || res.error.message?.includes('validation_failed') || res.error.message?.includes('Unsupported provider')) {
-          setErrorMsg('Google login is pending provider configuration. Please sign in using Email & Password below.');
+          setErrorMsg('Google login is currently disabled by security policy. Please use Email & Password below.');
         } else {
           setErrorMsg(res.error.message || 'Google authentication encountered an issue.');
         }
@@ -184,30 +185,11 @@ export default function AuthPage() {
     }
   };
 
-  const handleInstantDemoLogin = () => {
-    const demoUser = {
-      id: '376a0c53-3c86-487c-8b50-d8a0ac596a72',
-      email: 'yashuhb18@gmail.com',
-      user_metadata: { full_name: 'Squad Commander Yash' }
-    };
-    localStorage.setItem('haxlr8_leader_session', JSON.stringify({ user: demoUser }));
-    localStorage.setItem('haxlr8_leader_confirmed', 'true');
-
-    // Also trigger automated login notification
-    sendLoginNotificationEmail({
-      recipientEmail: 'yashuhb18@gmail.com',
-      leaderName: 'Squad Commander Yash'
-    }).catch(err => console.warn('Demo login email error:', err));
-
-    playTaskCompleteSound();
-    navigate('/dashboard');
-  };
-
-  const fillQuickDemo = () => {
-    setEmail('yashuhb18@gmail.com');
-    setPassword('leader123');
-    setName('Squad Commander Yash');
-    playCrewmatePopSound();
+  // Determine speech text for the Red Commander
+  const getCommanderSpeech = () => {
+    if (isPasswordFocused) return "Shh... Secret launch code! 🔐";
+    if (mode === 'signup') return "Assemble your squad! Lead them to victory 👑";
+    return "Welcome back, Captain! Ready for launch 🚀";
   };
 
   return (
@@ -215,25 +197,35 @@ export default function AuthPage() {
       className="auth-page-root"
       style={{
         minHeight: '100vh',
-        backgroundColor: '#f6ede3',
-        backgroundImage: 'radial-gradient(circle at 50% 15%, #faf4ed 0%, #f4eae0 55%, #eae0d4 100%)',
+        backgroundColor: '#faf5ef',
+        backgroundImage: `
+          radial-gradient(circle at 12% 18%, rgba(254, 215, 170, 0.45) 0%, transparent 35%),
+          radial-gradient(circle at 88% 82%, rgba(254, 202, 202, 0.4) 0%, transparent 35%),
+          radial-gradient(circle at 50% 50%, rgba(255, 237, 213, 0.25) 0%, transparent 60%)
+        `,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '24px 16px',
-        fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+        fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         position: 'relative',
         overflowX: 'hidden',
         boxSizing: 'border-box',
       }}
     >
+      {/* ── BACKGROUND FLOATING STARS (Cute Cosmic Atmosphere) ── */}
+      <div className="auth-star star-1" style={{ position: 'absolute', top: '12%', left: '8%', color: '#f59e0b', fontSize: '20px', opacity: 0.65, userSelect: 'none', pointerEvents: 'none' }}>✦</div>
+      <div className="auth-star star-2" style={{ position: 'absolute', top: '22%', right: '10%', color: '#ef4444', fontSize: '24px', opacity: 0.6, userSelect: 'none', pointerEvents: 'none' }}>★</div>
+      <div className="auth-star star-3" style={{ position: 'absolute', bottom: '15%', left: '12%', color: '#0ea5e9', fontSize: '18px', opacity: 0.6, userSelect: 'none', pointerEvents: 'none' }}>✧</div>
+      <div className="auth-star star-4" style={{ position: 'absolute', bottom: '25%', right: '14%', color: '#8b5cf6', fontSize: '22px', opacity: 0.6, userSelect: 'none', pointerEvents: 'none' }}>✦</div>
+
       {/* ── TOP NAV HEADER BAR ── */}
       <header
         className="auth-top-nav"
         style={{
           width: '100%',
-          maxWidth: '1020px',
+          maxWidth: '1060px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -249,9 +241,9 @@ export default function AuthPage() {
             alignItems: 'center',
             gap: '8px',
             background: '#ffffff',
-            border: '1.5px solid #e5e7eb',
+            border: '1.5px solid #fed7aa',
             borderRadius: '9999px',
-            padding: '8px 16px',
+            padding: '9px 18px',
             cursor: 'pointer',
             fontSize: '13px',
             fontWeight: 800,
@@ -260,10 +252,10 @@ export default function AuthPage() {
             transition: 'all 0.2s',
           }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = '#a8262a'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.transform = 'translateY(0)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#fed7aa'; e.currentTarget.style.transform = 'translateY(0)'; }}
         >
-          <ArrowLeft size={16} />
-          <span>Home</span>
+          <ArrowLeft size={16} color="#a8262a" />
+          <span>Back to Home</span>
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -272,23 +264,24 @@ export default function AuthPage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              backgroundColor: '#fee2e2',
-              border: '1px solid #fecaca',
-              color: '#a8262a',
-              padding: '6px 14px',
+              backgroundColor: '#fff1f2',
+              border: '1.5px solid #fecdd3',
+              color: '#9f1239',
+              padding: '7px 16px',
               borderRadius: '9999px',
               fontSize: '11.5px',
               fontWeight: 800,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
+              boxShadow: '0 2px 6px rgba(159, 18, 57, 0.06)'
             }}
           >
-            <span>👑 Leader Portal</span>
+            <span>👑 Leader Flight Deck</span>
           </div>
         </div>
       </header>
 
-      {/* ── MAIN AUTH CONTAINER CARD ── */}
+      {/* ── MAIN AUTH CONTAINER CARD (Desktop Two-Column / Mobile Single-Column) ── */}
       <motion.div
         className="auth-main-card"
         initial={{ opacity: 0, scale: 0.98, y: 15 }}
@@ -296,94 +289,245 @@ export default function AuthPage() {
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         style={{
           width: '100%',
-          maxWidth: '1020px',
+          maxWidth: '1060px',
           backgroundColor: '#ffffff',
-          borderRadius: '28px',
-          boxShadow: '0 24px 60px rgba(70, 50, 30, 0.12), 0 4px 16px rgba(0,0,0,0.04)',
+          borderRadius: '32px',
+          boxShadow: '0 25px 70px -15px rgba(180, 83, 9, 0.12), 0 8px 24px rgba(0,0,0,0.04)',
           display: 'grid',
-          gridTemplateColumns: '1.05fr 1.15fr',
-          minHeight: '580px',
+          gridTemplateColumns: '1fr 1.05fr',
+          minHeight: '600px',
           overflow: 'hidden',
           position: 'relative',
           zIndex: 10,
-          border: '1.5px solid #f1e7db',
+          border: '2px solid #fed7aa',
         }}
       >
-        {/* ══ LEFT PANEL: AMONG US ARTWORK (Desktop Only) ══ */}
+        {/* ══ LEFT PANEL: CUTE CREWMATE LAUNCH BAY (Desktop Only) ══ */}
         <div
           className="auth-desktop-hero-panel"
           style={{
             position: 'relative',
             width: '100%',
             height: '100%',
-            minHeight: '520px',
-            backgroundColor: '#e7d8c5',
-            overflow: 'hidden',
+            background: 'linear-gradient(165deg, #fffbeb 0%, #fff7ed 45%, #ffedd5 100%)',
+            borderRight: '1.5px solid #fed7aa',
+            padding: '38px 34px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
+            boxSizing: 'border-box',
           }}
         >
-          <img
-            src={amongusLoginHero}
-            alt="HAXLR8 3.0 Among Us Team Scene"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              display: 'block',
-            }}
-          />
+          {/* Header Branding */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+              <img 
+                src={haxlr8LogoDark} 
+                alt="HAXLR8 3.0" 
+                style={{ height: '36px', objectFit: 'contain' }} 
+              />
+              <span
+                style={{
+                  background: '#fef3c7',
+                  border: '1px solid #fde68a',
+                  color: '#92400e',
+                  fontSize: '11px',
+                  fontWeight: 900,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  padding: '3px 10px',
+                  borderRadius: '9999px',
+                }}
+              >
+                ✦ 24H FINALE
+              </span>
+            </div>
+            <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1e293b', margin: '0 0 4px', lineHeight: 1.25 }}>
+              National Level Hackathon
+            </h2>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: 0, fontWeight: 600 }}>
+              MIT Mysore Campus • November 6–7, 2026
+            </p>
+          </div>
 
-          {/* Floating Top Badge */}
+          {/* Cute Interactive Crewmate Launch Platform */}
           <div
             style={{
               position: 'relative',
-              zIndex: 2,
-              padding: '24px 28px',
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 100%)',
+              margin: '24px 0',
+              padding: '24px 16px',
+              borderRadius: '24px',
+              background: 'rgba(255, 255, 255, 0.75)',
+              border: '1.5px solid #fed7aa',
+              boxShadow: '0 12px 28px rgba(251, 146, 60, 0.08)',
+              textAlign: 'center',
             }}
           >
+            {/* Crewmates Group Presentation */}
             <div
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'rgba(255,255,255,0.95)',
-                padding: '6px 14px',
-                borderRadius: '100px',
-                fontSize: '12px',
-                fontWeight: 900,
-                color: '#a8262a',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                gap: '18px',
+                marginBottom: '10px',
               }}
             >
-              <span>HAXLR8 3.0 • FLIGHT TERMINAL</span>
+              {/* Cyan MedBay Crewmate */}
+              <div className="crewmate-bob-cyan">
+                <AmongUsCrewmate 
+                  color="cyan" 
+                  size={58} 
+                  hat="med" 
+                  speechText="MedBay online! 🩺" 
+                  interactive={true}
+                />
+              </div>
+
+              {/* Red Captain Commander (Center Lead) */}
+              <div className="crewmate-bob-red" style={{ zIndex: 5 }}>
+                <AmongUsCrewmate 
+                  color="red" 
+                  size={84} 
+                  hat={mode === 'signup' ? 'crown' : 'cap'} 
+                  speechText={getCommanderSpeech()} 
+                  interactive={true}
+                />
+              </div>
+
+              {/* Yellow Builder Crewmate */}
+              <div className="crewmate-bob-yellow">
+                <AmongUsCrewmate 
+                  color="yellow" 
+                  size={58} 
+                  hat="sprout" 
+                  speechText="Reactor primed! 🌱" 
+                  interactive={true}
+                />
+              </div>
+            </div>
+
+            {/* Platform Shadow */}
+            <div
+              style={{
+                width: '78%',
+                height: '10px',
+                margin: '0 auto',
+                background: 'radial-gradient(ellipse at center, rgba(120, 53, 15, 0.16) 0%, transparent 70%)',
+                borderRadius: '50%',
+              }}
+            />
+
+            <div style={{ marginTop: '12px' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  color: '#a8262a',
+                  background: '#ffe4e6',
+                  padding: '3px 12px',
+                  borderRadius: '100px',
+                  border: '1px solid #fecdd3',
+                }}
+              >
+                {mode === 'signup' ? '👑 Assemble Your Crew of 3–4' : '🚀 Captain Clearance Active'}
+              </span>
             </div>
           </div>
 
-          {/* Floating Bottom Card */}
+          {/* Hackathon Key Highlights */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #fed7aa',
+                borderRadius: '14px',
+                padding: '10px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <Trophy size={18} color="#d97706" style={{ flexShrink: 0 }} />
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 900, color: '#92400e' }}>₹1,00,000+ POOL</div>
+                <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Grand Cash Prizes</div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #fed7aa',
+                borderRadius: '14px',
+                padding: '10px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <Zap size={18} color="#ea580c" style={{ flexShrink: 0 }} />
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 900, color: '#9a3412' }}>DIRECT FINALE</div>
+                <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>No Elimination Rounds</div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #fed7aa',
+                borderRadius: '14px',
+                padding: '10px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <Users size={18} color="#0284c7" style={{ flexShrink: 0 }} />
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 900, color: '#0369a1' }}>3–4 CREWMATES</div>
+                <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>₹1,200 Per Squad</div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #fed7aa',
+                borderRadius: '14px',
+                padding: '10px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <ShieldCheck size={18} color="#16a34a" style={{ flexShrink: 0 }} />
+              <div>
+                <div style={{ fontSize: '11px', fontWeight: 900, color: '#15803d' }}>MIT MYSORE</div>
+                <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Nov 6–7 Grand Finale</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Note at Bottom */}
           <div
             style={{
-              position: 'relative',
-              zIndex: 2,
-              padding: '24px 28px',
-              background: 'linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%)',
-              color: '#ffffff',
+              marginTop: '16px',
+              padding: '10px 14px',
+              borderRadius: '12px',
+              background: '#fef3c7',
+              border: '1px solid #fde68a',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
             }}
           >
-            <div style={{ fontSize: '12px', fontWeight: 800, color: '#facc15', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '4px' }}>
-              ✦ Commander Mission
-            </div>
-            <div style={{ fontSize: '15px', fontWeight: 800, lineHeight: 1.3 }}>
-              24-Hour National Hackathon • MIT Mysore
-            </div>
-            <div style={{ fontSize: '12px', opacity: 0.85, marginTop: '4px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Only Team Leader registers. Assemble your 3–4 crewmates inside your flight deck!
-            </div>
+            <Sparkles size={16} color="#b45309" style={{ flexShrink: 0 }} />
+            <p style={{ margin: 0, fontSize: '11.5px', color: '#92400e', fontWeight: 700, lineHeight: 1.4 }}>
+              Only Team Leader registers. Teammates are added directly inside your Flight Deck!
+            </p>
           </div>
         </div>
 
@@ -392,7 +536,7 @@ export default function AuthPage() {
           className="auth-form-panel"
           style={{
             backgroundColor: '#ffffff',
-            padding: '36px 36px',
+            padding: '40px 38px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -451,7 +595,7 @@ export default function AuthPage() {
                 transition: 'all 0.2s',
               }}
             >
-              <span>🔑 Sign In</span>
+              <span>🔑 Captain Login</span>
             </button>
 
             <button
@@ -479,7 +623,7 @@ export default function AuthPage() {
           </div>
 
           {/* Title on Desktop */}
-          <div className="auth-desktop-title-row" style={{ marginBottom: '20px' }}>
+          <div className="auth-desktop-title-row" style={{ marginBottom: '22px' }}>
             <h1
               style={{
                 fontSize: '28px',
@@ -489,7 +633,7 @@ export default function AuthPage() {
                 lineHeight: 1.2,
               }}
             >
-              {mode === 'login' ? 'Welcome Back!' : 'Create Squad Account'}
+              {mode === 'login' ? 'Welcome Back, Captain! 👋' : 'Assemble Your Crew! 🚀'}
             </h1>
             <p
               style={{
@@ -500,8 +644,8 @@ export default function AuthPage() {
               }}
             >
               {mode === 'login'
-                ? 'Sign in to access your flight deck and team controls'
-                : 'Register as Team Leader (Only 1 leader registers per squad)'}
+                ? 'Sign in to access your squad manifest, flight pass, and domain track'
+                : 'Create your Leader account to register your squad for MIT Mysore'}
             </p>
           </div>
 
@@ -531,7 +675,7 @@ export default function AuthPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g., Yashwanth B."
+                    placeholder="Enter Leader full name"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     style={{
@@ -598,7 +742,7 @@ export default function AuthPage() {
                 {mode === 'login' && (
                   <button
                     type="button"
-                    onClick={() => alert('Password reset instructions: Please contact haxlr8ecemitm@gmail.com or register your account if new!')}
+                    onClick={() => alert('Password reset: Please contact haxlr8ecemitm@gmail.com or create a new squad account if unregistered!')}
                     style={{
                       background: 'none',
                       border: 'none',
@@ -634,6 +778,8 @@ export default function AuthPage() {
                   placeholder="At least 6 characters"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
                   style={{
                     border: 'none',
                     outline: 'none',
@@ -716,7 +862,7 @@ export default function AuthPage() {
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '14px',
-                fontSize: '15.5px',
+                fontSize: '15px',
                 fontWeight: 800,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.75 : 1,
@@ -782,61 +928,25 @@ export default function AuthPage() {
             <span>Continue with Google</span>
           </button>
 
-          {/* Quick Demo Autofill & Instant Access */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '16px' }}>
-            <button
-              type="button"
-              onClick={fillQuickDemo}
-              style={{
-                background: '#f8fafc',
-                border: '1.5px dashed #cbd5e1',
-                borderRadius: '100px',
-                padding: '6px 14px',
-                fontSize: '11.5px',
-                color: '#64748b',
-                cursor: 'pointer',
-                fontWeight: 700,
-              }}
-            >
-              📝 Fill Demo Credentials
-            </button>
-            <button
-              type="button"
-              onClick={handleInstantDemoLogin}
-              style={{
-                background: '#fff7ed',
-                border: '1.5px solid #fed7aa',
-                borderRadius: '100px',
-                padding: '6px 16px',
-                fontSize: '12px',
-                color: '#ea580c',
-                cursor: 'pointer',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              <span>⚡ 1-Click Instant Demo Access</span>
-            </button>
-          </div>
-
           {/* Impostor / Squad Member Help Pill */}
-          <div style={{ textAlign: 'center', marginTop: '14px' }}>
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
             <button
               type="button"
               onClick={() => { playEmergencyMeetingSound(); setShowImpostorModal(true); }}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#94a3b8',
-                fontSize: '11.5px',
+                color: '#64748b',
+                fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
-                textDecoration: 'underline',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
               }}
             >
-              Not a Team Leader? See how Squad Members join →
+              <HelpCircle size={14} color="#94a3b8" />
+              <span>Not a Team Leader? See how Squad Members join →</span>
             </button>
           </div>
         </div>
@@ -982,7 +1092,7 @@ export default function AuthPage() {
         )}
       </AnimatePresence>
 
-      {/* ── RESPONSIVE STYLES ── */}
+      {/* ── RESPONSIVE STYLES & CUTE KEYFRAMES ── */}
       <style>{`
         * { box-sizing: border-box; }
         
@@ -1007,6 +1117,43 @@ export default function AuthPage() {
           background-color: #ffffff !important;
           box-shadow: 0 0 0 3px rgba(168, 38, 42, 0.12) !important;
         }
+
+        @keyframes bobRed {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+
+        @keyframes bobCyan {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
+
+        @keyframes bobYellow {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+        }
+
+        @keyframes twinkleStar {
+          0%, 100% { opacity: 0.3; transform: scale(0.9) rotate(0deg); }
+          50% { opacity: 0.8; transform: scale(1.15) rotate(15deg); }
+        }
+
+        .crewmate-bob-red {
+          animation: bobRed 3s ease-in-out infinite;
+        }
+
+        .crewmate-bob-cyan {
+          animation: bobCyan 3.4s ease-in-out infinite 0.4s;
+        }
+
+        .crewmate-bob-yellow {
+          animation: bobYellow 3.2s ease-in-out infinite 0.8s;
+        }
+
+        .star-1 { animation: twinkleStar 4s ease-in-out infinite; }
+        .star-2 { animation: twinkleStar 3.5s ease-in-out infinite 1s; }
+        .star-3 { animation: twinkleStar 4.5s ease-in-out infinite 2s; }
+        .star-4 { animation: twinkleStar 3.8s ease-in-out infinite 0.5s; }
 
         @media (max-width: 860px) {
           .auth-main-card {

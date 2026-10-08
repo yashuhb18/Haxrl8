@@ -276,7 +276,7 @@ export default function AdminAuthGate({ children }) {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="yashuhb18@gmail.com"
+                placeholder="organizer@haxlr8.in"
                 style={{
                   width: '100%',
                   padding: '13px 16px',

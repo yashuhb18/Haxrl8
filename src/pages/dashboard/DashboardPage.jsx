@@ -284,19 +284,6 @@ export default function DashboardPage() {
               Sign In to Flight Deck →
             </button>
             <button
-              onClick={async () => {
-                setLoading(true);
-                await supabase.auth.signInWithPassword({
-                  email: 'yashuhb18@gmail.com',
-                  password: 'leader123'
-                });
-                await fetchDashboardData();
-              }}
-              style={{ padding: '12px 20px', borderRadius: 12, background: '#fff7ed', color: '#ea580c', border: '1.5px solid #fed7aa', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}
-            >
-              ⚡ 1-Click Instant Commander Access
-            </button>
-            <button
               onClick={() => navigate('/')}
               style={{ padding: '10px', background: 'transparent', border: 'none', color: '#64748b', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
             >

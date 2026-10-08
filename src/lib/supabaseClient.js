@@ -103,16 +103,7 @@ function saveRegisteredUser(email, password, fullName, id) {
 
 function verifyRegisteredCredentials(email, password) {
   const cleanEmail = email.toLowerCase().trim();
-  // 1. Built-in Demo Commander account
-  if (cleanEmail === 'yashuhb18@gmail.com' && password === 'leader123') {
-    return {
-      id: '376a0c53-3c86-487c-8b50-d8a0ac596a72',
-      email: 'yashuhb18@gmail.com',
-      fullName: 'Squad Commander Yash',
-    };
-  }
-
-  // 2. Check locally registered accounts
+  // Check locally registered accounts
   const users = getRegisteredUsers();
   const found = users[cleanEmail];
   if (found && found.password === password) {
