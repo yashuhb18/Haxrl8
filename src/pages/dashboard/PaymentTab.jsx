@@ -27,7 +27,7 @@ import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 // Event Coordinators can update this link directly anytime:
 export const GOOGLE_FORM_PAYMENT_URL = 
   import.meta.env.VITE_PAYMENT_GOOGLE_FORM_URL || 
-  "https://forms.gle/HAXLR8_MITM_PAYMENT_FORM"; // Replace with official G-Form link
+  "https://forms.gle/pw945ievXT9bH1wV7";
 
 export const OFFICIAL_UPI_ID = "haxlr8ecemitm@upi"; // Official UPI ID
 export const REGISTRATION_FEE_INR = 1200;

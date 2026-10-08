@@ -4,7 +4,7 @@ import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 import ProblemStatementPDF from '../../assets/PS_example/Hackathon Problem Statement 2026.pdf';
 
 const RESOURCES = [
-  { icon: '💳', label: 'Payment & Verification Guide', desc: 'Instructions for ₹1,200 UPI fee & G-Form verification', tag: 'GUIDE', href: '#payment', color: '#ff3b69', bg: '#fef2f2', border: '#fecaca' },
+  { icon: '💳', label: 'Payment Google Form', desc: 'Official Google Form link for ₹1,200 fee & UTR submission', tag: 'G-FORM', href: 'https://forms.gle/pw945ievXT9bH1wV7', target: '_blank', color: '#ff3b69', bg: '#fef2f2', border: '#fecaca' },
   { icon: '📄', label: 'Hackathon Rulebook', desc: 'Official rules and judging criteria', tag: 'PDF', href: '#', color: '#ea580c', bg: '#fff7ed', border: '#fed7aa' },
   { icon: '🧩', label: 'Sample Problem Statements', desc: 'Download sample problem statements for 2026', tag: 'PDF', href: ProblemStatementPDF, download: 'HAXLR8-Problem-Statements-2026.pdf', color: '#0284c7', bg: '#eff6ff', border: '#bfdbfe' },
   { icon: '👑', label: 'Leader vs. Impostor Protocol', desc: 'Official flight manifest rules & role guide', tag: 'GUIDE', href: '#leader-protocol', color: '#9333ea', bg: '#fdf4ff', border: '#f5d0fe' },
@@ -88,10 +88,9 @@ export default function ResourcesTab({ hasTeam, submissions }) {
 
   const EVENTS = [
     { date: 'Oct 09', event: 'Registration Opens', status: 'done', desc: 'Team registration opens for undergraduate students.', time: 'All day' },
-    { date: 'Oct 28', event: 'Team Confirmation', status: hasTeam ? 'done' : 'active', desc: 'Form your 3–4 member team and confirm details.', time: '11:59 PM IST' },
-    { date: 'Oct 28', event: 'Idea Submission', status: hasSubmitted ? 'done' : (hasTeam ? 'active' : 'upcoming'), desc: 'Submit your idea paper in Agriculture, Healthcare, or Smart City.', time: '11:59 PM IST' },
-    { date: 'Nov 02', event: 'Shortlist Announced', status: hasSubmitted ? 'active' : 'upcoming', desc: 'Top teams notified for offline finale.', time: '12:00 PM IST' },
-    { date: 'Nov 06–07', event: 'Grand Finale', status: 'upcoming', desc: '24-hour hackathon finale and prize ceremony at MIT Mysore.', time: '09:00 AM IST' },
+    { date: 'Oct 28', event: 'Squad & Fee Lock', status: hasTeam ? 'done' : 'active', desc: 'Assemble 3–4 members, pay ₹1,200 team fee, & submit verification.', time: '11:59 PM IST' },
+    { date: 'Nov 02', event: 'Flight Pass Clearance', status: hasTeam ? 'active' : 'upcoming', desc: 'Download your official 24-hour hackathon entry boarding pass.', time: '12:00 PM IST' },
+    { date: 'Nov 06–07', event: 'Grand Finale', status: 'upcoming', desc: '24-hour offline hackathon finale and prize ceremony at MIT Mysore.', time: '08:30 AM IST' },
   ];
 
   return (
@@ -111,6 +110,8 @@ export default function ResourcesTab({ hasTeam, submissions }) {
               key={i}
               href={r.href}
               download={r.download}
+              target={r.target || (r.href?.startsWith('http') ? '_blank' : undefined)}
+              rel={r.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
               onClick={(e) => {
                 if (r.label === 'Hackathon Rulebook') {
                   e.preventDefault();
