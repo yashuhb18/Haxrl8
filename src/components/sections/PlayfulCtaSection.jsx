@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useAuth } from '../../lib/useAuth';
 import haxlr8LogoContrast from '../../assets/logo/haxlr8-logo-contrast.png';
-import emitersSeal from '../../assets/logo/emiters-seal.png';
-import mitMysoreBanner from '../../assets/logo/mit-mysore-banner.png';
 
 export default function PlayfulCtaSection() {
   const user = useAuth();
@@ -205,21 +203,17 @@ export default function PlayfulCtaSection() {
             marginTop: '36px',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '14px',
+            gap: '10px',
             background: 'rgba(255, 255, 255, 0.16)',
             backdropFilter: 'blur(12px)',
             borderRadius: '100px',
-            padding: '8px 24px 8px 12px',
+            padding: '10px 24px',
             border: '1.5px solid rgba(255, 255, 255, 0.3)',
             flexWrap: 'wrap',
             justifyContent: 'center',
           }}
         >
-          <img src={emitersSeal} alt="EMITERS" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
-          <div style={{ background: '#ffffff', borderRadius: '6px', padding: '3px 8px', display: 'flex', alignItems: 'center' }}>
-            <img src={mitMysoreBanner} alt="MIT Mysore" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
-          </div>
-          <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#ffffff' }}>
+          <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#ffffff' }}>
             Dept. of ECE · Maharaja Institute of Technology Mysore
           </span>
         </div>

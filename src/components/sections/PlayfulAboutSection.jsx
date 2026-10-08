@@ -2,8 +2,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import AmongUsCrewmate from '../amongus/AmongUsCrewmate';
 import { Users, GraduationCap, Globe, Trophy, Lightbulb } from 'lucide-react';
-import emitersSeal from '../../assets/logo/emiters-seal.png';
-import mitMysoreBanner from '../../assets/logo/mit-mysore-banner.png';
 import haxlr8LogoContrast from '../../assets/logo/haxlr8-logo-contrast.png';
 
 const STAT_CARDS = [
@@ -179,22 +177,17 @@ export default function PlayfulAboutSection() {
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '10px',
+                  gap: '8px',
                   background: 'rgba(255, 255, 255, 0.22)',
                   backdropFilter: 'blur(10px)',
-                  padding: '5px 16px 5px 10px',
+                  padding: '6px 18px',
                   borderRadius: '100px',
                   marginBottom: '16px',
                   border: '1.5px solid rgba(255, 255, 255, 0.35)',
                   boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
-                  flexWrap: 'wrap',
                 }}
               >
-                <img src={emitersSeal} alt="EMITERS" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'contain' }} />
-                <div style={{ background: '#ffffff', borderRadius: '6px', padding: '2px 8px', display: 'flex', alignItems: 'center' }}>
-                  <img src={mitMysoreBanner} alt="MIT Mysore" style={{ height: '17px', width: 'auto', objectFit: 'contain' }} />
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   Dept. of ECE Presents
                 </span>
               </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import haxlr8LogoWhite from '../../assets/logo/haxlr8-logo-white.png';
-import mitMysoreBanner from '../../assets/logo/mit-mysore-banner.png';
+import mitMysoreLogo from '../../assets/logo/mit-mysore-logo.png';
 import emitersSeal from '../../assets/logo/emiters-seal.png';
 
 const InstagramIcon = ({ size = 20 }) => (
@@ -201,45 +201,97 @@ export default function PlayfulFooter() {
               Belagola, Mandya, Karnataka
             </p>
 
-            {/* Host Institution & Department Logos */}
+            {/* Host Institution & Department (Both logos shortly with words) */}
             <div
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                marginBottom: '20px',
-                flexWrap: 'wrap',
+                flexDirection: 'column',
+                gap: '10px',
+                marginBottom: '22px',
+                maxWidth: '380px',
               }}
             >
+              {/* MIT Mysore */}
+              <a
+                href="https://mitmysore.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '12px',
+                  padding: '8px 14px',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                }}
+                title="Maharaja Institute of Technology Mysore"
+              >
+                <img
+                  src={mitMysoreLogo}
+                  alt="MIT Mysore"
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    objectFit: 'contain',
+                    flexShrink: 0,
+                    filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.3))',
+                  }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#ffffff', lineHeight: 1.25 }}>
+                    Maharaja Institute of Technology Mysore
+                  </span>
+                  <span style={{ fontSize: '10.5px', color: '#94a3b8', fontWeight: 600 }}>
+                    Autonomous Institution · Affiliated to VTU
+                  </span>
+                </div>
+              </a>
+
+              {/* Department of ECE */}
               <div
                 style={{
-                  background: '#ffffff',
-                  borderRadius: '12px',
-                  padding: '8px 18px',
-                  display: 'inline-flex',
+                  display: 'flex',
                   alignItems: 'center',
-                  boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+                  gap: '12px',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '12px',
+                  padding: '8px 14px',
                 }}
               >
                 <img
-                  src={mitMysoreBanner}
-                  alt="Maharaja Institute of Technology Mysore"
-                  style={{ height: '36px', width: 'auto', objectFit: 'contain' }}
+                  src={emitersSeal}
+                  alt="Department of ECE"
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    objectFit: 'contain',
+                    flexShrink: 0,
+                    filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.3))',
+                  }}
                 />
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#ffffff', lineHeight: 1.25 }}>
+                    Department of Electronics & Communication Engineering
+                  </span>
+                  <span style={{ fontSize: '10.5px', color: '#38bdf8', fontWeight: 700, letterSpacing: '0.02em' }}>
+                    EMITERS Technical Association
+                  </span>
+                </div>
               </div>
-
-              <img
-                src={emitersSeal}
-                alt="EMITERS Department of ECE"
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '50%',
-                  objectFit: 'contain',
-                  border: '2.5px solid rgba(255, 255, 255, 0.45)',
-                  filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.35))',
-                }}
-              />
             </div>
 
             {/* Social Icons */}
