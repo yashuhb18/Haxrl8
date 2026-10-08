@@ -110,8 +110,8 @@ function AdminLayoutInner() {
               <Menu size={20} />
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <img src={haxlr8LogoDark} alt="HAXLR8 3.0" style={{ height: 24, objectFit: 'contain' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <img src={haxlr8LogoDark} alt="HAXLR8 3.0" style={{ height: 22, objectFit: 'contain' }} />
               <span
                 style={{
                   fontSize: 10,
@@ -125,6 +125,19 @@ function AdminLayoutInner() {
                 }}
               >
                 ORGANIZER
+              </span>
+              <span
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 800,
+                  background: '#fef3c7',
+                  border: '1px solid #fde68a',
+                  color: '#92400e',
+                  padding: '2px 6px',
+                  borderRadius: 6,
+                }}
+              >
+                🔒 1m Lock
               </span>
             </div>
 

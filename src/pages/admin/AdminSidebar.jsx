@@ -173,6 +173,10 @@ export default function AdminSidebar() {
           >
             <LogOut size={16} /> Exit Organizer Deck
           </button>
+
+          <div style={{ textAlign: 'center', marginTop: 8, fontSize: 11, fontWeight: 700, color: '#92400e', background: '#fef3c7', padding: '5px 8px', borderRadius: 8, border: '1px solid #fde68a' }}>
+            🔒 Auto-locks after 1 min inactivity
+          </div>
         </div>
       </aside>
 

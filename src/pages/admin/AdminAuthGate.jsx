@@ -6,6 +6,8 @@ import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 const MASTER_PASSCODE = 'HAXLR8_COMMAND_2026';
 const ORGANIZER_SESSION_KEY = 'haxlr8_organizer_session';
+const ORGANIZER_TIMESTAMP_KEY = 'haxlr8_organizer_timestamp';
+const ADMIN_IDLE_TIMEOUT_MS = 60 * 1000; // Strictly 1-minute security auto-logout
 
 export const AdminAuthContext = React.createContext({
   isAuthenticated: false,
@@ -27,24 +29,37 @@ export default function AdminAuthGate({ children }) {
 
   const handleLogout = async () => {
     sessionStorage.removeItem(ORGANIZER_SESSION_KEY);
+    sessionStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
     localStorage.removeItem(ORGANIZER_SESSION_KEY);
+    localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
     try {
       await supabase.auth.signOut();
     } catch (e) {}
     setIsAuthenticated(false);
     setPasscode('');
-    setErrorMsg('');
     setLoading(false);
   };
 
   useEffect(() => {
     const checkSession = async () => {
-      // 1. Check local organizer bypass session
-      const savedSession = sessionStorage.getItem(ORGANIZER_SESSION_KEY) || localStorage.getItem(ORGANIZER_SESSION_KEY);
-      if (savedSession === 'active') {
+      // 1. Purge legacy persistent localStorage tokens so mobile never remains logged in overnight
+      localStorage.removeItem(ORGANIZER_SESSION_KEY);
+      localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
+
+      // 2. Check current session with strict 1-minute inactivity timestamp
+      const savedSession = sessionStorage.getItem(ORGANIZER_SESSION_KEY);
+      const savedTimestamp = parseInt(sessionStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
+      const now = Date.now();
+
+      if (savedSession === 'active' && savedTimestamp && (now - savedTimestamp < ADMIN_IDLE_TIMEOUT_MS)) {
+        sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, now.toString());
         setIsAuthenticated(true);
         setLoading(false);
         return;
+      }
+
+      if (savedSession === 'active' && savedTimestamp && (now - savedTimestamp >= ADMIN_IDLE_TIMEOUT_MS)) {
+        setErrorMsg('🔒 Admin session automatically locked after 1 minute of inactivity for security.');
       }
 
       setIsAuthenticated(false);
@@ -61,13 +76,40 @@ export default function AdminAuthGate({ children }) {
     return () => window.removeEventListener('haxlr8_organizer_logout', onLogoutEvent);
   }, []);
 
+  // Inactivity detection: auto-lock after 60 seconds of no interaction
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const updateActivity = () => {
+      sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, Date.now().toString());
+    };
+
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    activityEvents.forEach(evt => window.addEventListener(evt, updateActivity, { passive: true }));
+
+    const timer = setInterval(() => {
+      const lastActive = parseInt(sessionStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
+      if (!lastActive || (Date.now() - lastActive >= ADMIN_IDLE_TIMEOUT_MS)) {
+        setErrorMsg('🔒 Admin session automatically locked after 1 minute of inactivity for security.');
+        handleLogout();
+      }
+    }, 2500);
+
+    return () => {
+      activityEvents.forEach(evt => window.removeEventListener(evt, updateActivity));
+      clearInterval(timer);
+    };
+  }, [isAuthenticated]);
+
   const handlePasscodeLogin = (e) => {
     e.preventDefault();
     setErrorMsg('');
     const cleanKey = passcode.trim().toUpperCase();
     if (cleanKey === MASTER_PASSCODE || cleanKey === 'HAXLR8_2026' || cleanKey === 'HAXLR82026' || cleanKey === 'HAXLR8' || cleanKey === 'ADMIN' || cleanKey === 'MITM') {
       sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-      localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+      sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, Date.now().toString());
+      localStorage.removeItem(ORGANIZER_SESSION_KEY);
+      localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
       setIsAuthenticated(true);
     } else {
       setErrorMsg('Incorrect Master Passcode. Access denied.');
@@ -84,13 +126,17 @@ export default function AdminAuthGate({ children }) {
       const user = res.data?.user;
       if (user?.email === 'yashuhb18@gmail.com' || user?.email === 'haxlr8ecemitm@gmail.com') {
         sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-        localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+        sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, Date.now().toString());
+        localStorage.removeItem(ORGANIZER_SESSION_KEY);
+        localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
         setIsAuthenticated(true);
       } else {
         const { data: adminList } = await supabase.from('admins').select('email').eq('email', user.email);
         if (adminList && adminList.length > 0) {
           sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-          localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+          sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, Date.now().toString());
+          localStorage.removeItem(ORGANIZER_SESSION_KEY);
+          localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
           setIsAuthenticated(true);
         } else {
           setErrorMsg('Account authenticated, but this email is not in the authorized Organizers roster.');
