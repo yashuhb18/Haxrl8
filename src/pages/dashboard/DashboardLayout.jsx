@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LayoutDashboard, Users, FileUp, BookOpen, Bell } from 'lucide-react';
+import { LayoutDashboard, Users, CreditCard, Ticket, BookOpen, Bell } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import DomainWheel from '../../components/ui/DomainWheel';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
@@ -11,11 +11,12 @@ export { DomainWheel };
 export const SDGWheel = DomainWheel;
 
 const NAV = [
-  { id:'overview',     icon: LayoutDashboard, label:'Overview',      shortLabel:'Overview' },
-  { id:'team',         icon: Users,           label:'My Team',       shortLabel:'Team'     },
-  { id:'submission',   icon: FileUp,          label:'Submission',    shortLabel:'Submit'   },
-  { id:'resources',    icon: BookOpen,        label:'Resources',     shortLabel:'Guides'   },
-  { id:'announcements',icon: Bell,            label:'Announcements', shortLabel:'Alerts'   },
+  { id:'overview',      icon: LayoutDashboard, label:'Overview',       shortLabel:'Overview' },
+  { id:'team',          icon: Users,           label:'My Team',        shortLabel:'Team'     },
+  { id:'payment',       icon: CreditCard,      label:'Payment & Verify', shortLabel:'Payment' },
+  { id:'ticket',        icon: Ticket,          label:'Flight Pass',    shortLabel:'Ticket'   },
+  { id:'resources',     icon: BookOpen,        label:'Resources',      shortLabel:'Guides'   },
+  { id:'announcements', icon: Bell,            label:'Announcements',  shortLabel:'Alerts'   },
 ];
 
 export default function DashboardLayout({ activeTab, setActiveTab, children, hasTeam, announcements, user }) {

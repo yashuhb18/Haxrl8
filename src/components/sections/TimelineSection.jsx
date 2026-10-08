@@ -50,16 +50,16 @@ const EVENTS = [
   },
   {
     index: 1, num: "02", day: "28", month: "OCT", year: "2026",
-    title: "Oxygen Clock (Idea Papers Lock)",
-    desc: "Final deadline to submit your idea paper in Hydroponics (Agriculture), Navigation (Smart City), or MedBay (Healthcare).",
+    title: "Roster & Payment Lock",
+    desc: "Final deadline to confirm your 3–4 crew members and complete payment verification.",
     tag: "Deadline", tagColor: "#ef4444", tagBg: "rgba(239,68,68,0.1)", tagBorder: "rgba(239,68,68,0.3)",
     Icon: IconDeadline,
   },
   {
     index: 2, num: "03", day: "02", month: "NOV", year: "2026",
-    title: "Crew Manifest Confirmed (Shortlist)",
-    desc: "Expert panel evaluation concludes; shortlisted crew squads announced for the offline hackathon stage.",
-    tag: "Announcement", tagColor: "#facc15", tagBg: "rgba(250,204,21,0.1)", tagBorder: "rgba(250,204,21,0.3)",
+    title: "Flight Passes Issued",
+    desc: "Verification concluded; official Flight Passes with entry QR codes issued to all registered squads.",
+    tag: "Pass Clearance", tagColor: "#facc15", tagBg: "rgba(250,204,21,0.1)", tagBorder: "rgba(250,204,21,0.3)",
     Icon: IconAnnounce,
   },
   {
@@ -402,7 +402,7 @@ function CTABanner({ mobile }) {
       </div>
 
       <a
-        href="/shortlisted"
+        href="/register"
         style={{
           display: "inline-flex", alignItems: "center", gap: 10,
           padding: mobile ? "12px 22px" : "15px 30px",
@@ -423,7 +423,7 @@ function CTABanner({ mobile }) {
           e.currentTarget.style.boxShadow = "0 8px 25px rgba(56,254,220,0.35)";
         }}
       >
-        View Shortlisted Teams
+        Register Squad (₹1,200)
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#070a13" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>

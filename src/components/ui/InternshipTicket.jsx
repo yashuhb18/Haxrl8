@@ -228,7 +228,7 @@ export const InternshipTicket = () => {
                 transformStyle: "preserve-3d",
               }}
             >
-              Shortlisted crew squads advance to the 24-hour Grand Hackathon on November 6–7 at Maharaja Institute of Technology Mysore Base Station. Build game-changing solutions in Hydroponics, Navigation, and MedBay.
+              Registered crew squads participate directly in the 24-hour Grand Hackathon on November 6–7 at Maharaja Institute of Technology Mysore Base Station. Build game-changing solutions in Agriculture, Healthcare, and Smart City.
             </motion.p>
 
             {/* CTA — pops out the most */}

@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import OverviewTab    from './OverviewTab';
 import TeamTab        from './TeamTab';
-import SubmissionTab  from './SubmissionTab';
+import PaymentTab     from './PaymentTab';
+import TicketTab      from './TicketTab';
 import ResourcesTab   from './ResourcesTab';
 import AnnouncementsTab from './AnnouncementsTab';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
@@ -273,7 +274,7 @@ export default function DashboardPage() {
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>Commander Login Required</h2>
           <p style={{ fontSize: 13.5, color: '#64748b', margin: '0 0 24px', lineHeight: 1.5 }}>
-            To access your squad manifest, presentation decks, and technical submission vault, please verify your commander credentials.
+            To access your squad manifest, challenge track, payment verification, and official Flight Pass, please verify your commander credentials.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <button
@@ -311,8 +312,9 @@ export default function DashboardPage() {
     <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab} hasTeam={hasTeam} announcements={announcements} user={user}>
       {activeTab === 'overview'   && <OverviewTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} user={user} setActiveTab={setActiveTab} announcements={announcements} />}
       {activeTab === 'team'       && <TeamTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} user={user} setTeamMembers={setTeamMembers} setTeamData={setTeamData} setHasTeam={setHasTeam} setActiveTab={setActiveTab} />}
-      {activeTab === 'submission' && <SubmissionTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} setSubmissions={setSubmissions} setActiveTab={setActiveTab} />}
-      {activeTab === 'resources'  && <ResourcesTab hasTeam={hasTeam} submissions={submissions} />}
+      {activeTab === 'payment'    && <PaymentTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} user={user} setActiveTab={setActiveTab} onPaymentUpdated={(p) => { if (teamData) setTeamData({ ...teamData, payment_status: 'submitted', payment_utr: p.transaction_id }); }} />}
+      {activeTab === 'ticket'     && <TicketTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} user={user} setActiveTab={setActiveTab} />}
+      {activeTab === 'resources'  && <ResourcesTab hasTeam={hasTeam} submissions={submissions} setActiveTab={setActiveTab} />}
       {activeTab === 'announcements' && <AnnouncementsTab announcements={announcements} />}
     </DashboardLayout>
   );

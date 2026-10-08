@@ -194,7 +194,7 @@ export default function PlayfulCtaSection() {
         >
           <span>✦ 3–4 Members Per Team</span>
           <span>✦ Inter-College Allowed</span>
-          <span>✦ Free Registration</span>
+          <span>✦ ₹1,200 Per Team Fee</span>
         </div>
 
         {/* Host Institution & Department verification */}

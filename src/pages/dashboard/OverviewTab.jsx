@@ -8,9 +8,9 @@ import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 const TIMELINE_STEPS = [
   { title: 'Registration', date: 'Oct 09' },
-  { title: 'Team Lock', date: 'Oct 28' },
-  { title: 'Idea Paper', date: 'Oct 28' },
-  { title: 'Shortlist', date: 'Nov 02' },
+  { title: 'Squad Lock', date: 'Oct 28' },
+  { title: 'Fee Verify', date: 'Oct 28' },
+  { title: 'Pass Issued', date: 'Nov 02' },
   { title: 'Grand Finale', date: 'Nov 06–07' },
 ];
 
@@ -81,15 +81,23 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
   }, [showRulebook]);
 
   const memberCount = teamMembers?.length || 1;
-  const hasSubmitted = submissions?.length > 0;
-  const overallProgress = hasTeam ? (hasSubmitted ? 60 : 40) : 20; 
-  const currentStepIndex = hasSubmitted ? 2 : (hasTeam ? 1 : 0);
+  let isPaid = false;
+  try {
+    if (user?.id) {
+      const p = localStorage.getItem(`haxlr8_payment_${user.id}`);
+      if (p) isPaid = true;
+    }
+  } catch (e) {}
+  if (!isPaid && teamData?.payment_status === 'submitted') isPaid = true;
+
+  const overallProgress = hasTeam ? (isPaid ? 100 : 60) : 25; 
+  const currentStepIndex = isPaid ? 3 : (hasTeam ? 1 : 0);
 
   const now = new Date();
   const milestones = [
-    { title: 'Registration & Idea Submission', dateStr: '2026-10-28T23:59:59', icon: '💡', desc: 'Submit team details & idea paper' },
-    { title: 'Shortlist Announced', dateStr: '2026-11-02T12:00:00', icon: '🚩', desc: 'Top teams announced for offline finale' },
-    { title: 'Grand Finale (MIT Mysore)', dateStr: '2026-11-06T09:00:00', icon: '🏆', desc: '24-hour hackathon & ₹30,000 bounty' }
+    { title: 'Registration & Squad Lock', dateStr: '2026-10-28T23:59:59', icon: '🚀', desc: 'Lock in 3–4 crew members & ₹1,200 fee' },
+    { title: 'Flight Passes & Venue Briefing', dateStr: '2026-11-02T12:00:00', icon: '🎫', desc: 'Official checkpoint passes & instructions' },
+    { title: 'Grand Finale (MIT Mysore)', dateStr: '2026-11-06T09:00:00', icon: '🏆', desc: '24-hour hackathon & ₹30,000+ bounty' }
   ];
 
   const upcomingMilestones = milestones.filter(m => new Date(m.dateStr) > now);
@@ -108,9 +116,9 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
       {/* Priority Mission Broadcast Banner */}
       {showNotification && (
         <div style={{ background: '#f0f9ff', border: '1.5px solid #bae6fd', borderRadius: 16, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 14, overflow: 'hidden', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.08)' }}>
-          <AmongUsCrewmate color="red" size={32} speechText="Deadline approaching!" />
+          <AmongUsCrewmate color="red" size={32} speechText="Registrations live tomorrow!" />
           <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0369a1', flex: 1, letterSpacing: '0.01em', lineHeight: 1.5 }}>
-            <strong>STARSHIP MISSION ADVISORY:</strong> Registration &amp; Idea Abstract Paper lock on <strong>October 28, 2026 at 11:59 PM IST</strong>. Confirm your 3–4 crew members before lock!
+            <strong>STARSHIP MISSION ADVISORY:</strong> Registrations open tomorrow evening (Oct 09). Registration fee is <strong>₹1,200 per team</strong> (3–4 members). Final roster &amp; payment lock on <strong>October 28, 2026 at 11:59 PM IST</strong>.
           </div>
           <button onClick={() => setShowNotification(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#0369a1', opacity: 0.7 }} onMouseEnter={e => e.currentTarget.style.opacity='1'} onMouseLeave={e => e.currentTarget.style.opacity='0.7'}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -232,14 +240,14 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
             {/* Checklist */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
               <CheckItem label="Registration" status="done" />
-              <CheckItem label="Crew Manifest" status={hasTeam ? 'done' : 'active'} />
-              <CheckItem label="Idea Deck" status={hasSubmitted ? 'done' : (hasTeam ? 'active' : 'pending')} />
-              <CheckItem label="Shortlist Clearance" status={hasSubmitted ? 'active' : 'pending'} />
-              <CheckItem label="Grand Finale" status="pending" />
+              <CheckItem label="Crew Manifest (3–4 Members)" status={hasTeam ? 'done' : 'active'} />
+              <CheckItem label="Payment Verification (₹1,200)" status={isPaid ? 'done' : (hasTeam ? 'active' : 'pending')} />
+              <CheckItem label="Official Flight Pass" status={isPaid ? 'done' : 'pending'} />
+              <CheckItem label="Grand Finale (Nov 6–7)" status="pending" />
             </div>
           </div>
           <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#64748b' }}>
-            {hasTeam ? 'Roster locked! Prepare abstract paper for submission.' : 'Assemble 3–4 crew members in "My Team" to advance.'}
+            {isPaid ? 'All systems nominal! Your official Flight Pass is active.' : (hasTeam ? 'Roster locked! Proceed to Payment & Verification (₹1,200).' : 'Assemble 3–4 crew members in "My Team" to advance.')}
           </div>
         </div>
 
@@ -278,21 +286,20 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
-              📦 Official Mission Artifacts &amp; Downloads
+              📦 Official Mission Artifacts &amp; Resources
             </h3>
             <p style={{ fontSize: 13, color: '#64748b', margin: 0, fontWeight: 500 }}>
-              Essential templates, guidelines, and problem statements for your squad.
+              Official guides, sample problem statements, and campus logistics for your squad.
             </p>
           </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
-          {/* PPT Template */}
-          <a
-            href={OfficialPPT}
-            download="HAXLR8_3.0_Template.pptx"
+          {/* Flight Rulebook */}
+          <div
+            onClick={() => setShowRulebook(true)}
             style={{
-              textDecoration: 'none',
+              cursor: 'pointer',
               background: '#f0f9ff',
               border: '1.5px solid #bae6fd',
               borderRadius: 16,
@@ -305,12 +312,12 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
           >
-            <span style={{ fontSize: 28 }}>📊</span>
+            <span style={{ fontSize: 28 }}>📄</span>
             <div>
-              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0369a1' }}>Official PPT Deck</div>
-              <div style={{ fontSize: 11, color: '#0284c7', fontWeight: 600 }}>Required PPTX Format</div>
+              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#0369a1' }}>Flight Rulebook</div>
+              <div style={{ fontSize: 11, color: '#0284c7', fontWeight: 600 }}>Rules &amp; Evaluation</div>
             </div>
-          </a>
+          </div>
 
           {/* Problem Statement PDF */}
           <a

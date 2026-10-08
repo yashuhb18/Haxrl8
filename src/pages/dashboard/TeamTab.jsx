@@ -160,6 +160,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
   const [formData, setFormData] = useState({
     teamName: '',
     teamSize: 3,
+    domain: teamData?.domain || 'Agriculture',
     leader: {
       ...defaultMember,
       full_name: user?.user_metadata?.full_name || '',
@@ -206,6 +207,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
     setFormData({
       teamName: teamData?.team_name || '',
       teamSize: teamMembers?.length || 3,
+      domain: teamData?.domain || 'Agriculture',
       leader: {
         ...defaultMember,
         ...leader,
@@ -245,6 +247,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
   const validateCurrentStep = () => {
     setErrorMsg('');
     if (currentStep === 0) {
+      if (!formData.domain) return "Please select a challenge domain track.";
       if (!formData.teamName.trim()) return "Team Name is required.";
       if (!/^[a-zA-Z0-9 ]+$/.test(formData.teamName)) return "Team Name can only contain letters, numbers, and spaces.";
       return true;
@@ -266,9 +269,6 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
       if (member.city === 'Other' && !member.city_other?.trim()) {
         return "Please specify your city/district.";
       }
-      // if (!member.id_card_front_url || !member.id_card_back_url) {
-      //   return "Please upload and confirm the Student ID Card (Front & Back).";
-      // }
       return true;
     };
 
@@ -314,13 +314,23 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
 
       // 1. Create or Update Team
       const cleanTeamName = sanitizeInput(formData.teamName);
+      const cleanDomain = formData.domain || 'Agriculture';
 
       if (isEditingTeam) {
-        const { error: teamErr } = await supabase.from('teams').update({
-          team_name: cleanTeamName
-        }).eq('id', currentTeamId);
-        if (teamErr) throw teamErr;
-        finalTeamData = { ...teamData, team_name: cleanTeamName };
+        try {
+          const { error: teamErr } = await supabase.from('teams').update({
+            team_name: cleanTeamName,
+            domain: cleanDomain
+          }).eq('id', currentTeamId);
+          if (teamErr) throw teamErr;
+        } catch (e) {
+          try {
+            await supabase.from('teams').update({
+              team_name: cleanTeamName
+            }).eq('id', currentTeamId);
+          } catch (e2) {}
+        }
+        finalTeamData = { ...teamData, team_name: cleanTeamName, domain: cleanDomain };
       } else {
         let team = null;
         currentTeamId = ensureUUID(currentTeamId || teamData?.id);
@@ -329,25 +339,39 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           const { data: createdTeam, error: teamErr } = await supabase.from('teams').insert({
             id: currentTeamId,
             leader_id: validLeaderId,
-            team_name: cleanTeamName
+            team_name: cleanTeamName,
+            domain: cleanDomain
           }).select().single();
           if (teamErr) throw teamErr;
           team = createdTeam;
           localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(team));
           localStorage.removeItem('haxlr8_teams_db');
         } catch (tErr) {
-          console.warn('Supabase teams insert notice:', tErr);
-          team = {
-            id: currentTeamId,
-            leader_id: validLeaderId,
-            team_name: cleanTeamName,
-            created_at: new Date().toISOString()
-          };
+          console.warn('Supabase teams insert notice, attempting fallback:', tErr);
+          try {
+            const { data: retryTeam, error: retryErr } = await supabase.from('teams').insert({
+              id: currentTeamId,
+              leader_id: validLeaderId,
+              team_name: cleanTeamName
+            }).select().single();
+            if (!retryErr && retryTeam) {
+              team = { ...retryTeam, domain: cleanDomain };
+            }
+          } catch (e2) {}
+          if (!team) {
+            team = {
+              id: currentTeamId,
+              leader_id: validLeaderId,
+              team_name: cleanTeamName,
+              domain: cleanDomain,
+              created_at: new Date().toISOString()
+            };
+          }
           localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(team));
           localStorage.removeItem('haxlr8_teams_db');
         }
         currentTeamId = team.id;
-        finalTeamData = team;
+        finalTeamData = { ...team, domain: cleanDomain };
       }
 
       // --- Upload Files Helper ---
@@ -656,17 +680,65 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
                 <div style={{ background: '#ffedd5', color: '#ea580c', padding: 8, borderRadius: 10, flexShrink: 0 }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg></div>
                 <div>
                   <h3 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px 0', fontSize: 15 }}>Station Roster Directives</h3>
-                  <p style={{ color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.5 }}>Only the Team Leader should register the squad. Teams must consist of <strong>3 to 4 members</strong> in total (including the leader). Inter-college teams are permitted!</p>
+                  <p style={{ color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                    Select your domain track, choose a squad name, and add <strong>3 to 4 members</strong> (including captain). Inter-college teams are welcome! Registration fee is ₹1,200 per team.
+                  </p>
                 </div>
               </div>
 
+              {/* 1. DOMAIN SELECTION FIRST */}
               <div>
-                <label style={styles.label}>Team Name</label>
+                <label style={styles.label}>1. Select Challenge Domain Track *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginTop: 8 }}>
+                  {[
+                    { id: 'Agriculture', icon: '🌾', title: 'Agriculture', desc: 'Smart Farming, IoT Irrigation, Crop Disease AI, Supply Chain' },
+                    { id: 'Healthcare', icon: '🏥', title: 'Healthcare', desc: 'Diagnostic AI, Patient Telemetry, MedTech, Assistive Robotics' },
+                    { id: 'Smart City', icon: '🏙️', title: 'Smart City', desc: 'Urban Mobility, Intelligent Grid, Waste Management, Public Safety' }
+                  ].map(track => {
+                    const isSelected = formData.domain === track.id;
+                    return (
+                      <div
+                        key={track.id}
+                        onClick={() => setFormData({ ...formData, domain: track.id })}
+                        style={{
+                          border: isSelected ? '2.5px solid #0284c7' : '1.5px solid #cbd5e1',
+                          background: isSelected ? '#f0f9ff' : '#ffffff',
+                          borderRadius: 14,
+                          padding: '14px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          boxShadow: isSelected ? '0 4px 14px rgba(2, 132, 199, 0.18)' : 'none'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                          <span style={{ fontSize: 24 }}>{track.icon}</span>
+                          {isSelected && (
+                            <span style={{ fontSize: 10.5, fontWeight: 800, color: '#0284c7', background: '#e0f2fe', padding: '2px 8px', borderRadius: 10, border: '1px solid #bae6fd' }}>
+                              SELECTED ✓
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 15, fontWeight: 900, color: isSelected ? '#0369a1' : '#0f172a', marginBottom: 4 }}>
+                          {track.title}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: '#64748b', lineHeight: 1.4 }}>
+                          {track.desc}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. TEAM NAME */}
+              <div>
+                <label style={styles.label}>2. Squad / Team Name *</label>
                 <input type="text" value={formData.teamName} onChange={e => setFormData({ ...formData, teamName: e.target.value })} placeholder="e.g. Innovators, Crew Red, Skeld Hackers" style={styles.input} />
               </div>
 
+              {/* 3. TOTAL CREW SIZE */}
               <div>
-                <label style={styles.label}>Total Crew Size</label>
+                <label style={styles.label}>3. Total Crew Size *</label>
                 <select value={formData.teamSize} onChange={e => {
                   const newSize = parseInt(e.target.value);
                   const requiredTeammates = newSize - 1;
@@ -682,8 +754,8 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
 
                   setFormData(prev => ({ ...prev, teamSize: newSize, teammates: newTeammates }));
                 }} style={{ ...styles.input, cursor: 'pointer' }}>
-                  <option value={3}>3 Members (Captain + 2 Crewmates)</option>
-                  <option value={4}>4 Members (Captain + 3 Crewmates)</option>
+                  <option value={3}>3 Members (Flight Captain + 2 Crewmates)</option>
+                  <option value={4}>4 Members (Flight Captain + 3 Crewmates)</option>
                 </select>
               </div>
             </div>
@@ -841,19 +913,19 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
             </div>
             <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: 0 }}>Mission Directives</h3>
           </div>
-          <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 24 }}>Follow the flight stages below to ensure qualification.</p>
+          <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 24 }}>Follow the flight stages below to secure your entry pass.</p>
 
-          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 28, marginLeft: 10, paddingBottom: 10 }}>
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 24, marginLeft: 10, paddingBottom: 10 }}>
             <div style={{ position: 'absolute', top: 16, bottom: 16, left: 15, width: 2, background: '#f1e7db', zIndex: 0 }}></div>
 
             {[
-              { num: 1, title: 'Analyze Problem Statement', desc: 'Select challenge in Agriculture, Smart City, or Healthcare.' },
-              { num: 2, title: 'Build Presentation Deck', desc: 'Use the official HAXLR8 PPT template for your abstract paper.' },
-              { num: 3, title: 'Submit Before Oct 28 Lock', desc: 'Lock in your idea paper to compete for the ₹30,000 bounty.' }
+              { num: 1, title: 'Squad Manifest Locked In', desc: `Crew of ${teamMembers.length} confirmed in ${teamData?.domain || 'Agriculture'} track.` },
+              { num: 2, title: 'Pay Registration Fee (₹1,200)', desc: 'Pay via UPI QR scanner & submit Google Form details.' },
+              { num: 3, title: 'Unlock Official Flight Pass', desc: 'Download your verified 24-hour hackathon entry ticket with QR code.' }
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: 20, position: 'relative', zIndex: 1 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', border: '2px solid #0284c7', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, flexShrink: 0, boxShadow: '0 2px 8px rgba(2, 132, 199, 0.2)' }}>
-                  {step.num}
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#16a34a' : '#ffffff', border: `2px solid ${i === 0 ? '#16a34a' : '#0284c7'}`, color: i === 0 ? '#ffffff' : '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, flexShrink: 0, boxShadow: '0 2px 8px rgba(2, 132, 199, 0.2)' }}>
+                  {i === 0 ? '✓' : step.num}
                 </div>
                 <div style={{ flex: 1, paddingTop: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
@@ -872,7 +944,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
               <Calendar size={24} />
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#854d0e', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 2, fontWeight: 800 }}>Idea Paper Hard Deadline</div>
+              <div style={{ fontSize: 11, color: '#854d0e', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 2, fontWeight: 800 }}>Registration & Payment Lock</div>
               <div style={{ fontSize: 15, fontWeight: 900, color: '#ea580c' }}>October 28, 2026 · 11:59 PM IST</div>
             </div>
           </div>
@@ -887,15 +959,15 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
             <Rocket size={24} color="#0284c7" />
           </div>
           <div>
-            <div style={{ fontSize: 16.5, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>Ready to submit your Idea Abstract?</div>
-            <div style={{ fontSize: 13, color: '#64748b' }}>Proceed to Submissions to upload your PDF slide deck and domain track.</div>
+            <div style={{ fontSize: 16.5, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>Ready to complete squad verification?</div>
+            <div style={{ fontSize: 13, color: '#64748b' }}>Proceed to Payment &amp; Verification to pay the ₹1,200 team fee and generate your official Flight Pass.</div>
           </div>
         </div>
         <button
-          onClick={() => { if (setActiveTab) setActiveTab('submission'); }}
+          onClick={() => { if (setActiveTab) setActiveTab('payment'); }}
           style={{ padding: '14px 28px', borderRadius: 12, border: 'none', background: '#0284c7', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' }}
         >
-          Access Submissions Bay →
+          Proceed to Payment & Verification (₹1,200) →
         </button>
       </div>
 

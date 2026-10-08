@@ -18,11 +18,11 @@ const FAQS = [
   },
   {
     q: 'What is the registration fee?',
-    a: 'Registration and initial idea paper submission are completely free. Shortlisted teams attending the offline grand hackathon at MIT Mysore will receive full logistical briefing and onboard passes.',
+    a: 'The registration fee is ₹1,200 per team (for 3 to 4 members). Registrations open tomorrow evening (Oct 09). There are no screening or elimination rounds—all registered and verified teams advance directly to the 24-hour offline hackathon at Maharaja Institute of Technology Mysore!',
   },
   {
     q: 'Can we work on pre-existing ideas?',
-    a: 'You can submit your existing solution concept in the idea paper phase. However, all prototype code, hardware circuitry, and features must be built during the 24-hour hackathon period.',
+    a: 'You can develop ideas based on our fixed challenge domains (Agriculture, Healthcare, Smart City). However, all actual prototype code, hardware circuitry, and features must be built live during the 24-hour offline hackathon.',
   },
   {
     q: 'What are the judging criteria?',

@@ -4,7 +4,7 @@ import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 import ProblemStatementPDF from '../../assets/PS_example/Hackathon Problem Statement 2026.pdf';
 
 const RESOURCES = [
-  { icon: '📝', label: 'Official PPT Template', desc: 'Download the required presentation format', tag: 'PPTX', href: OfficialPPT, download: 'HAXLR8_3.0_Template.pptx', color: '#ff3b69', bg: '#fef2f2', border: '#fecaca' },
+  { icon: '💳', label: 'Payment & Verification Guide', desc: 'Instructions for ₹1,200 UPI fee & G-Form verification', tag: 'GUIDE', href: '#payment', color: '#ff3b69', bg: '#fef2f2', border: '#fecaca' },
   { icon: '📄', label: 'Hackathon Rulebook', desc: 'Official rules and judging criteria', tag: 'PDF', href: '#', color: '#ea580c', bg: '#fff7ed', border: '#fed7aa' },
   { icon: '🧩', label: 'Sample Problem Statements', desc: 'Download sample problem statements for 2026', tag: 'PDF', href: ProblemStatementPDF, download: 'HAXLR8-Problem-Statements-2026.pdf', color: '#0284c7', bg: '#eff6ff', border: '#bfdbfe' },
   { icon: '👑', label: 'Leader vs. Impostor Protocol', desc: 'Official flight manifest rules & role guide', tag: 'GUIDE', href: '#leader-protocol', color: '#9333ea', bg: '#fdf4ff', border: '#f5d0fe' },
@@ -23,7 +23,7 @@ const FAQS = [
         >
           the registration page
         </a>
-        . Only the Team Leader needs to register. Once logged in, the leader registers 3–4 crew members from the My Team tab.
+        . Only the Team Leader needs to register. Once logged in, the leader selects the domain, adds 3–4 crew members in the My Team tab, and completes payment verification.
       </>
     ),
   },
@@ -41,7 +41,7 @@ const FAQS = [
   },
   {
     q: "Is there a registration fee?",
-    a: "No, participation is completely free. We believe innovation should be accessible to all students.",
+    a: "Yes, the registration fee is ₹1,200 per team (for 3 to 4 members). It covers complete 24-hour hackathon entry, Wi-Fi, mentorship, catering, meals, and official certificates.",
   },
   {
     q: "What should I bring to HAXLR8 3.0 at MIT Mysore?",
@@ -61,7 +61,7 @@ const FAQS = [
   },
   {
     q: "Will the hackathon be in person or online?",
-    a: "The Idea Paper round (Round 1) is entirely online. Shortlisted teams will be invited to participate in the 24-hour offline hackathon on November 6–7, 2026 at MIT Mysore.",
+    a: "HAXLR8 3.0 is a 100% in-person 24-hour Grand Hackathon hosted at Maharaja Institute of Technology Mysore on November 6–7, 2026. There are no screening or elimination rounds—all registered teams advance directly!",
   },
 ];
 

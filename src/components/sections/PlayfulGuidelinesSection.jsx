@@ -21,7 +21,7 @@ const guidelinesPart1 = [
   {
     num: '02',
     title: 'Online Registration',
-    description: 'Registration opens Oct 09 and closes Oct 28, 2026. Only the team leader needs to register and submit the idea paper.',
+    description: 'Registration opens Oct 09 and closes Oct 28, 2026. Only the team leader needs to register and add 3–4 crew members.',
     icon: UserPlus,
     badge: 'DEADLINE OCT 28',
     bg: '#eff6ff',
@@ -30,10 +30,10 @@ const guidelinesPart1 = [
   },
   {
     num: '03',
-    title: 'Idea Paper Screening',
-    description: 'Submit your structured abstract proposing a novel solution. Shortlisted teams get invited to the offline grand finale.',
+    title: 'Team Fee & Pass',
+    description: 'Registration fee is ₹1,200 per team (3–4 members). Complete payment details in the dashboard to unlock your official flight pass.',
     icon: FileText,
-    badge: 'STEP 1',
+    badge: '₹1,200 / TEAM',
     bg: '#fdf4ff',
     border: '#f5d0fe',
     accent: '#d946ef',

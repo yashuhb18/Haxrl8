@@ -876,14 +876,14 @@ export default function ShortlistedPage() {
                 color: '#111827',
               }}
             >
-              Shortlisted <span style={{ color: '#16A34A' }}>Teams</span>
+              Registered <span style={{ color: '#16A34A' }}>Squads</span>
             </h1>
 
             {/* Right Golden Leaf Spray (Flipped) */}
             <GoldenLaurelSpray width={36} height={48} flip className="shortlisted-hero-laurel" />
           </motion.div>
 
-          {/* Subtitle (Two Centered Lines, Medium Gray, "best ideas" highlighted in Green) */}
+          {/* Subtitle */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -897,13 +897,12 @@ export default function ShortlistedPage() {
               fontWeight: 500,
             }}
           >
-            <div>These teams have demonstrated exceptional innovation and problem-solving skills.</div>
+            <div>Direct entry to the 24-hour offline Grand Finale on November 6–7 at MIT Mysore!</div>
             <div>
-              Get ready to witness the{' '}
+              There are no screening rounds—all registered and verified teams{' '}
               <strong style={{ color: '#16A34A', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 700 }}>
-                best ideas
-              </strong>{' '}
-              in action!
+                build live on campus
+              </strong>.
             </div>
           </motion.div>
 

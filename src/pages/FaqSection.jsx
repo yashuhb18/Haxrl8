@@ -50,8 +50,8 @@ const FAQS = [
   {
     id: 8,
     category: 'registration',
-    question: "What is the idea paper submission deadline?",
-    answer: "Registration and idea paper submission will close on October 28, 2026. Make sure your team leader submits your abstract before the deadline.",
+    question: "What is the registration fee?",
+    answer: "The registration fee is ₹1,200 per team (for 3 to 4 members). Registrations open tomorrow evening (Oct 09). It covers complete 24-hour hackathon entry, Wi-Fi, mentorship, catering, meals, and official certificates.",
   },
   {
     id: 9,
@@ -81,7 +81,7 @@ const FAQS = [
     id: 13,
     category: 'logistics',
     question: "Will the hackathon be in-person or online?",
-    answer: "Phase 1 (Idea Paper Submission & Screening) is online. Phase 2 (the 24-hour Grand Finale) is 100% in-person at the campus of Maharaja Institute of Technology Mysore.",
+    answer: "HAXLR8 3.0 is a 100% in-person 24-hour Grand Hackathon hosted at Maharaja Institute of Technology Mysore on November 6–7, 2026. There are no screening or elimination rounds—all registered and verified teams participate directly on campus!",
   },
   {
     id: 14,

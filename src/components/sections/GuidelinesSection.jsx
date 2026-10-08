@@ -100,12 +100,12 @@ const guidelinesPart1 = [
   },
   {
     id: '02', title: 'Register Online',
-    description: 'Registration opens Oct 09 and closes Oct 28. Submit your idea paper before the deadline.',
+    description: 'Registration opens Oct 09 and closes Oct 28. Register your 3–4 crew members online.',
     icon: UserPlus
   },
   {
-    id: '03', title: 'Idea Paper Submission',
-    description: 'Submit your structured idea paper focusing on Agriculture, Smart City, or Healthcare for initial screening.',
+    id: '03', title: 'Registration Fee & Pass',
+    description: 'Registration fee is ₹1,200 per team (3–4 members). Complete payment verification to receive your official Flight Pass.',
     icon: FileText
   },
   {
@@ -555,7 +555,7 @@ export default function GuidelinesSection() {
           </div>
           
           <a
-            href="/shortlisted"
+            href="/register"
             style={{
               display: "inline-flex", alignItems: "center", gap: 10,
               padding: "14px 28px",
@@ -576,7 +576,7 @@ export default function GuidelinesSection() {
               e.currentTarget.style.boxShadow = "0 8px 25px rgba(56,254,220,0.35)";
             }}
           >
-            VIEW SHORTLISTED MANIFEST →
+            REGISTER YOUR SQUAD (₹1,200) →
           </a>
         </motion.div>
       </div>

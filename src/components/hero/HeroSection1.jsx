@@ -397,10 +397,10 @@ export default function HeroSection1() {
 
         {/* CTA */}
         <div style={{ ...reveal(120), display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link to="/shortlisted" style={{ textDecoration: 'none' }}>
+          <Link to="/register" style={{ textDecoration: 'none' }}>
             <span className="hero-btn-learn-more">
               <span className="hero-btn-circle"><span className="hero-btn-icon hero-btn-arrow" /></span>
-              <span className="hero-btn-text">Shortlisted Teams</span>
+              <span className="hero-btn-text">Register Squad →</span>
             </span>
           </Link>
         </div>
