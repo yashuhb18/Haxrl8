@@ -33,13 +33,13 @@ export default function AdminTeams() {
 
   const fetchData = useCallback(async () => {
     try {
-      await syncLocalDataToSupabase();
+      const { count: total } = await supabase.from('teams').select('*', { count: 'exact', head: true });
+      setTotalTeamsDB(total || 0);
     } catch (e) {
-      console.warn('Sync error:', e);
+      console.warn('Fetch teams notice:', e);
+    } finally {
+      setLoading(false);
     }
-    const { count: total } = await supabase.from('teams').select('*', { count: 'exact', head: true });
-    setTotalTeamsDB(total || 0);
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -147,13 +147,17 @@ export default function AdminTeams() {
     const { data } = await query;
     if (!data) return;
 
-    let csv = "data:text/csv;charset=utf-8,Team,Status,Registered On\n";
-    data.forEach(t => {
-      csv += `"${t.team_name || ''}","${t.status || 'Active'}","${t.created_at || ''}"\n`;
+    let csv = "data:text/csv;charset=utf-8,S.No,Squad Name,Domain Track,Team Lead,Email,Phone,Members Count,Status,Registered On\n";
+    data.forEach((t, i) => {
+      const sub = submissions.find(s => s.team_id === t.id);
+      const teamMems = members.filter(m => m.team_id === t.id);
+      const lead = teamMems.find(m => m.is_leader === true) || teamMems[0];
+      const track = sub?.category || 'General';
+      csv += `${i + 1},"${t.team_name || ''}","${track}","${lead?.full_name || ''}","${lead?.email || ''}","${lead?.phone_number || ''}",${teamMems.length || 1},"Finale Ready","${t.created_at || ''}"\n`;
     });
     const a = document.createElement("a");
     a.href = encodeURI(csv);
-    a.download = "teams_export.csv";
+    a.download = "haxlr8_squads_manifest.csv";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   };
 
@@ -163,8 +167,8 @@ export default function AdminTeams() {
         <header style={{ height:64, background:S.card, borderBottom:'1px solid '+S.border, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 28px', flexShrink:0 }}>
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             <div>
-              <h1 style={{ fontSize:18, fontWeight:700, margin:0, color:S.t1 }}>Dashboard</h1>
-              <div style={{ fontSize:11, fontWeight:500, color:S.t2, display:'flex', alignItems:'center', gap:4 }}>Home <ChevronRight size={12}/> <span style={{color:S.t1}}>Teams</span></div>
+              <h1 style={{ fontSize:18, fontWeight:700, margin:0, color:S.t1 }}>Squads &amp; Teams</h1>
+              <div style={{ fontSize:11, fontWeight:500, color:S.t2, display:'flex', alignItems:'center', gap:4 }}>Home <ChevronRight size={12}/> <span style={{color:S.t1}}>Squads</span></div>
             </div>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:20 }}>
@@ -184,13 +188,12 @@ export default function AdminTeams() {
 
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
               <div>
-                <h2 style={{ fontSize:20, fontWeight:700, margin:0 }}>Teams</h2>
-                <p style={{ fontSize:13, color:S.t2, margin:'4px 0 0' }}>Manage all teams participating in the hackathon.</p>
+                <h2 style={{ fontSize:20, fontWeight:700, margin:0 }}>Squads &amp; Teams Roster</h2>
+                <p style={{ fontSize:13, color:S.t2, margin:'4px 0 0' }}>All registered 3–4 member squads. Every registered squad has direct entry to the 24H offline finale!</p>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                
                 <button onClick={exportCSV} style={{ display:'flex', alignItems:'center', gap:6, background:S.card, color:S.t1, border:'1px solid '+S.border, padding:'10px 16px', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', boxShadow:'0 1px 2px rgba(0,0,0,.04)' }}>
-                  <Download size={16}/> Export
+                  <Download size={16}/> Export Squads CSV
                 </button>
               </div>
             </div>
@@ -202,7 +205,7 @@ export default function AdminTeams() {
                   <div style={{ position:'relative', minWidth:260 }}>
                     <Search size={16} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:S.t3 }}/>
                     <input 
-                      placeholder="Search teams by name..." 
+                      placeholder="Search squads by name..." 
                       value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                       style={{ paddingLeft:36, paddingRight:16, paddingTop:10, paddingBottom:10, background:S.card, border:'1px solid '+S.border, borderRadius:8, fontSize:13, width:'100%', outline:'none', color:S.t1 }}
                     />
@@ -217,7 +220,7 @@ export default function AdminTeams() {
                 <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
                   <thead>
                     <tr style={{ background:'#FAFAFA', borderBottom:'1px solid '+S.border }}>
-                      {['S.No', 'Team', 'Team Lead', 'Members', 'Registered On'].map(h => (
+                      {['S.No', 'Squad Name', 'Domain Track', 'Squad Commander', 'Crew Members', 'Registered On', 'Finale Status'].map(h => (
                         <th key={h} style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>{h}</th>
                       ))}
                     </tr>
@@ -234,30 +237,7 @@ export default function AdminTeams() {
                         {bg: '#FEF3C7', text: '#D97706'}, {bg: '#F3E8FF', text: '#9333EA'},
                         {bg: '#DCFCE7', text: '#16A34A'}
                       ];
-                      const ac = avatarColors[t.id % avatarColors.length] || avatarColors[0];
-                      
-                      const trackColors = {
-                        'Climate Action': {bg:'#DCFCE7', text:'#16A34A'},
-                        'Affordable Energy': {bg:'#FEF3C7', text:'#D97706'},
-                        'Sustainable Cities': {bg:'#F3E8FF', text:'#9333EA'},
-                        'Life on Land': {bg:'#DCFCE7', text:'#16A34A'},
-                        'Quality Education': {bg:'#DBEAFE', text:'#2563EB'},
-                        'Software': {bg:'#DBEAFE', text:'#2563EB'},
-                        'Hardware': {bg:'#FEF3C7', text:'#D97706'},
-                        'General': {bg:'#F1F5F9', text:'#64748B'}
-                      };
-                      const tc = trackColors[track] || {bg:'#F1F5F9', text:'#64748B'};
-
-                      let sdgNumbers = '-';
-                      if (sub?.sdg_goal) {
-                        const matches = sub.sdg_goal.match(/SDG\s*(\d+)/gi);
-                        if (matches) {
-                          sdgNumbers = matches.map(m => m.replace(/SDG\s*/i, '')).join(', ');
-                        } else {
-                          const justNums = sub.sdg_goal.replace(/[^0-9,]/g, '').trim();
-                          if (justNums) sdgNumbers = justNums;
-                        }
-                      }
+                      const ac = avatarColors[index % avatarColors.length] || avatarColors[0];
 
                       return (
                         <tr key={t.id} style={{ borderBottom:'1px solid #F8FAFC' }}>
@@ -270,10 +250,16 @@ export default function AdminTeams() {
                                 {t.team_name?.substring(0,2)?.toUpperCase() || 'TM'}
                               </div>
                               <div>
-                                <div style={{ fontWeight:700, color:S.t1 }}>{t.team_name || 'Unnamed Team'}</div>
-                                <div style={{ fontSize:12, color:S.t3, marginTop:2 }}>@{t.team_name?.toLowerCase().replace(/\s+/g,'') || 'team'}</div>
+                                <div style={{ fontWeight:700, color:S.t1 }}>{t.team_name || 'Unnamed Squad'}</div>
+                                <div style={{ fontSize:11, color:S.t3, marginTop:2 }}>ID: {t.id.substring(0,8)}...</div>
                               </div>
                             </div>
+                          </td>
+
+                          <td style={{ padding:'16px 20px' }}>
+                            <span style={{ padding:'4px 10px', borderRadius:20, fontSize:11, fontWeight:800, background:'#E0F2FE', color:'#0369A1', border:'1px solid #BAE6FD' }}>
+                              {track}
+                            </span>
                           </td>
 
                           <td style={{ padding:'16px 20px' }}>
@@ -287,22 +273,27 @@ export default function AdminTeams() {
                               </div>
                             </div>
                           </td>
+
                           <td style={{ padding:'16px 20px' }}>
                             <div style={{ display:'flex', alignItems:'center' }}>
-                              {teamMembers.slice(0,3).map((m, idx) => (
-                                <div key={m.id} style={{ width:28, height:28, borderRadius:'50%', background:'#E2E8F0', border:'2px solid #fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:10, fontWeight:700, color:'#475569', marginLeft: idx > 0 ? -8 : 0 }}>
+                              {teamMembers.slice(0,4).map((m, idx) => (
+                                <div key={m.id || idx} style={{ width:28, height:28, borderRadius:'50%', background:'#E2E8F0', border:'2px solid #fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:10, fontWeight:700, color:'#475569', marginLeft: idx > 0 ? -8 : 0 }} title={`${m.full_name} (${m.email})`}>
                                   {m.full_name?.charAt(0)}
                                 </div>
                               ))}
-                              {teamMembers.length > 3 && (
-                                <div style={{ width:28, height:28, borderRadius:'50%', background:'#F1F5F9', border:'2px solid #fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:10, fontWeight:700, color:'#64748B', marginLeft:-8 }}>
-                                  +{teamMembers.length - 3}
-                                </div>
-                              )}
+                              <span style={{ fontSize:12, fontWeight:700, color:'#64748B', marginLeft:8 }}>
+                                {teamMembers.length} Crew
+                              </span>
                             </div>
                           </td>
 
                           <td style={{ padding:'16px 20px', color:S.t2 }}>{t.created_at ? new Date(t.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-'}</td>
+
+                          <td style={{ padding:'16px 20px' }}>
+                            <span style={{ padding:'5px 12px', borderRadius:20, fontSize:11, fontWeight:800, background:'#DCFCE7', color:'#15803D', border:'1px solid #86EFAC', display:'inline-flex', alignItems:'center', gap:4 }}>
+                              ● Finale Confirmed
+                            </span>
+                          </td>
                         </tr>
                       );
                     })}

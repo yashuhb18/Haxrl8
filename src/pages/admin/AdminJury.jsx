@@ -81,10 +81,10 @@ export default function AdminJury() {
     );
   }
 
-  // Process data
-  const processedData = submissions.map((sub, index) => {
-    const team = teams.find(t => t.id === sub.team_id);
-    const teamMembers = members.filter(m => m.team_id === sub.team_id);
+  // Process data for all registered squads
+  const processedData = teams.map((team, index) => {
+    const sub = submissions.find(s => s.team_id === team.id);
+    const teamMembers = members.filter(m => m.team_id === team.id);
     
     const tl = teamMembers.find(m => m.is_leader) || teamMembers[0] || null;
     const otherMembers = teamMembers.filter(m => m.id !== tl?.id);
@@ -92,51 +92,53 @@ export default function AdminJury() {
     const tm1 = otherMembers[0] || null;
     const tm2 = otherMembers[1] || null;
     const tm3 = otherMembers[2] || null;
+    const track = sub?.category || 'General';
 
     return {
       sNo: index + 1,
       teamName: team?.team_name || 'N/A',
-      tlName: tl?.full_name || 'No member',
-      tlEmail: tl?.email || 'No member',
-      tlPhone: tl?.phone_number || 'No member',
-      tm1Name: tm1?.full_name || 'No member',
-      tm1Email: tm1?.email || 'No member',
-      tm1Phone: tm1?.phone_number || 'No member',
-      tm2Name: tm2?.full_name || 'No member',
-      tm2Email: tm2?.email || 'No member',
-      tm2Phone: tm2?.phone_number || 'No member',
-      tm3Name: tm3?.full_name || 'No member',
-      tm3Email: tm3?.email || 'No member',
-      tm3Phone: tm3?.phone_number || 'No member',
+      domain: track,
+      tlName: tl?.full_name || 'N/A',
+      tlEmail: tl?.email || 'N/A',
+      tlPhone: tl?.phone_number || 'N/A',
+      tm1Name: tm1?.full_name || '-',
+      tm1Email: tm1?.email || '-',
+      tm1Phone: tm1?.phone_number || '-',
+      tm2Name: tm2?.full_name || '-',
+      tm2Email: tm2?.email || '-',
+      tm2Phone: tm2?.phone_number || '-',
+      tm3Name: tm3?.full_name || '-',
+      tm3Email: tm3?.email || '-',
+      tm3Phone: tm3?.phone_number || '-',
       collegeName: tl?.college_name || 'N/A',
       location: tl?.location || 'N/A',
-      projectTitle: sub.project_title || 'N/A',
-      projectDescription: sub.project_description || 'N/A',
-      pdfLink: sub.pdf_url || 'N/A',
-      submitDate: new Date(sub.created_at).toLocaleDateString(),
-      sdgs: sub.sdg_goal || 'N/A',
-      shortlisting: '' // For CSV column
+      crewCount: teamMembers.length || 1,
+      regFee: '₹1,200',
+      status: 'Finale Ready',
+      submitDate: team.created_at ? new Date(team.created_at).toLocaleDateString() : '-'
     };
   });
 
   const filteredData = processedData.filter(d => 
     d.teamName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    d.projectTitle.toLowerCase().includes(searchTerm.toLowerCase())
+    d.domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    d.tlName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    d.tlEmail.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const exportExcel = () => {
     const headers = [
-      "S.no", "Team Name", "TL Name", "TL Email", "TL Phone",
+      "S.no", "Squad Name", "Domain Track", "Team Lead Name", "TL Email", "TL Phone",
       "TM1 Name", "TM1 Email", "TM1 Phone", "TM2 Name", "TM2 Email", "TM2 Phone",
       "TM3 Name", "TM3 Email", "TM3 Phone", "College Name", "Location (City, State)",
-      "Project Title", "Project Description", "PDF Link", "Submit Date", "SDGs", "Shortlisting (Shortlisted/Rejected/Waiting List)"
+      "Crew Count", "Registration Fee", "Finale Status", "Registered Date"
     ];
 
     const excelData = filteredData.map((row, i) => ([
-      i + 1, row.teamName, row.tlName, row.tlEmail, row.tlPhone,
+      i + 1, row.teamName, row.domain, row.tlName, row.tlEmail, row.tlPhone,
       row.tm1Name, row.tm1Email, row.tm1Phone, row.tm2Name, row.tm2Email, row.tm2Phone,
       row.tm3Name, row.tm3Email, row.tm3Phone, row.collegeName, row.location,
-      row.projectTitle, row.projectDescription, row.pdfLink, row.submitDate, row.sdgs, row.shortlisting
+      row.crewCount, row.regFee, row.status, row.submitDate
     ]));
 
     excelData.unshift(headers);
@@ -191,7 +193,7 @@ export default function AdminJury() {
                 <div style={{ position:'relative', minWidth:260 }}>
                   <Search size={16} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:S.t3 }}/>
                   <input 
-                    placeholder="Search by team name or project title..." 
+                    placeholder="Search by squad name, domain track, or commander..." 
                     value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                     style={{ paddingLeft:36, paddingRight:16, paddingTop:10, paddingBottom:10, background:S.card, border:'1px solid '+S.border, borderRadius:8, fontSize:13, width:'100%', outline:'none', color:S.t1 }}
                   />
@@ -204,34 +206,45 @@ export default function AdminJury() {
                 <thead>
                   <tr style={{ background:'#FAFAFA', borderBottom:'1px solid '+S.border }}>
                     <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>S.No</th>
-                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Team Name</th>
-                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Project Title</th>
-                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>TL Name</th>
-                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>College & Location</th>
-                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>PDF Link</th>
+                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Squad Name</th>
+                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Domain Track</th>
+                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Squad Commander</th>
+                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Crew Count</th>
+                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>College &amp; Location</th>
+                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Finale Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredData.slice(0, 50).map((row, i) => (
                     <tr key={i} style={{ borderBottom:'1px solid #F8FAFC' }}>
                       <td style={{ padding:'16px 20px', color:S.t2, fontSize:12, fontWeight:600 }}>{i + 1}</td>
-                      <td style={{ padding:'16px 20px', fontWeight:600, color:S.t1 }}>{row.teamName}</td>
-                      <td style={{ padding:'16px 20px', color:S.t1, maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.projectTitle}</td>
-                      <td style={{ padding:'16px 20px', color:S.t2 }}>{row.tlName}</td>
+                      <td style={{ padding:'16px 20px', fontWeight:700, color:S.t1 }}>{row.teamName}</td>
+                      <td style={{ padding:'16px 20px' }}>
+                        <span style={{ padding:'4px 10px', borderRadius:20, fontSize:11, fontWeight:800, background:'#E0F2FE', color:'#0369A1', border:'1px solid #BAE6FD' }}>
+                          {row.domain}
+                        </span>
+                      </td>
+                      <td style={{ padding:'16px 20px', color:S.t2 }}>
+                        <div style={{ fontWeight: 600, color: S.t1 }}>{row.tlName}</div>
+                        <div style={{ fontSize: 11, color: S.t3 }}>{row.tlEmail}</div>
+                      </td>
+                      <td style={{ padding:'16px 20px', fontWeight:700, color:'#64748B' }}>
+                        {row.crewCount} Members
+                      </td>
                       <td style={{ padding:'16px 20px', color:S.t2 }}>
                         <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150 }}>{row.collegeName}</div>
                         <div style={{ fontSize: 11, color: S.t3 }}>{row.location}</div>
                       </td>
                       <td style={{ padding:'16px 20px' }}>
-                        {row.pdfLink !== 'N/A' ? (
-                          <a href={row.pdfLink} target="_blank" rel="noopener noreferrer" style={{ color: S.primary, textDecoration: 'none', fontWeight: 600 }}>View PDF</a>
-                        ) : 'No PDF'}
+                        <span style={{ padding:'4px 10px', borderRadius:20, fontSize:11, fontWeight:800, background:'#DCFCE7', color:'#15803D', border:'1px solid #86EFAC' }}>
+                          ● Finale Confirmed
+                        </span>
                       </td>
                     </tr>
                   ))}
                   {filteredData.length === 0 && (
                     <tr>
-                      <td colSpan="6" style={{ padding:'40px 20px', textAlign:'center', color:S.t3 }}>No submissions found matching your search.</td>
+                      <td colSpan="7" style={{ padding:'40px 20px', textAlign:'center', color:S.t3 }}>No squads found matching your search.</td>
                     </tr>
                   )}
                 </tbody>

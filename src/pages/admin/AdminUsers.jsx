@@ -40,13 +40,13 @@ export default function AdminUsers() {
 
   const fetchData = useCallback(async () => {
     try {
-      await syncLocalDataToSupabase();
+      const { count: total } = await supabase.from('team_members').select('*', { count: 'exact', head: true });
+      setTotalUsersDB(total || 0);
     } catch (e) {
-      console.warn('Sync error:', e);
+      console.warn('Fetch users notice:', e);
+    } finally {
+      setLoading(false);
     }
-    const { count: total } = await supabase.from('team_members').select('*', { count: 'exact', head: true });
-    setTotalUsersDB(total || 0);
-    setLoading(false);
   }, []);
 
   useEffect(() => {

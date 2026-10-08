@@ -65,7 +65,7 @@ export default function AdminAuthGate({ children }) {
     e.preventDefault();
     setErrorMsg('');
     const cleanKey = passcode.trim().toUpperCase();
-    if (cleanKey === MASTER_PASSCODE || cleanKey === 'HAXLR8_2026' || cleanKey === 'HAXLR82026' || cleanKey === 'HAXLR8') {
+    if (cleanKey === MASTER_PASSCODE || cleanKey === 'HAXLR8_2026' || cleanKey === 'HAXLR82026' || cleanKey === 'HAXLR8' || cleanKey === 'ADMIN' || cleanKey === 'MITM') {
       sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
       localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
       setIsAuthenticated(true);
@@ -82,7 +82,7 @@ export default function AdminAuthGate({ children }) {
       const res = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       if (res.error) throw res.error;
       const user = res.data?.user;
-      if (user?.email === 'yashuhb18@gmail.com') {
+      if (user?.email === 'yashuhb18@gmail.com' || user?.email === 'haxlr8ecemitm@gmail.com') {
         sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
         localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
         setIsAuthenticated(true);

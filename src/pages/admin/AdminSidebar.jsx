@@ -13,12 +13,12 @@ const S = {
 };
 
 const navItems = [
-  { icon: Home, label: 'Dashboard', subPath: '' },
-  { icon: Users, label: 'Users & Leads', subPath: '/users' },
+  { icon: Home, label: 'Command Deck', subPath: '' },
   { icon: Flag, label: 'Squads & Teams', subPath: '/teams' },
-  { icon: FileText, label: 'Submissions', subPath: '/submissions' },
-  { icon: CheckSquare, label: 'Evaluations', subPath: '/evaluations' },
-  { icon: FileText, label: 'Jury Export (XLSX)', subPath: '/jury' },
+  { icon: Users, label: 'Participants', subPath: '/users' },
+  { icon: FileText, label: 'Squad Payments', subPath: '/submissions' },
+  { icon: CheckSquare, label: 'Finale Check-in', subPath: '/evaluations' },
+  { icon: FileText, label: 'Master Export', subPath: '/jury' },
   { icon: TrendingUp, label: 'Analytics', subPath: '/analytics' },
   { icon: Bell, label: 'Announcements', subPath: '/announcements' },
 ];

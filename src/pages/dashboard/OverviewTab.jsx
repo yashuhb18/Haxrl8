@@ -48,24 +48,27 @@ const CheckItem = ({ label, status }) => {
 };
 
 export default function OverviewTab({ hasTeam, teamData, teamMembers, submissions, user, setActiveTab, announcements = [] }) {
-  const [totalTeams, setTotalTeams] = useState(245);
+  const [totalTeams, setTotalTeams] = useState(0);
   const [showRulebook, setShowRulebook] = useState(false);
   const [showNotification, setShowNotification] = useState(true);
 
   useEffect(() => {
     const fetchTeamCount = async () => {
-      const cachedCount = localStorage.getItem('total_teams_count');
-      const cacheTime = localStorage.getItem('total_teams_time');
-      
-      if (cachedCount && cacheTime && (Date.now() - cacheTime < 300000)) {
-        setTotalTeams(Number(cachedCount));
-      } else {
-        const { count } = await supabase.from('teams').select('id', { count: 'exact', head: true });
-        if (count !== null) {
-          localStorage.setItem('total_teams_count', count);
-          localStorage.setItem('total_teams_time', Date.now());
+      try {
+        localStorage.removeItem('total_teams_count');
+        localStorage.removeItem('total_teams_time');
+        const { count, error } = await supabase.from('teams').select('id', { count: 'exact' });
+        if (!error && typeof count === 'number') {
           setTotalTeams(count);
+        } else {
+          // If query returns data array
+          const { data } = await supabase.from('teams').select('id');
+          if (data && Array.isArray(data)) {
+            setTotalTeams(data.length);
+          }
         }
+      } catch (e) {
+        console.warn('Error fetching live teams count:', e);
       }
     };
     fetchTeamCount();

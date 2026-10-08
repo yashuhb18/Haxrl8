@@ -318,58 +318,82 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
 
       if (isEditingTeam) {
         try {
-          const { error: teamErr } = await supabase.from('teams').update({
-            team_name: cleanTeamName,
-            domain: cleanDomain
+          await supabase.from('teams').update({
+            team_name: cleanTeamName
           }).eq('id', currentTeamId);
-          if (teamErr) throw teamErr;
         } catch (e) {
-          try {
-            await supabase.from('teams').update({
-              team_name: cleanTeamName
-            }).eq('id', currentTeamId);
-          } catch (e2) {}
+          console.warn('Teams update notice:', e);
         }
+
+        // Persist domain track into submissions table
+        try {
+          const { data: existingSub } = await supabase.from('submissions').select('id').eq('team_id', currentTeamId).maybeSingle();
+          if (existingSub?.id) {
+            await supabase.from('submissions').update({
+              project_title: `${cleanTeamName} - ${cleanDomain}`,
+              category: cleanDomain,
+              sdg_goal: cleanDomain,
+              status: 'Registered'
+            }).eq('id', existingSub.id);
+          } else {
+            await supabase.from('submissions').insert({
+              team_id: currentTeamId,
+              project_title: `${cleanTeamName} - ${cleanDomain}`,
+              category: cleanDomain,
+              sdg_goal: cleanDomain,
+              status: 'Registered'
+            });
+          }
+        } catch (subErr) {
+          console.warn('Submissions domain track notice:', subErr);
+        }
+
         finalTeamData = { ...teamData, team_name: cleanTeamName, domain: cleanDomain };
+        localStorage.setItem(`haxlr8_team_${user?.id}`, JSON.stringify(finalTeamData));
       } else {
         let team = null;
         currentTeamId = ensureUUID(currentTeamId || teamData?.id);
         const validLeaderId = ensureUUID(user?.id);
+        
         try {
           const { data: createdTeam, error: teamErr } = await supabase.from('teams').insert({
             id: currentTeamId,
             leader_id: validLeaderId,
-            team_name: cleanTeamName,
-            domain: cleanDomain
+            team_name: cleanTeamName
           }).select().single();
-          if (teamErr) throw teamErr;
-          team = createdTeam;
-          localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(team));
-          localStorage.removeItem('haxlr8_teams_db');
-        } catch (tErr) {
-          console.warn('Supabase teams insert notice, attempting fallback:', tErr);
-          try {
-            const { data: retryTeam, error: retryErr } = await supabase.from('teams').insert({
-              id: currentTeamId,
-              leader_id: validLeaderId,
-              team_name: cleanTeamName
-            }).select().single();
-            if (!retryErr && retryTeam) {
-              team = { ...retryTeam, domain: cleanDomain };
-            }
-          } catch (e2) {}
-          if (!team) {
-            team = {
-              id: currentTeamId,
-              leader_id: validLeaderId,
-              team_name: cleanTeamName,
-              domain: cleanDomain,
-              created_at: new Date().toISOString()
-            };
+          
+          if (!teamErr && createdTeam) {
+            team = { ...createdTeam, domain: cleanDomain };
           }
-          localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(team));
-          localStorage.removeItem('haxlr8_teams_db');
+        } catch (tErr) {
+          console.warn('Supabase teams insert notice:', tErr);
         }
+
+        if (!team) {
+          team = {
+            id: currentTeamId,
+            leader_id: validLeaderId,
+            team_name: cleanTeamName,
+            domain: cleanDomain,
+            created_at: new Date().toISOString()
+          };
+        }
+
+        // Persist domain track into submissions table
+        try {
+          await supabase.from('submissions').insert({
+            team_id: currentTeamId,
+            project_title: `${cleanTeamName} - ${cleanDomain}`,
+            category: cleanDomain,
+            sdg_goal: cleanDomain,
+            status: 'Registered'
+          });
+        } catch (subErr) {
+          console.warn('Submissions track insert notice:', subErr);
+        }
+
+        localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(team));
+        localStorage.removeItem('haxlr8_teams_db');
         currentTeamId = team.id;
         finalTeamData = { ...team, domain: cleanDomain };
       }

@@ -242,11 +242,11 @@ export default function AdminAnalytics() {
 
         {/* KPI Cards */}
         <div style={{ display: 'flex', gap: S.gap, flexWrap: 'wrap' }}>
-          <KPICard icon={Users} label="Total Registrations" value={counts.members.toLocaleString()} sub="Team Members" color="#6C4EFF" bg="#EEE8FF" />
-          <KPICard icon={Flag} label="Total Teams" value={counts.teams.toLocaleString()} sub="Registered Teams" color="#0891B2" bg="#CFFAFE" />
-          <KPICard icon={FileText} label="Total Submissions" value={counts.subs.toLocaleString()} sub="Projects Submitted" color="#059669" bg="#D1FAE5" />
-          <KPICard icon={TrendingUp} label="Submission Rate" value={subRate + '%'} sub="Submissions / Teams" color="#D97706" bg="#FEF3C7" />
-          <KPICard icon={Users} label="Avg Team Size" value={avgTeamSize} sub={`${counts.members} members / ${counts.teams} teams`} color="#7C3AED" bg="#EDE9FE" />
+          <KPICard icon={Users} label="Total Participants" value={counts.members.toLocaleString()} sub="Registered Crew" color="#6C4EFF" bg="#EEE8FF" />
+          <KPICard icon={Flag} label="Total Squads" value={counts.teams.toLocaleString()} sub="3–4 Member Teams" color="#0891B2" bg="#CFFAFE" />
+          <KPICard icon={FileText} label="Fee Collected Est." value={`₹${(counts.teams * 1200).toLocaleString('en-IN')}`} sub="₹1,200 per squad" color="#059669" bg="#D1FAE5" />
+          <KPICard icon={TrendingUp} label="Direct Finale Pass" value={`${counts.teams} Squads`} sub="100% advance to MIT Mysore" color="#D97706" bg="#FEF3C7" />
+          <KPICard icon={Users} label="Avg Squad Size" value={avgTeamSize} sub={`${counts.members} crew / ${counts.teams} squads`} color="#7C3AED" bg="#EDE9FE" />
         </div>
 
         {/* Section A */}
@@ -354,12 +354,12 @@ export default function AdminAnalytics() {
           </div>
         </div>
 
-        {/* Section C */}
+        {/* Section B: Domains */}
         <div>
-          <SectionTitle title="C. Submission Insights" sub="SDG targeting, status and daily trends" />
+          <SectionTitle title="B. Squad Domain Distribution" sub="Domain tracks chosen by squads across India" />
 
-          {/* SDG Chart */}
-          <ChartCard title="Submissions by UN SDG Goal">
+          {/* Domain Chart */}
+          <ChartCard title="Squads by Domain Track">
             {sdgData.length > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={sdgData} margin={{ left: 0, right: 20 }}>
@@ -369,15 +369,15 @@ export default function AdminAnalytics() {
                   <Tooltip content={({ active, payload }) => active && payload?.length ? (
                     <div style={{ background: '#1F2937', color: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12 }}>
                       <div style={{ color: '#9CA3AF', marginBottom: 2 }}>{payload[0]?.payload?.label}</div>
-                      <div>Submissions: <strong>{payload[0]?.value}</strong></div>
+                      <div>Squads: <strong>{payload[0]?.value}</strong></div>
                     </div>
                   ) : null} />
-                  <Bar dataKey="count" name="Submissions" radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="count" name="Squads" radius={[4, 4, 0, 0]}>
                     {sdgData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            ) : <div style={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', color: S.t3 }}>No SDG data. Ensure submissions have `sdg_goal` field (e.g., "SDG 13 - Climate Action").</div>}
+            ) : <div style={{ height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', color: S.t3 }}>No domain distribution data recorded yet.</div>}
           </ChartCard>
 
           <div style={{ display: 'flex', gap: S.gap, flexWrap: 'wrap', marginTop: S.gap }}>

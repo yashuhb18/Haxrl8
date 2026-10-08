@@ -29,20 +29,16 @@ export default function AdminDashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchData = useCallback(async () => {
-    try {
-      await syncLocalDataToSupabase();
-    } catch (syncErr) {
-      console.warn('Sync error:', syncErr);
-    }
-
-    // 1. Fetch exact counts (instant, no data download)
-    const [cT, cM, cS, cE] = await Promise.all([
+    // 1. Fetch exact counts (instant, reliable)
+    const [cT, cM, cS] = await Promise.all([
       supabase.from('teams').select('*', { count: 'exact', head: true }),
       supabase.from('team_members').select('*', { count: 'exact', head: true }),
       supabase.from('submissions').select('*', { count: 'exact', head: true }),
-      supabase.from('teams').select('*', { count: 'exact', head: true }).gt('score', 0)
     ]);
-    setExactCounts({ teams: cT.count || 0, members: cM.count || 0, subs: cS.count || 0, evals: cE.count || 0 });
+    const teamCount = cT.count || 0;
+    const memberCount = cM.count || 0;
+    const subCount = cS.count || 0;
+    setExactCounts({ teams: teamCount, members: memberCount, subs: subCount, evals: teamCount });
 
     // 2. Fetch data for charts & tables
     const [{ data: t }, { data: m }, { data: s }] = await Promise.all([
@@ -99,10 +95,10 @@ export default function AdminDashboard() {
   }, []);
 
   const statCards = [
-    { title: 'Total Teams', value: exactCounts.teams, trend: getTrend(teams), color: '#6C4EFF', bg: '#EEE8FF' },
+    { title: 'Registered Squads', value: exactCounts.teams, trend: getTrend(teams), color: '#6C4EFF', bg: '#EEE8FF' },
     { title: 'Total Participants', value: exactCounts.members, trend: getTrend(members), color: '#059669', bg: '#D1FAE5' },
-    { title: 'Submissions', value: exactCounts.subs, trend: getTrend(submissions), color: '#D97706', bg: '#FEF3C7' },
-    { title: 'Evaluations', value: exactCounts.evals, trend: getTrend(teams.filter(t => t.score > 0)), color: '#2563EB', bg: '#DBEAFE' },
+    { title: 'Squad Fee Est. (₹1,200/squad)', value: `₹${(exactCounts.teams * 1200).toLocaleString('en-IN')}`, trend: getTrend(teams), color: '#EA580C', bg: '#FFEDD5' },
+    { title: 'Direct Finale Passes', value: `${exactCounts.teams} Squads`, trend: 100, color: '#0284C7', bg: '#E0F2FE' },
   ];
 
   const chartsData = useMemo(() => {
@@ -271,11 +267,11 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Submissions Chart */}
+              {/* Track Distribution & Registration Overview */}
               <div style={{ background:S.card, border:'1px solid '+S.border, borderRadius:S.radius, padding:S.pad, boxShadow:'0 1px 3px rgba(0,0,0,.04)', display:'flex', flexDirection:'column' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-                  <h3 style={{ fontSize:15, fontWeight:700, margin:0 }}>Submissions Graph</h3>
-                  <div style={{ fontSize:12, fontWeight:500, color:S.t2, background:'#F1F5F9', padding:'5px 10px', borderRadius:8, border:'1px solid '+S.border, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>This Week</div>
+                  <h3 style={{ fontSize:15, fontWeight:700, margin:0 }}>Squad Registrations &amp; Domains</h3>
+                  <div style={{ fontSize:12, fontWeight:500, color:S.t2, background:'#F1F5F9', padding:'5px 10px', borderRadius:8, border:'1px solid '+S.border, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>Live Activity</div>
                 </div>
                 <div style={{ flex:1, position:'relative', minHeight:180 }}>
                   <div style={{ position:'absolute', left:0, top:0, bottom:32, display:'flex', flexDirection:'column', justifyContent:'space-between', fontSize:10, fontWeight:500, color:S.t3, width:24 }}>
@@ -286,7 +282,7 @@ export default function AdminDashboard() {
                     <path d={chartsData.submission.fillString} fill="url(#cgSub)"/>
                     <path d={chartsData.submission.pathString} fill="none" stroke="#059669" strokeWidth="2.5"/>
                     {chartsData.submission.points.map(([x,y],i) => (
-                      <circle key={i} cx={x} cy={y} r="6" fill="#059669" style={{cursor: 'pointer'}}><title>{chartsData.submission.counts[i]} Submissions on this day</title></circle>
+                      <circle key={i} cx={x} cy={y} r="6" fill="#059669" style={{cursor: 'pointer'}}><title>{chartsData.submission.counts[i]} Squads Registered</title></circle>
                     ))}
                   </svg>
                   <div style={{ position:'absolute', bottom:0, left:30, right:0, display:'flex', justifyContent:'space-between', fontSize:11, fontWeight:500, color:S.t3 }}>
@@ -295,17 +291,17 @@ export default function AdminDashboard() {
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(110px, 1fr))', gap:10, marginTop:16 }}>
                   {[
-                    { dot:'#3b82f6', label:'Submitted', val: exactCounts.subs },
-                    { dot:'#eab308', label:'Pending', val: teams.filter(t => t.status === 'Pending').length },
-                    { dot:'#8b5cf6', label:'Shortlisted', val: teams.filter(t => t.status === 'Shortlisted').length },
-                    { dot:'#ef4444', label:'Rejected', val: teams.filter(t => t.status === 'Rejected').length },
+                    { dot:'#059669', label:'Registered', val: exactCounts.teams },
+                    { dot:'#2563EB', label:'Direct Finale', val: exactCounts.teams },
+                    { dot:'#d97706', label:'Fee / Squad', val: '₹1,200' },
+                    { dot:'#7c3aed', label:'Squad Size', val: '3–4' },
                   ].map((s,i) => (
                     <div key={i} style={{ background:'#FAFAFA', border:'1px solid #F1F5F9', borderRadius:10, padding:'10px 12px' }}>
                       <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:4 }}>
                         <div style={{ width:8, height:8, borderRadius:'50%', background:s.dot }}/>
                         <span style={{ fontSize:11, fontWeight:600, color:S.t2, whiteSpace:'nowrap' }}>{s.label}</span>
                       </div>
-                      <div style={{ fontSize:20, fontWeight:800, color:S.t1 }}>{s.val}</div>
+                      <div style={{ fontSize:18, fontWeight:800, color:S.t1 }}>{s.val}</div>
                     </div>
                   ))}
                 </div>
@@ -314,24 +310,24 @@ export default function AdminDashboard() {
 
             {/* BOTTOM ROW */}
             <div className="admin-bottom-grid" style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:S.gap }}>
-              {/* Recent Submissions */}
+              {/* Recent Squads */}
               <div style={{ background:S.card, border:'1px solid '+S.border, borderRadius:S.radius, boxShadow:'0 1px 3px rgba(0,0,0,.04)', overflow:'hidden' }}>
                 <div style={{ padding:'18px 22px', borderBottom:'1px solid #F1F5F9', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                  <h3 style={{ fontSize:15, fontWeight:700, margin:0 }}>Recently Created Team</h3>
+                  <h3 style={{ fontSize:15, fontWeight:700, margin:0 }}>Recent Squad Registrations</h3>
                 </div>
                 <div style={{ width:'100%', overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
                   <table style={{ width:'100%', minWidth:540, borderCollapse:'collapse', fontSize:12 }}>
                     <thead>
                       <tr style={{ background:'#FAFAFA', borderBottom:'1px solid #F1F5F9' }}>
-                        {['Team Name','Track','Submission Title','Submitted On','Status'].map(h => (
-                          <th key={h} style={{ padding:'12px 18px', fontWeight:600, color:S.t2, textAlign: h==='Action' ? 'center' : 'left' }}>{h}</th>
+                        {['Squad Name','Domain Track','Crew Size','Registered On','Status'].map(h => (
+                          <th key={h} style={{ padding:'12px 18px', fontWeight:600, color:S.t2, textAlign: 'left' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {teams.slice(0,5).map(team => {
+                      {teams.slice(0,6).map(team => {
                         const sub = submissions.find(s => s.team_id === team.id);
-                        const st = statusStyle(team.status);
+                        const teamMems = members.filter(m => m.team_id === team.id);
                         return (
                           <tr key={team.id} style={{ borderBottom:'1px solid #F8FAFC' }}>
                             <td style={{ padding:'14px 18px' }}>
@@ -341,11 +337,11 @@ export default function AdminDashboard() {
                               </div>
                             </td>
                             <td style={{ padding:'14px 18px', color:S.t2 }}>{sub?.category || 'General'}</td>
-                            <td style={{ padding:'14px 18px', color:S.t2, maxWidth:140, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub?.project_title || '-'}</td>
+                            <td style={{ padding:'14px 18px', color:S.t2, fontWeight:700 }}>{teamMems.length ? `${teamMems.length} Members` : '1 Member'}</td>
                             <td style={{ padding:'14px 18px', color:S.t3 }}>{team.created_at ? new Date(team.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-'}</td>
                             <td style={{ padding:'14px 18px' }}>
-                              <span style={{ ...st, padding:'4px 10px', borderRadius:6, fontSize:10, fontWeight:700, display:'inline-block' }}>
-                                {team.status === 'Pending' ? 'Under Review' : team.status || 'Submitted'}
+                              <span style={{ padding:'4px 10px', borderRadius:6, fontSize:10, fontWeight:700, display:'inline-block', color:'#059669', background:'#D1FAE5' }}>
+                                Finale Ready
                               </span>
                             </td>
                           </tr>
@@ -355,8 +351,8 @@ export default function AdminDashboard() {
                   </table>
                 </div>
                 <div style={{ padding:'14px 22px', borderTop:'1px solid #F1F5F9', textAlign:'center' }}>
-                  <button onClick={() => navigate(`${basePath}/submissions`)} style={{ background:'none', border:'none', fontSize:12, fontWeight:700, color:S.primary, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4 }}>
-                    View all submissions <ChevronRight size={14}/>
+                  <button onClick={() => navigate(`${basePath}/teams`)} style={{ background:'none', border:'none', fontSize:12, fontWeight:700, color:S.primary, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4 }}>
+                    View all squads &amp; teams <ChevronRight size={14}/>
                   </button>
                 </div>
               </div>
@@ -366,9 +362,9 @@ export default function AdminDashboard() {
                 <h3 style={{ fontSize:15, fontWeight:700, margin:'0 0 16px' }}>Quick Actions</h3>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
                   {[
-                    { Icon: Users, label:'Users', color:'#2563EB', bg:'#DBEAFE', onClick: () => navigate(`${basePath}/users`) },
-                    { Icon: Flag, label:'Teams', color:'#059669', bg:'#D1FAE5', onClick: () => navigate(`${basePath}/teams`) },
-                    { Icon: CheckSquare, label:'Evaluations', color:'#D97706', bg:'#FEF3C7', onClick: () => navigate(`${basePath}/evaluations`) },
+                    { Icon: Flag, label:'Squads', color:'#059669', bg:'#D1FAE5', onClick: () => navigate(`${basePath}/teams`) },
+                    { Icon: Users, label:'Participants', color:'#2563EB', bg:'#DBEAFE', onClick: () => navigate(`${basePath}/users`) },
+                    { Icon: FileText, label:'Payments', color:'#D97706', bg:'#FEF3C7', onClick: () => navigate(`${basePath}/submissions`) },
                     { Icon: Megaphone, label:'Announcements', color:'#6C4EFF', bg:'#EEE8FF', onClick: () => navigate(`${basePath}/announcements`) }
                   ].map((a, i) => (
                     <button key={i} onClick={a.onClick} style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:8, padding:'18px 12px', borderRadius:12, border:'1px solid #F1F5F9', background:S.card, cursor:'pointer', boxShadow:'0 1px 2px rgba(0,0,0,.04)', transition:'box-shadow .15s' }}

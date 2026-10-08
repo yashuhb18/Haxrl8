@@ -267,7 +267,7 @@ export default function ResourcesTab({ hasTeam, submissions }) {
               <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 14, maxHeight: '70vh', overflowY: 'auto', fontSize: 14, color: '#475569', lineHeight: 1.6 }}>
                 <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 16, padding: '16px' }}>
                   <h4 style={{ color: '#166534', fontWeight: 900, margin: '0 0 6px' }}>👑 Team Leader (Squad Commander)</h4>
-                  <p style={{ margin: 0, color: '#15803d' }}>Only the designated Team Leader creates an account. The leader registers 3–4 members, uploads the idea abstract, and receives official announcements.</p>
+                  <p style={{ margin: 0, color: '#15803d' }}>Only the designated Team Leader creates an account. The leader selects the domain track, registers 3–4 squad members, completes the ₹1,200 team payment, and receives official passes &amp; announcements.</p>
                 </div>
 
                 <div style={{ background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 16, padding: '16px' }}>

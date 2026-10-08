@@ -222,7 +222,7 @@ export default function AuthPage() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '24px 16px',
-        fontFamily: "'Fredoka', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
         position: 'relative',
         overflowX: 'hidden',
         boxSizing: 'border-box',
@@ -985,6 +985,21 @@ export default function AuthPage() {
       {/* ── RESPONSIVE STYLES ── */}
       <style>{`
         * { box-sizing: border-box; }
+        
+        .auth-page-root, 
+        .auth-page-root input, 
+        .auth-page-root button, 
+        .auth-page-root label, 
+        .auth-page-root p, 
+        .auth-page-root h1, 
+        .auth-page-root h2, 
+        .auth-page-root h3,
+        .auth-page-root span {
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
         input::placeholder { color: #94a3b8; }
         
         .auth-input-wrapper:focus-within {
@@ -1014,6 +1029,9 @@ export default function AuthPage() {
           }
           .auth-top-nav {
             margin-bottom: 12px !important;
+          }
+          .auth-input-wrapper input {
+            font-size: 16px !important;
           }
         }
 

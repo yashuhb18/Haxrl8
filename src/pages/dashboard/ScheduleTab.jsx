@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Calendar, Clock, UserCheck, Sparkles, Radio } from 'lucide-react';
 
 const EVENTS = [
-  { date: 'Oct 09',    event: 'Registration Opens',               status: 'done',     desc: 'Team registration opens for undergraduate students across India.', time: '12:00 AM IST' },
-  { date: 'Oct 28',    event: 'Registration & Idea Paper Closes', status: 'active',   desc: 'Final deadline to register teams and submit idea presentation abstract.', time: '11:59 PM IST' },
-  { date: 'Nov 02',    event: 'Shortlist Announced',             status: 'upcoming', desc: 'Top shortlisted teams announced for offline finale at MIT Mysore.', time: '12:00 PM IST' },
-  { date: 'Nov 06–07', event: 'Grand Finale & Awards',           status: 'upcoming', desc: '24-hour hackathon finale at Maharaja Institute of Technology Mysore.', time: '09:00 AM IST' },
+  { date: 'Oct 09',    event: 'Registration Opens',               status: 'active',   desc: 'Squad registration opens for undergraduate students across India.', time: '06:00 PM IST' },
+  { date: 'Oct 28',    event: 'Squad Registration & Payment Closes', status: 'upcoming', desc: 'Final deadline to lock 3–4 crew members & verify ₹1,200 squad registration fee.', time: '11:59 PM IST' },
+  { date: 'Nov 02',    event: 'Flight Passes & Venue Briefing',   status: 'upcoming', desc: 'Official checkpoint passes & offline hackathon briefing released to all squads.', time: '12:00 PM IST' },
+  { date: 'Nov 06–07', event: 'Grand Finale & 24H Hackathon',      status: 'upcoming', desc: '24-hour offline hackathon and live showcase at Maharaja Institute of Technology Mysore.', time: '09:00 AM IST' },
 ];
 
 const MENTORS = [
