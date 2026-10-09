@@ -5,6 +5,49 @@
  */
 
 export const HAXLR8_HOST_EMAIL = 'haxlr8ecemitm@gmail.com';
+export const HAXLR8_BANNER_URL = 'https://raw.githubusercontent.com/yashuhb18/Haxrl8/main/public/haxlr8-email-banner.png';
+export const HAXLR8_PORTAL_URL = 'https://haxlr8.vercel.app';
+
+/**
+ * Common Header with official HAXLR8 3.0 Space Banner
+ */
+function renderEmailHeader(subtag = '🚀 National Level 24-Hour Hackathon • MIT Mysore • Nov 06–07, 2026') {
+  return `
+    <div style="background-color: #030712; text-align: center; border-radius: 16px 16px 0 0; overflow: hidden; line-height: 0;">
+      <a href="${HAXLR8_PORTAL_URL}" target="_blank" style="display: block; text-decoration: none;">
+        <img src="${HAXLR8_BANNER_URL}" alt="HAXLR8 3.0 - National Level 24-Hour Hackathon" width="600" style="width: 100%; max-width: 600px; height: auto; display: block; margin: 0 auto; border: 0;" />
+      </a>
+    </div>
+    <div style="background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); padding: 11px 20px; text-align: center; border-bottom: 2px solid #ff3b69;">
+      <span style="color: #fda4af; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">
+        ${subtag}
+      </span>
+    </div>
+  `;
+}
+
+/**
+ * Common Footer for Maharaja Institute of Technology Mysore
+ */
+function renderEmailFooter() {
+  return `
+    <div style="background-color: #0f172a; border-top: 1px solid #1e293b; padding: 26px 30px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; color: #94a3b8; line-height: 1.6;">
+      <div style="color: #ffffff; font-weight: 800; font-size: 13px; margin-bottom: 4px; letter-spacing: 0.02em;">
+        HAXLR8 3.0 Space Flight Command
+      </div>
+      <div style="color: #cbd5e1; font-weight: 600; font-size: 12px; margin-bottom: 8px;">
+        Department of Electronics &amp; Communication Engineering<br>
+        Maharaja Institute of Technology Mysore, Belagola, Srirangapatna Taluk, Mandya - 571438
+      </div>
+      <div style="margin-top: 10px; font-size: 11px; color: #64748b;">
+        Official Mailbox: <a href="mailto:${HAXLR8_HOST_EMAIL}" style="color: #ff3b69; text-decoration: none; font-weight: 700;">${HAXLR8_HOST_EMAIL}</a> • Portal: <a href="${HAXLR8_PORTAL_URL}" style="color: #38bdf8; text-decoration: none; font-weight: 700;">${HAXLR8_PORTAL_URL}</a>
+      </div>
+      <div style="margin-top: 10px; font-size: 10.5px; color: #475569;">
+        This automated transmission was dispatched to confirm your hackathon status. No reply needed.
+      </div>
+    </div>
+  `;
+}
 
 /**
  * Generate rich, warm-themed HTML welcome email for newly registered squad leaders & crewmates
@@ -15,83 +58,86 @@ export function generateWelcomeEmailHtml({ leaderName, teamName, teamId, crewCou
 <html>
 <head>
   <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fffaf3; margin: 0; padding: 20px; color: #0f172a; }
-    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; border: 2px solid #fed7aa; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-    .header { background: linear-gradient(135deg, #ff3b69 0%, #ea580c 100%); padding: 36px 30px; text-align: center; color: #ffffff; }
-    .header h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
-    .header p { margin: 6px 0 0; font-size: 14px; opacity: 0.95; font-weight: 600; }
-    .content { padding: 32px 30px; line-height: 1.6; }
-    .highlight-card { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 18px 20px; margin: 24px 0; }
-    .field-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-    .field-label { color: #ea580c; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
-    .field-val { font-weight: 800; color: #0f172a; }
-    .cta-btn { display: inline-block; background: #ff3b69; color: #ffffff !important; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; margin-top: 20px; text-align: center; }
-    .timeline-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin: 20px 0; font-size: 13px; color: #475569; }
-    .footer { background: #fdf4e7; border-top: 1.5px solid #fed7aa; padding: 20px 30px; text-align: center; font-size: 12px; color: #64748b; line-height: 1.5; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to HAXLR8 3.0</title>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div style="font-size: 40px; margin-bottom: 8px;">🚀</div>
-      <h1>HAXLR8 3.0 Space Command</h1>
-      <p>National Level 24-Hour Hackathon • MIT Mysore</p>
-    </div>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 24px 10px; color: #0f172a;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid #1e293b;">
+    ${renderEmailHeader('🚀 FLIGHT MANIFEST CONFIRMED • MIT MYSORE • NOV 06–07')}
 
-    <div class="content">
-      <h2 style="font-size: 20px; color: #0f172a; margin-top: 0;">Welcome Aboard, Commander ${leaderName || 'Participant'}!</h2>
-      <p>
-        Your registration for <strong>HAXLR8 3.0</strong> has been officially confirmed by the Department of Electronics &amp; Communication Engineering at Maharaja Institute of Technology, Mysore.
+    <div style="padding: 32px 30px; line-height: 1.6;">
+      <div style="display: inline-block; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;">
+        <span style="color: #059669; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">● Squad Clearance Confirmed</span>
+      </div>
+
+      <h2 style="font-size: 22px; color: #0f172a; margin: 0 0 10px; font-weight: 800;">
+        Welcome Aboard, Commander ${leaderName || 'Squad Captain'}!
+      </h2>
+      <p style="margin: 0 0 20px; color: #334155; font-size: 14.5px;">
+        Your squad registration for <strong>HAXLR8 3.0</strong> is officially confirmed! You and your crew have secured entry into the 24-hour offline hackathon grand finale at <strong>Maharaja Institute of Technology, Mysore</strong>.
       </p>
 
-      <div class="highlight-card">
-        <div style="font-size: 12px; font-weight: 900; color: #ea580c; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">
-          ⭐ Confirmed Flight Manifest
+      <!-- Manifest Summary Card -->
+      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;">
+          ⭐ OFFICIAL SQUAD MANIFEST
         </div>
-        <div class="field-row">
-          <span class="field-label">Squad Name:</span>
-          <span class="field-val">${teamName || 'Confirmed Squad'}</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Commander:</span>
-          <span class="field-val">${leaderName || 'Squad Leader'}</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Squad Strength:</span>
-          <span class="field-val">${crewCount || '3-4'} Members</span>
-        </div>
-        <div class="field-row" style="margin-bottom: 0;">
-          <span class="field-label">Flight Registry ID:</span>
-          <span class="field-val" style="font-family: monospace;">${teamId || 'HAXLR8-2026'}</span>
-        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Squad Name</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${teamName || 'Confirmed Squad'}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Commander / Lead</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${leaderName || 'Squad Leader'}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Squad Strength</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${crewCount || '3–4'} Members</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Flight Registry ID</td>
+            <td style="padding: 8px 0 0; color: #ff3b69; font-weight: 800; font-family: monospace; text-align: right;">${teamId ? teamId.substring(0, 16) + '...' : 'HAXLR8-2026'}</td>
+          </tr>
+        </table>
       </div>
 
-      <h3 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;">Immediate Flight Directives:</h3>
-      <ol style="padding-left: 20px; margin: 0 0 20px; font-size: 14px; color: #334155;">
-        <li style="margin-bottom: 6px;">Ensure all 3–4 crew members are registered in your squad roster.</li>
-        <li style="margin-bottom: 6px;">Complete the <strong>₹1,200 team registration fee</strong> and submit verification in the Payment tab.</li>
-        <li style="margin-bottom: 6px;">Claim and download your official <strong>Hackathon Flight Pass</strong> for entry on <strong>November 06–07, 2026</strong>.</li>
-      </ol>
+      <!-- Action Directives -->
+      <div style="margin: 22px 0;">
+        <div style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Immediate Mission Directives:</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #334155;">
+          <tr>
+            <td style="vertical-align: top; width: 24px; padding-bottom: 8px; color: #ff3b69; font-weight: 900;">1.</td>
+            <td style="padding-bottom: 8px;">Verify that all <strong>3 to 4 crewmates</strong> are listed in your dashboard roster.</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; width: 24px; padding-bottom: 8px; color: #ff3b69; font-weight: 900;">2.</td>
+            <td style="padding-bottom: 8px;">Complete the <strong>₹1,200 team registration fee</strong> in the Payment Tab to unlock your entry pass.</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; width: 24px; color: #ff3b69; font-weight: 900;">3.</td>
+            <td>Download and save your official <strong>Entry QR Flight Pass</strong> for registration on <strong>November 06, 2026</strong>.</td>
+          </tr>
+        </table>
+      </div>
 
-      <div class="timeline-box">
+      <!-- Milestones Box -->
+      <div style="background-color: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 14px 18px; margin: 20px 0; font-size: 12.5px; color: #7c2d12; line-height: 1.55;">
         <strong>🗓️ Mission Flight Milestones:</strong><br>
-        • Oct 09: Registrations Open<br>
-        • Oct 28: Squad Roster &amp; Payment Lock<br>
-        • Nov 02: Verification Clearance &amp; Logistics Briefing<br>
-        • Nov 06–07: 24-Hour Offline Finale at MIT Mysore Campus (₹30,000+ Bounty Pool)
+        • <strong>Oct 09:</strong> Squad Registrations Open<br>
+        • <strong>Oct 28:</strong> Roster &amp; Payment Lock<br>
+        • <strong>Nov 06–07:</strong> 24-Hour Offline Hackathon Grand Finale at MIT Mysore Campus (₹30,000+ Prize Bounty)
       </div>
 
-      <div style="text-align: center;">
-        <a href="https://haxlr8.vercel.app/dashboard" class="cta-btn">Access Flight Deck Dashboard →</a>
+      <!-- CTA Button -->
+      <div style="text-align: center; margin-top: 26px;">
+        <a href="${HAXLR8_PORTAL_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #ff3b69 0%, #ea580c 100%); color: #ffffff !important; padding: 14px 34px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; box-shadow: 0 4px 16px rgba(234, 88, 12, 0.35);">
+          Launch Flight Deck Dashboard →
+        </a>
       </div>
     </div>
 
-    <div class="footer">
-      Sent automatically by <strong>HAXLR8 3.0 Space Command</strong><br>
-      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a><br>
-      Maharaja Institute of Technology Mysore, Belagola, Srirangapatna Taluk, Mandya - 571438
-    </div>
+    ${renderEmailFooter()}
   </div>
 </body>
 </html>
@@ -107,57 +153,57 @@ export function generateSubmissionEmailHtml({ leaderName, teamName, trackName, p
 <html>
 <head>
   <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fffaf3; margin: 0; padding: 20px; color: #0f172a; }
-    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; border: 2px solid #fed7aa; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-    .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 36px 30px; text-align: center; color: #ffffff; }
-    .header h1 { margin: 0; font-size: 24px; font-weight: 900; }
-    .content { padding: 32px 30px; line-height: 1.6; }
-    .highlight-card { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 14px; padding: 18px 20px; margin: 24px 0; }
-    .field-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-    .field-label { color: #15803d; font-weight: 800; text-transform: uppercase; font-size: 11px; }
-    .field-val { font-weight: 800; color: #0f172a; }
-    .footer { background: #fdf4e7; border-top: 1.5px solid #fed7aa; padding: 20px 30px; text-align: center; font-size: 12px; color: #64748b; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abstract Submission Confirmed</title>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div style="font-size: 40px; margin-bottom: 8px;">✅</div>
-      <h1>Project Abstract Locked In!</h1>
-      <p style="margin: 6px 0 0; font-size: 14px; opacity: 0.95;">HAXLR8 3.0 Technical Evaluation Review</p>
-    </div>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 24px 10px; color: #0f172a;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid #1e293b;">
+    ${renderEmailHeader('✅ TECHNICAL ABSTRACT LOCKED IN • EVALUATION VAULT')}
 
-    <div class="content">
-      <h2 style="font-size: 20px; color: #0f172a; margin-top: 0;">Transmission Received, Commander ${leaderName || 'Leader'}!</h2>
-      <p>
-        Your project presentation deck and problem statement for squad <strong>${teamName || 'Your Squad'}</strong> have been successfully registered in the central evaluation vault.
-      </p>
-
-      <div class="highlight-card">
-        <div class="field-row">
-          <span class="field-label">Squad:</span>
-          <span class="field-val">${teamName || 'Registered Squad'}</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Track:</span>
-          <span class="field-val">${trackName || 'Open Innovation'}</span>
-        </div>
-        <div class="field-row" style="margin-bottom: 0;">
-          <span class="field-label">Project Title:</span>
-          <span class="field-val">${projectTitle || 'Submitted Proposal'}</span>
-        </div>
+    <div style="padding: 32px 30px; line-height: 1.6;">
+      <div style="display: inline-block; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;">
+        <span style="color: #059669; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">● Submission Verified</span>
       </div>
 
-      <p style="font-size: 14px; color: #475569;">
+      <h2 style="font-size: 22px; color: #0f172a; margin: 0 0 10px; font-weight: 800;">
+        Transmission Received, Commander ${leaderName || 'Leader'}!
+      </h2>
+      <p style="margin: 0 0 20px; color: #334155; font-size: 14.5px;">
+        Your project presentation deck and technical proposal for squad <strong>${teamName || 'Your Squad'}</strong> have been locked into the central evaluation vault.
+      </p>
+
+      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;">
+          📑 SUBMISSION DETAILS
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Squad Name</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${teamName || 'Registered Squad'}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Domain Track</td>
+            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${trackName || 'General Track'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Project Title</td>
+            <td style="padding: 8px 0 0; color: #0f172a; font-weight: 800; text-align: right;">${projectTitle || 'Submitted Proposal'}</td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="font-size: 13.5px; color: #475569;">
         Our technical evaluation panel will review all submissions following the deadline on <strong>October 28, 2026</strong>. Final shortlisted squads for the 24-hour offline hackathon will be announced on <strong>November 02, 2026</strong>.
       </p>
+
+      <div style="text-align: center; margin-top: 26px;">
+        <a href="${HAXLR8_PORTAL_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: #ffffff !important; padding: 14px 34px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3);">
+          View Submission in Dashboard →
+        </a>
+      </div>
     </div>
 
-    <div class="footer">
-      Sent automatically by <strong>HAXLR8 3.0 Space Command</strong><br>
-      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a>
-    </div>
+    ${renderEmailFooter()}
   </div>
 </body>
 </html>
@@ -293,57 +339,57 @@ export function generateLoginEmailHtml({ leaderName, recipientEmail }) {
 <html>
 <head>
   <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fffaf3; margin: 0; padding: 20px; color: #0f172a; }
-    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; border: 2px solid #fed7aa; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-    .header { background: linear-gradient(135deg, #a8262a 0%, #ea580c 100%); padding: 36px 30px; text-align: center; color: #ffffff; }
-    .header h1 { margin: 0; font-size: 24px; font-weight: 900; }
-    .content { padding: 32px 30px; line-height: 1.6; }
-    .card { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 18px 20px; margin: 20px 0; }
-    .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13.5px; }
-    .label { color: #ea580c; font-weight: 800; text-transform: uppercase; font-size: 11px; }
-    .val { font-weight: 700; color: #0f172a; }
-    .cta-btn { display: inline-block; background: #a8262a; color: #ffffff !important; padding: 13px 26px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; margin-top: 16px; }
-    .footer { background: #fdf4e7; border-top: 1.5px solid #fed7aa; padding: 20px 30px; text-align: center; font-size: 12px; color: #64748b; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flight Deck Login Notice</title>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div style="font-size: 36px; margin-bottom: 6px;">🚀</div>
-      <h1>HAXLR8 3.0 Space Command</h1>
-      <p style="margin: 4px 0 0; opacity: 0.95; font-size: 13.5px;">Flight Deck Authentication Notice</p>
-    </div>
-    <div class="content">
-      <h2 style="font-size: 19px; color: #0f172a; margin-top: 0;">Welcome Back, Commander ${leaderName || 'Participant'}!</h2>
-      <p style="font-size: 14px; color: #334155;">
-        You have successfully logged in to the <strong>HAXLR8 3.0 Candidate Dashboard</strong>.
-      </p>
-      <div class="card">
-        <div class="row">
-          <span class="label">Commander Account:</span>
-          <span class="val">${recipientEmail}</span>
-        </div>
-        <div class="row">
-          <span class="label">Access Timestamp:</span>
-          <span class="val">${timeStr} IST</span>
-        </div>
-        <div class="row" style="margin-bottom: 0;">
-          <span class="label">Event Venue:</span>
-          <span class="val">Maharaja Institute of Technology Mysore</span>
-        </div>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 24px 10px; color: #0f172a;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid #1e293b;">
+    ${renderEmailHeader('🔐 FLIGHT DECK AUTHENTICATION NOTICE • MIT MYSORE')}
+
+    <div style="padding: 32px 30px; line-height: 1.6;">
+      <div style="display: inline-block; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;">
+        <span style="color: #2563eb; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">● Security Clearance Verified</span>
       </div>
+
+      <h2 style="font-size: 22px; color: #0f172a; margin: 0 0 10px; font-weight: 800;">
+        Welcome Back, Commander ${leaderName || 'Participant'}!
+      </h2>
+      <p style="margin: 0 0 20px; color: #334155; font-size: 14.5px;">
+        You have successfully signed in to the <strong>HAXLR8 3.0 Space Flight Deck</strong>.
+      </p>
+
+      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;">
+          🛡️ SESSION TELEMETRY
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Account</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${recipientEmail}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Access Time</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${timeStr} IST</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Venue Checkpoint</td>
+            <td style="padding: 8px 0 0; color: #059669; font-weight: 800; text-align: right;">MIT Mysore Campus</td>
+          </tr>
+        </table>
+      </div>
+
       <p style="font-size: 13.5px; color: #475569;">
-        You can now manage your 3–4 crewmates, review guidelines, and prepare your project submission abstract before October 28, 2026.
+        Your flight command deck is active. You can manage your 3–4 crew roster, monitor payment verification, and review challenge track problem statements.
       </p>
-      <div style="text-align: center;">
-        <a href="https://haxlr8.vercel.app/dashboard" class="cta-btn">Access Candidate Flight Deck →</a>
+
+      <div style="text-align: center; margin-top: 26px;">
+        <a href="${HAXLR8_PORTAL_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff !important; padding: 14px 34px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; box-shadow: 0 4px 16px rgba(2, 132, 199, 0.3);">
+          Access Candidate Flight Deck →
+        </a>
       </div>
     </div>
-    <div class="footer">
-      Sent automatically by <strong>HAXLR8 3.0 Space Command</strong> • Dept of ECE, MIT Mysore<br>
-      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a>
-    </div>
+
+    ${renderEmailFooter()}
   </div>
 </body>
 </html>
@@ -359,75 +405,74 @@ export function generateAccountWelcomeEmailHtml({ leaderName, recipientEmail }) 
 <html>
 <head>
   <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fffaf3; margin: 0; padding: 20px; color: #0f172a; }
-    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; border: 2px solid #fed7aa; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-    .header { background: linear-gradient(135deg, #ff3b69 0%, #ea580c 100%); padding: 36px 30px; text-align: center; color: #ffffff; }
-    .header h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
-    .header p { margin: 6px 0 0; font-size: 14px; opacity: 0.95; font-weight: 600; }
-    .content { padding: 32px 30px; line-height: 1.6; }
-    .highlight-card { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 18px 20px; margin: 24px 0; }
-    .field-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-    .field-label { color: #ea580c; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
-    .field-val { font-weight: 800; color: #0f172a; }
-    .cta-btn { display: inline-block; background: #ff3b69; color: #ffffff !important; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; margin-top: 20px; text-align: center; }
-    .timeline-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin: 20px 0; font-size: 13px; color: #475569; }
-    .footer { background: #fdf4e7; border-top: 1.5px solid #fed7aa; padding: 20px 30px; text-align: center; font-size: 12px; color: #64748b; line-height: 1.5; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commander Account Activated</title>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div style="font-size: 40px; margin-bottom: 8px;">🚀</div>
-      <h1>HAXLR8 3.0 Space Command</h1>
-      <p>National Level 24-Hour Hackathon • MIT Mysore</p>
-    </div>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 24px 10px; color: #0f172a;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid #1e293b;">
+    ${renderEmailHeader('⭐ COMMANDER PROFILE ACTIVATED • HAXLR8 3.0')}
 
-    <div class="content">
-      <h2 style="font-size: 20px; color: #0f172a; margin-top: 0;">Welcome Aboard, Commander ${leaderName || 'Participant'}!</h2>
-      <p>
-        Your Commander Account for <strong>HAXLR8 3.0</strong> has been successfully created with the Department of Electronics &amp; Communication Engineering at Maharaja Institute of Technology Mysore.
+    <div style="padding: 32px 30px; line-height: 1.6;">
+      <div style="display: inline-block; background-color: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;">
+        <span style="color: #db2777; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">● Profile Initialized</span>
+      </div>
+
+      <h2 style="font-size: 22px; color: #0f172a; margin: 0 0 10px; font-weight: 800;">
+        Welcome to HAXLR8 3.0, Commander ${leaderName || 'Squad Captain'}!
+      </h2>
+      <p style="margin: 0 0 20px; color: #334155; font-size: 14.5px;">
+        Your Commander Account for <strong>HAXLR8 3.0</strong> is officially registered with the Department of Electronics &amp; Communication Engineering at <strong>Maharaja Institute of Technology Mysore</strong>.
       </p>
 
-      <div class="highlight-card">
-        <div style="font-size: 12px; font-weight: 900; color: #ea580c; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">
-          ⭐ Commander Profile Activated
+      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #db2777; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;">
+          🚀 FLIGHT CAPTAIN PROFILE
         </div>
-        <div class="field-row">
-          <span class="field-label">Account Leader:</span>
-          <span class="field-val">${leaderName || 'Squad Commander'}</span>
-        </div>
-        <div class="field-row" style="margin-bottom: 0;">
-          <span class="field-label">Commander Email:</span>
-          <span class="field-val">${recipientEmail}</span>
-        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Captain Name</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${leaderName || 'Squad Commander'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Commander Email</td>
+            <td style="padding: 8px 0 0; color: #0f172a; font-weight: 800; text-align: right;">${recipientEmail}</td>
+          </tr>
+        </table>
       </div>
 
-      <h3 style="font-size: 16px; color: #0f172a; margin-bottom: 8px;">Next Steps to Lock In Your Squad:</h3>
-      <ol style="padding-left: 20px; margin: 0 0 20px; font-size: 14px; color: #334155;">
-        <li style="margin-bottom: 6px;">Log in to your <strong>Candidate Flight Deck Dashboard</strong>.</li>
-        <li style="margin-bottom: 6px;">Select your challenge track (Agriculture, Healthcare, Smart City) and register your <strong>3 to 4 crewmates</strong>.</li>
-        <li style="margin-bottom: 6px;">Complete the team fee (<strong>₹1,200 per team</strong>) in the Payment tab to generate your official Flight Pass.</li>
-      </ol>
+      <div style="margin: 22px 0;">
+        <div style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Steps to Lock In Your Squad:</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #334155;">
+          <tr>
+            <td style="vertical-align: top; width: 24px; padding-bottom: 8px; color: #ff3b69; font-weight: 900;">1.</td>
+            <td style="padding-bottom: 8px;">Log in to your <strong>Candidate Flight Deck</strong>.</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; width: 24px; padding-bottom: 8px; color: #ff3b69; font-weight: 900;">2.</td>
+            <td style="padding-bottom: 8px;">Assemble your squad name and add your <strong>3 to 4 crewmates</strong>.</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; width: 24px; color: #ff3b69; font-weight: 900;">3.</td>
+            <td>Complete the team fee (<strong>₹1,200 per squad</strong>) in the Payment tab to unlock your Grand Finale Pass.</td>
+          </tr>
+        </table>
+      </div>
 
-      <div class="timeline-box">
+      <div style="background-color: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 14px 18px; margin: 20px 0; font-size: 12.5px; color: #7c2d12; line-height: 1.55;">
         <strong>🗓️ Mission Milestones:</strong><br>
-        • Oct 09: Registrations Open<br>
-        • Oct 28: Registration &amp; Payment Verification Lock<br>
-        • Nov 02: Pass Clearance &amp; Venue Logistics Briefing<br>
-        • Nov 06–07: 24-Hour Offline Finale at MIT Mysore Campus (₹30,000+ Bounty Pool)
+        • <strong>Oct 09:</strong> Registrations Open<br>
+        • <strong>Oct 28:</strong> Registration &amp; Payment Lock<br>
+        • <strong>Nov 06–07:</strong> 24-Hour Offline Grand Finale at MIT Mysore Campus (₹30,000+ Prize Bounty)
       </div>
 
-      <div style="text-align: center;">
-        <a href="https://haxlr8.vercel.app/dashboard" class="cta-btn">Open Candidate Flight Deck →</a>
+      <div style="text-align: center; margin-top: 26px;">
+        <a href="${HAXLR8_PORTAL_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #ff3b69 0%, #ea580c 100%); color: #ffffff !important; padding: 14px 34px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; box-shadow: 0 4px 16px rgba(234, 88, 12, 0.35);">
+          Assemble Your Squad Now →
+        </a>
       </div>
     </div>
 
-    <div class="footer">
-      Sent automatically by <strong>HAXLR8 3.0 Space Command</strong><br>
-      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a><br>
-      Maharaja Institute of Technology Mysore, Belagola, Srirangapatna Taluk, Mandya - 571438
-    </div>
+    ${renderEmailFooter()}
   </div>
 </body>
 </html>
@@ -558,63 +603,57 @@ export function generatePaymentEmailHtml({ leaderName, teamName, teamId, transac
 <html>
 <head>
   <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fffaf3; margin: 0; padding: 20px; color: #0f172a; }
-    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 20px; border: 2px solid #fed7aa; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-    .header { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 36px 30px; text-align: center; color: #ffffff; }
-    .header h1 { margin: 0; font-size: 24px; font-weight: 900; }
-    .content { padding: 32px 30px; line-height: 1.6; }
-    .highlight-card { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 14px; padding: 18px 20px; margin: 24px 0; }
-    .field-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
-    .field-label { color: #15803d; font-weight: 800; text-transform: uppercase; font-size: 11px; }
-    .field-val { font-weight: 800; color: #0f172a; }
-    .cta-btn { display: inline-block; background: #ea580c; color: #ffffff; font-weight: 800; text-decoration: none; padding: 14px 28px; border-radius: 12px; margin-top: 10px; }
-    .footer { background: #fdf4e7; border-top: 1.5px solid #fed7aa; padding: 20px 30px; text-align: center; font-size: 12px; color: #64748b; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Verified & Flight Pass Active</title>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div style="font-size: 40px; margin-bottom: 8px;">🎫</div>
-      <h1>Flight Pass Verification Logged!</h1>
-      <p style="margin: 6px 0 0; font-size: 14px; opacity: 0.95;">HAXLR8 3.0 · National 24-Hour Hackathon</p>
-    </div>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 24px 10px; color: #0f172a;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid #1e293b;">
+    ${renderEmailHeader('🎫 FLIGHT PASS UNLOCKED • ₹1,200 FEE VERIFIED')}
 
-    <div class="content">
-      <h2 style="font-size: 20px; color: #0f172a; margin-top: 0;">Payment Recorded, Captain ${leaderName || 'Leader'}!</h2>
-      <p>
-        Your ₹1,200 team registration fee submission for squad <strong>${teamName || 'Your Squad'}</strong> has been successfully received by Starship Flight Command.
-      </p>
-
-      <div class="highlight-card">
-        <div class="field-row">
-          <span class="field-label">Squad:</span>
-          <span class="field-val">${teamName || 'Registered Squad'}</span>
-        </div>
-        <div class="field-row">
-          <span class="field-label">Transaction UTR:</span>
-          <span class="field-val">${transactionId || 'SUBMITTED'}</span>
-        </div>
-        <div class="field-row" style="margin-bottom: 0;">
-          <span class="field-label">Amount:</span>
-          <span class="field-val">₹1,200 (Complete Team Fee)</span>
-        </div>
+    <div style="padding: 32px 30px; line-height: 1.6;">
+      <div style="display: inline-block; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;">
+        <span style="color: #059669; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">● Payment Verified &amp; Cleared</span>
       </div>
 
-      <p style="font-size: 14px; color: #475569;">
-        Your official <strong>Hackathon Flight Pass</strong> with verified entry QR code is now unlocked in your dashboard. You can print or download the pass to present at the MIT Mysore entrance checkpoint on <strong>November 6, 2026</strong>.
+      <h2 style="font-size: 22px; color: #0f172a; margin: 0 0 10px; font-weight: 800;">
+        Grand Finale Pass Unlocked, Captain ${leaderName || 'Leader'}!
+      </h2>
+      <p style="margin: 0 0 20px; color: #334155; font-size: 14.5px;">
+        Your squad registration fee of <strong>₹1,200</strong> for <strong>${teamName || 'Your Squad'}</strong> has been verified. Your squad has full clearance for the 24-hour offline hackathon grand finale!
       </p>
 
-      <div style="text-align: center;">
-        <a href="https://haxlr8.vercel.app/dashboard" class="cta-btn">View Official Flight Pass →</a>
+      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;">
+          💳 VERIFIED TRANSACTION RECEIPT
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Squad Name</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${teamName || 'Registered Squad'}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Transaction UTR</td>
+            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; font-family: monospace; text-align: right;">${transactionId || 'VERIFIED'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Amount Paid</td>
+            <td style="padding: 8px 0 0; color: #16a34a; font-weight: 800; text-align: right;">₹1,200 (Complete Squad Fee)</td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="font-size: 13.5px; color: #475569;">
+        Your official <strong>Hackathon Entry Pass</strong> with your squad QR badge is now generated and ready to download in your dashboard. Present this pass at the MIT Mysore registration desk on <strong>November 06, 2026</strong>.
+      </p>
+
+      <div style="text-align: center; margin-top: 26px;">
+        <a href="${HAXLR8_PORTAL_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: #ffffff !important; padding: 14px 34px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35);">
+          Download Official Entry Pass →
+        </a>
       </div>
     </div>
 
-    <div class="footer">
-      Sent automatically by <strong>HAXLR8 3.0 Space Command</strong><br>
-      Host Mailbox: <a href="mailto:haxlr8ecemitm@gmail.com" style="color: #ea580c; text-decoration: none; font-weight: 700;">haxlr8ecemitm@gmail.com</a><br>
-      Department of ECE · Maharaja Institute of Technology Mysore
-    </div>
+    ${renderEmailFooter()}
   </div>
 </body>
 </html>
