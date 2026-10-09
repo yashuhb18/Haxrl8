@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Terminal, ShieldCheck, Award, Sparkles, Phone } from 'lucide-react';
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
@@ -7,56 +7,29 @@ import sandeshImg from '../assets/humans/sandesh.jpg';
 import yashwanthImg from '../assets/humans/yashwanth.png';
 import emitersSeal from '../assets/logo/emiters-seal.png';
 import mitMysoreBanner from '../assets/logo/mit-mysore-banner.png';
-
-const studentOrganizers = [
-  {
-    name: 'Yashwanth H B',
-    role: 'Student Coordinator',
-    phone: '+91 80506 14849',
-    station: 'Chief Flight Engineer & Tech Lead',
-    org: 'HAXLR8 3.0 · MIT Mysore',
-    color: 'cyan',
-    hat: 'pilot',
-    photo: yashwanthImg,
-  },
-  {
-    name: 'Chethan Kumar B',
-    role: 'Student Coordinator',
-    phone: '+91 99455 07099',
-    station: 'Mission Operations Lead',
-    org: 'HAXLR8 3.0 · MIT Mysore',
-    color: 'yellow',
-    hat: 'pilot',
-    photo: null,
-  },
-];
-
-const staffCoordinators = [
-  {
-    name: 'Balakrishna K',
-    role: 'Faculty Coordinator',
-    designation: 'Associate Prof & HoD, Dept of ECE',
-    station: 'Flight Director // Mission Advisor',
-    org: 'Maharaja Institute of Technology Mysore',
-    phone: '+91 98864 78574',
-    color: 'lime',
-    hat: 'crown',
-    photo: balakrishnaImg,
-  },
-  {
-    name: 'Sandesh NG',
-    role: 'Faculty Coordinator',
-    designation: 'Assistant Professor, Dept of ECE',
-    station: 'Flight Director // Mission Advisor',
-    org: 'Maharaja Institute of Technology Mysore',
-    phone: '+91 94813 36585',
-    color: 'purple',
-    hat: 'crown',
-    photo: sandeshImg,
-  },
-];
+import { fetchCoordinators, getLocalCoordinators } from '../lib/coordinatorsService';
 
 export default function HumansPage() {
+  const [coordinators, setCoordinators] = useState(() => getLocalCoordinators());
+
+  useEffect(() => {
+    fetchCoordinators().then(res => {
+      if (res) setCoordinators(res);
+    });
+
+    const handler = (e) => {
+      if (e.detail) {
+        setCoordinators(e.detail);
+      }
+    };
+    window.addEventListener('haxlr8_coordinators_updated', handler);
+    return () => window.removeEventListener('haxlr8_coordinators_updated', handler);
+  }, []);
+
+  const staffCoordinators = coordinators.faculty || [];
+  const studentOrganizers = coordinators.students || [];
+  const yashwanthData = studentOrganizers.find(s => s.name?.toLowerCase().includes('yashwanth')) || { photo: yashwanthImg, phone: '+91 80506 14849' };
+
   return (
     <div
       style={{
@@ -173,9 +146,11 @@ export default function HumansPage() {
               gap: '24px',
             }}
           >
-            {staffCoordinators.map((c, i) => (
+            {staffCoordinators.map((c, i) => {
+              const photo = c.photo || c.defaultPhoto;
+              return (
               <motion.div
-                key={i}
+                key={c.id || i}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
@@ -191,7 +166,7 @@ export default function HumansPage() {
                   gap: '22px',
                 }}
               >
-                {c.photo ? (
+                {photo ? (
                   <div
                     style={{
                       width: 92,
@@ -205,7 +180,7 @@ export default function HumansPage() {
                     }}
                   >
                     <img
-                      src={c.photo}
+                      src={photo}
                       alt={c.name}
                       style={{
                         width: '100%',
@@ -217,7 +192,7 @@ export default function HumansPage() {
                   </div>
                 ) : (
                   <div style={{ flexShrink: 0 }}>
-                    <AmongUsCrewmate color={c.color} hat={c.hat} size={88} floating={true} interactive={true} />
+                    <AmongUsCrewmate color={c.color || 'lime'} hat={c.hat || 'crown'} size={88} floating={true} interactive={true} />
                   </div>
                 )}
                 <div>
@@ -264,7 +239,8 @@ export default function HumansPage() {
                   )}
                 </div>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -284,9 +260,11 @@ export default function HumansPage() {
               gap: '24px',
             }}
           >
-            {studentOrganizers.map((c, i) => (
+            {studentOrganizers.map((c, i) => {
+              const photo = c.photo || c.defaultPhoto;
+              return (
               <motion.div
-                key={i}
+                key={c.id || i}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
@@ -302,7 +280,7 @@ export default function HumansPage() {
                   gap: '22px',
                 }}
               >
-                {c.photo ? (
+                {photo ? (
                   <div
                     style={{
                       width: 92,
@@ -316,7 +294,7 @@ export default function HumansPage() {
                     }}
                   >
                     <img
-                      src={c.photo}
+                      src={photo}
                       alt={c.name}
                       style={{
                         width: '100%',
@@ -328,7 +306,7 @@ export default function HumansPage() {
                   </div>
                 ) : (
                   <div style={{ flexShrink: 0 }}>
-                    <AmongUsCrewmate color={c.color} hat={c.hat} size={88} floating={true} interactive={true} />
+                    <AmongUsCrewmate color={c.color || 'cyan'} hat={c.hat || 'pilot'} size={88} floating={true} interactive={true} />
                   </div>
                 )}
                 <div>
@@ -351,7 +329,7 @@ export default function HumansPage() {
                     {c.name}
                   </h3>
                   <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 8px 0', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
-                    {c.org}
+                    {c.org || c.station}
                   </p>
                   {c.phone && (
                     <a
@@ -375,7 +353,8 @@ export default function HumansPage() {
                   )}
                 </div>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -419,7 +398,7 @@ export default function HumansPage() {
               }}
             >
               <img
-                src={yashwanthImg}
+                src={yashwanthData.photo || yashwanthData.defaultPhoto || yashwanthImg}
                 alt="Yashwanth H B - Lead Platform Architect"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
               />
@@ -455,14 +434,14 @@ export default function HumansPage() {
                 </span>
               </div>
               <h3 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px 0' }}>
-                Yashwanth H B
+                {yashwanthData.name || 'Yashwanth H B'}
               </h3>
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 16px 0', maxWidth: 640, lineHeight: 1.6, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
                 Architected and engineered the end-to-end HAXLR8 3.0 digital platform, real-time registration sync, Supabase authentication & database infrastructure, automated flight pass generation, and digital jury evaluation systems.
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
                 <a
-                  href="tel:8050614849"
+                  href={`tel:${(yashwanthData.phone || '8050614849').replace(/\s+/g, '')}`}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -478,7 +457,7 @@ export default function HumansPage() {
                   }}
                 >
                   <Phone size={14} />
-                  <span>+91 80506 14849</span>
+                  <span>{yashwanthData.phone || '+91 80506 14849'}</span>
                 </a>
                 <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>
                   Dept. of ECE · Maharaja Institute of Technology Mysore

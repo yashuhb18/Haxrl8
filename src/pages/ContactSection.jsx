@@ -1,60 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Mail, MapPin, Send, CheckCircle2, User, Radio, Sparkles, ExternalLink } from 'lucide-react';
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
-
-import balakrishnaImg from '../assets/humans/balakrishna.png';
-import sandeshImg from '../assets/humans/sandesh.jpg';
-import yashwanthImg from '../assets/humans/yashwanth.png';
-
-const FACULTY_COORDINATORS = [
-  {
-    name: 'Balakrishna K',
-    role: 'Associate Prof & HoD, Dept of ECE',
-    phone: '+91 98864 78574',
-    bg: '#f3e8ff',
-    border: '#d8b4fe',
-    badge: 'FACULTY LEAD',
-    crewColor: '#9333ea',
-    photo: balakrishnaImg,
-  },
-  {
-    name: 'Sandesh N G',
-    role: 'Assistant Professor, Dept of ECE',
-    phone: '+91 94813 36585',
-    bg: '#ffedd5',
-    border: '#fed7aa',
-    badge: 'FACULTY CO-LEAD',
-    crewColor: '#ea580c',
-    photo: sandeshImg,
-  },
-];
-
-const STUDENT_COORDINATORS = [
-  {
-    name: 'Yashwanth H B',
-    role: 'Student Coordinator',
-    phone: '+91 80506 14849',
-    bg: '#e0f2fe',
-    border: '#7dd3fc',
-    badge: 'CHIEF COORDINATOR',
-    crewColor: '#0284c7',
-    photo: yashwanthImg,
-  },
-  {
-    name: 'Chethan Kumar B',
-    role: 'Student Coordinator',
-    phone: '+91 99455 07099',
-    bg: '#dcfce7',
-    border: '#86efac',
-    badge: 'STUDENT COORDINATOR',
-    crewColor: '#16a34a',
-    photo: null,
-  },
-];
+import { fetchCoordinators, getLocalCoordinators } from '../lib/coordinatorsService';
 
 export default function ContactSection() {
+  const [coordinators, setCoordinators] = useState(() => getLocalCoordinators());
+
+  useEffect(() => {
+    fetchCoordinators().then(res => {
+      if (res) setCoordinators(res);
+    });
+
+    const handler = (e) => {
+      if (e.detail) {
+        setCoordinators(e.detail);
+      }
+    };
+    window.addEventListener('haxlr8_coordinators_updated', handler);
+    return () => window.removeEventListener('haxlr8_coordinators_updated', handler);
+  }, []);
+
+  const FACULTY_COORDINATORS = coordinators.faculty || [];
+  const STUDENT_COORDINATORS = coordinators.students || [];
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -197,99 +166,110 @@ export default function ContactSection() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {FACULTY_COORDINATORS.map((fac, idx) => (
-                  <motion.div
-                    key={idx}
-                    whileHover={{ y: -3, scale: 1.01 }}
-                    style={{
-                      backgroundColor: fac.bg,
-                      border: `2px solid ${fac.border}`,
-                      borderRadius: '22px',
-                      padding: '20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      {fac.photo ? (
-                        <div
-                          style={{
-                            width: '46px',
-                            height: '46px',
-                            borderRadius: '14px',
-                            overflow: 'hidden',
-                            border: `2px solid ${fac.border}`,
-                            flexShrink: 0,
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                            background: '#fff',
-                          }}
-                        >
-                          <img
-                            src={fac.photo}
-                            alt={fac.name}
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'cover',
-                              objectPosition: 'center 15%',
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
-                          <AmongUsCrewmate color={fac.crewColor} size={42} />
-                        </div>
-                      )}
-                      <div>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: 800,
-                            letterSpacing: '0.06em',
-                            padding: '2px 8px',
-                            borderRadius: '9999px',
-                            backgroundColor: '#fff',
-                            color: fac.crewColor,
-                            display: 'inline-block',
-                            marginBottom: '4px',
-                          }}
-                        >
-                          {fac.badge}
-                        </span>
-                        <h4 style={{ fontSize: '17px', fontWeight: 900, color: '#0f172a', margin: 0 }}>
-                          {fac.name}
-                        </h4>
-                        <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0', fontWeight: 600 }}>
-                          {fac.role}
-                        </p>
-                      </div>
-                    </div>
+                {FACULTY_COORDINATORS.map((fac, idx) => {
+                  const facPhoto = fac.photo || fac.defaultPhoto;
+                  const crewColor = fac.crewColor || '#9333ea';
+                  const bg = fac.bg || '#f3e8ff';
+                  const border = fac.border || '#d8b4fe';
+                  const badge = fac.badge || 'FACULTY COORDINATOR';
+                  const phoneNum = fac.phone || '';
 
-                    <a
-                      href={`tel:${fac.phone.replace(/\s+/g, '')}`}
+                  return (
+                    <motion.div
+                      key={fac.id || idx}
+                      whileHover={{ y: -3, scale: 1.01 }}
                       style={{
-                        backgroundColor: '#ffffff',
-                        color: fac.crewColor,
-                        border: `1.5px solid ${fac.border}`,
-                        padding: '10px 14px',
-                        borderRadius: '14px',
-                        fontWeight: 800,
-                        fontSize: '13px',
-                        textDecoration: 'none',
+                        backgroundColor: bg,
+                        border: `2px solid ${border}`,
+                        borderRadius: '22px',
+                        padding: '20px',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                        transition: 'all 0.2s ease',
+                        justifyContent: 'space-between',
+                        boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
                       }}
                     >
-                      <Phone size={14} />
-                      <span>{fac.phone}</span>
-                    </a>
-                  </motion.div>
-                ))}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        {facPhoto ? (
+                          <div
+                            style={{
+                              width: '46px',
+                              height: '46px',
+                              borderRadius: '14px',
+                              overflow: 'hidden',
+                              border: `2px solid ${border}`,
+                              flexShrink: 0,
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                              background: '#fff',
+                            }}
+                          >
+                            <img
+                              src={facPhoto}
+                              alt={fac.name}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                objectPosition: 'center 15%',
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
+                            <AmongUsCrewmate color={fac.color || 'purple'} size={42} />
+                          </div>
+                        )}
+                        <div>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 800,
+                              letterSpacing: '0.06em',
+                              padding: '2px 8px',
+                              borderRadius: '9999px',
+                              backgroundColor: '#fff',
+                              color: crewColor,
+                              display: 'inline-block',
+                              marginBottom: '4px',
+                            }}
+                          >
+                            {badge}
+                          </span>
+                          <h4 style={{ fontSize: '17px', fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                            {fac.name}
+                          </h4>
+                          <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0', fontWeight: 600 }}>
+                            {fac.designation || fac.role}
+                          </p>
+                        </div>
+                      </div>
+
+                      {phoneNum && (
+                        <a
+                          href={`tel:${phoneNum.replace(/\s+/g, '')}`}
+                          style={{
+                            backgroundColor: '#ffffff',
+                            color: crewColor,
+                            border: `1.5px solid ${border}`,
+                            padding: '10px 14px',
+                            borderRadius: '14px',
+                            fontWeight: 800,
+                            fontSize: '13px',
+                            textDecoration: 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          <Phone size={14} />
+                          <span>{phoneNum}</span>
+                        </a>
+                      )}
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
 
@@ -318,99 +298,110 @@ export default function ContactSection() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {STUDENT_COORDINATORS.map((stu, idx) => (
-                  <motion.div
-                    key={idx}
-                    whileHover={{ y: -3, scale: 1.01 }}
-                    style={{
-                      backgroundColor: stu.bg,
-                      border: `2px solid ${stu.border}`,
-                      borderRadius: '22px',
-                      padding: '20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      {stu.photo ? (
-                        <div
-                          style={{
-                            width: '46px',
-                            height: '46px',
-                            borderRadius: '14px',
-                            overflow: 'hidden',
-                            border: `2px solid ${stu.border}`,
-                            flexShrink: 0,
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                            background: '#fff',
-                          }}
-                        >
-                          <img
-                            src={stu.photo}
-                            alt={stu.name}
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'cover',
-                              objectPosition: 'center 15%',
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
-                          <AmongUsCrewmate color={stu.crewColor} size={42} />
-                        </div>
-                      )}
-                      <div>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: 800,
-                            letterSpacing: '0.06em',
-                            padding: '2px 8px',
-                            borderRadius: '9999px',
-                            backgroundColor: '#fff',
-                            color: stu.crewColor,
-                            display: 'inline-block',
-                            marginBottom: '4px',
-                          }}
-                        >
-                          {stu.badge}
-                        </span>
-                        <h4 style={{ fontSize: '17px', fontWeight: 900, color: '#0f172a', margin: 0 }}>
-                          {stu.name}
-                        </h4>
-                        <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0', fontWeight: 600 }}>
-                          {stu.role}
-                        </p>
-                      </div>
-                    </div>
+                {STUDENT_COORDINATORS.map((stu, idx) => {
+                  const stuPhoto = stu.photo || stu.defaultPhoto;
+                  const crewColor = stu.crewColor || '#0284c7';
+                  const bg = stu.bg || '#e0f2fe';
+                  const border = stu.border || '#7dd3fc';
+                  const badge = stu.badge || 'STUDENT COORDINATOR';
+                  const phoneNum = stu.phone || '';
 
-                    <a
-                      href={`tel:${stu.phone.replace(/\s+/g, '')}`}
+                  return (
+                    <motion.div
+                      key={stu.id || idx}
+                      whileHover={{ y: -3, scale: 1.01 }}
                       style={{
-                        backgroundColor: '#ffffff',
-                        color: stu.crewColor,
-                        border: `1.5px solid ${stu.border}`,
-                        padding: '10px 14px',
-                        borderRadius: '14px',
-                        fontWeight: 800,
-                        fontSize: '13px',
-                        textDecoration: 'none',
+                        backgroundColor: bg,
+                        border: `2px solid ${border}`,
+                        borderRadius: '22px',
+                        padding: '20px',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                        transition: 'all 0.2s ease',
+                        justifyContent: 'space-between',
+                        boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
                       }}
                     >
-                      <Phone size={14} />
-                      <span>{stu.phone}</span>
-                    </a>
-                  </motion.div>
-                ))}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        {stuPhoto ? (
+                          <div
+                            style={{
+                              width: '46px',
+                              height: '46px',
+                              borderRadius: '14px',
+                              overflow: 'hidden',
+                              border: `2px solid ${border}`,
+                              flexShrink: 0,
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                              background: '#fff',
+                            }}
+                          >
+                            <img
+                              src={stuPhoto}
+                              alt={stu.name}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                objectPosition: 'center 15%',
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
+                            <AmongUsCrewmate color={stu.color || 'yellow'} size={42} />
+                          </div>
+                        )}
+                        <div>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 800,
+                              letterSpacing: '0.06em',
+                              padding: '2px 8px',
+                              borderRadius: '9999px',
+                              backgroundColor: '#fff',
+                              color: crewColor,
+                              display: 'inline-block',
+                              marginBottom: '4px',
+                            }}
+                          >
+                            {badge}
+                          </span>
+                          <h4 style={{ fontSize: '17px', fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                            {stu.name}
+                          </h4>
+                          <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0', fontWeight: 600 }}>
+                            {stu.station || stu.role}
+                          </p>
+                        </div>
+                      </div>
+
+                      {phoneNum && (
+                        <a
+                          href={`tel:${phoneNum.replace(/\s+/g, '')}`}
+                          style={{
+                            backgroundColor: '#ffffff',
+                            color: crewColor,
+                            border: `1.5px solid ${border}`,
+                            padding: '10px 14px',
+                            borderRadius: '14px',
+                            fontWeight: 800,
+                            fontSize: '13px',
+                            textDecoration: 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          <Phone size={14} />
+                          <span>{phoneNum}</span>
+                        </a>
+                      )}
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
 

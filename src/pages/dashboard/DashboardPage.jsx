@@ -147,7 +147,7 @@ export default function DashboardPage() {
       // Fetch announcements with safe default fallback
       try {
         const { data: annData } = await withTimeout(supabase.from('announcements').select('*').order('created_at', { ascending: false }), 1500);
-        const filteredAnn = annData ? annData.filter(a => a.tag !== 'MOMENT') : [];
+        const filteredAnn = annData ? annData.filter(a => a.tag !== 'MOMENT' && a.tag !== 'COORDINATORS_CONFIG') : [];
         if (filteredAnn && filteredAnn.length > 0) {
           setAnnouncements(filteredAnn);
         } else {

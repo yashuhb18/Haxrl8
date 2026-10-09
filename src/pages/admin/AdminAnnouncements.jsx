@@ -34,7 +34,7 @@ export default function AdminAnnouncements() {
     setLoading(true);
     const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
     if (data) {
-      setAnnouncements(data.filter(a => a.tag !== 'MOMENT'));
+      setAnnouncements(data.filter(a => a.tag !== 'MOMENT' && a.tag !== 'COORDINATORS_CONFIG'));
     }
     setLoading(false);
   }, []);

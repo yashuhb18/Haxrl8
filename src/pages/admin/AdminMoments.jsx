@@ -198,10 +198,10 @@ export default function AdminMoments({ standalone = false }) {
 
   // Copy direct link to clipboard
   const copyDirectLink = () => {
-    const link = `${window.location.origin}/upload-moments`;
+    const link = `${window.location.origin}/admin/moments`;
     navigator.clipboard.writeText(link);
     setCopiedLink(true);
-    showToast('Direct upload link copied to clipboard!');
+    showToast('Admin Moments link copied to clipboard!');
     setTimeout(() => setCopiedLink(false), 2500);
   };
 
@@ -209,7 +209,7 @@ export default function AdminMoments({ standalone = false }) {
     <div style={{
       maxWidth: 1200,
       margin: '0 auto',
-      padding: standalone ? '120px 20px 60px' : '24px',
+      padding: '24px 20px 80px',
       fontFamily: "'Plus Jakarta Sans', sans-serif",
       color: '#0f172a',
     }}>

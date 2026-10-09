@@ -26,6 +26,7 @@ const AdminAnnouncements = lazy(() => import('./pages/admin/AdminAnnouncements')
 const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
 const AdminJury = lazy(() => import('./pages/admin/AdminJury'));
 const AdminMoments = lazy(() => import('./pages/admin/AdminMoments'));
+const AdminCoordinators = lazy(() => import('./pages/admin/AdminCoordinators'));
 const LegalPage = lazy(() => import('./pages/LegalPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const ShortlistedPage = lazy(() => import('./pages/ShortlistedPage'));
@@ -122,6 +123,7 @@ function App() {
             <Route path="evaluations/:id" element={<AdminEvaluateSubmission />} />
             <Route path="jury" element={<AdminJury />} />
             <Route path="moments" element={<AdminMoments />} />
+            <Route path="coordinators" element={<AdminCoordinators />} />
             <Route path="submissions" element={<AdminSubmissions />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
@@ -135,14 +137,16 @@ function App() {
             <Route path="evaluations/:id" element={<AdminEvaluateSubmission />} />
             <Route path="jury" element={<AdminJury />} />
             <Route path="moments" element={<AdminMoments />} />
+            <Route path="coordinators" element={<AdminCoordinators />} />
             <Route path="submissions" element={<AdminSubmissions />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
           </Route>
 
-          {/* Standalone Direct Mobile Moments Upload Deck */}
-          <Route path="/upload-moments" element={<AdminMoments standalone={true} />} />
-          <Route path="/moments-upload" element={<AdminMoments standalone={true} />} />
+          {/* Protected redirects to prevent unauthorized public uploads */}
+          <Route path="/upload-moments" element={<Navigate to="/admin/moments" replace />} />
+          <Route path="/moments-upload" element={<Navigate to="/admin/moments" replace />} />
+          <Route path="/upload-coordinators" element={<Navigate to="/admin/coordinators" replace />} />
 
           {/* All other pages — with Navbar/Footer */}
           <Route path="/*" element={

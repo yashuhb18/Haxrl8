@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { Camera, Sparkles, Heart, Trophy, Users, X, ZoomIn, ArrowRight, Plus } from 'lucide-react';
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
@@ -347,33 +346,6 @@ export default function HighlightsPage() {
                 </button>
               );
             })}
-          </div>
-
-          {/* Organizer / Media Crew Direct Upload Button */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-            <Link
-              to="/upload-moments"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                background: '#ffffff',
-                color: '#0284c7',
-                border: '2px dashed #0284c7',
-                padding: '9px 24px',
-                borderRadius: '9999px',
-                fontSize: 13,
-                fontWeight: 800,
-                textDecoration: 'none',
-                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.08)',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#f0f9ff'; e.currentTarget.style.borderColor = '#0369a1'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = '#0284c7'; }}
-            >
-              <Camera size={15} />
-              <span>+ Add / Upload Photos to Moments (Live Studio)</span>
-            </Link>
           </div>
         </div>
 
