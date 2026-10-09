@@ -10,11 +10,16 @@ import imgCrewGroup from '../assets/highlights/haxlr8_crew_group.jpg';
 import imgSmartDemo from '../assets/highlights/haxlr8_smart_demo.png';
 import imgJuryPitch from '../assets/highlights/haxlr8_jury_pitch.png';
 import imgTeamDefense from '../assets/highlights/haxlr8_team_defense.png';
+import imgHardwareLab from '../assets/highlights/haxlr8_hardware_lab.png';
+import imgSquadCelebration from '../assets/highlights/haxlr8_squad_celebration.jpg';
+import imgPrototypeReview from '../assets/highlights/haxlr8_prototype_review.jpg';
+import imgStagePitch from '../assets/highlights/haxlr8_stage_pitch.jpg';
+import imgSmartGlasses from '../assets/highlights/haxlr8_smart_glasses_pitch.jpg';
 
 const GALLERY = [
   {
     id: 1,
-    title: 'HAXLR8 2.0 Grand Cohort & Crew',
+    title: 'HAXLR8 Grand Cohort & Crew',
     subtitle: 'Maharaja Institute of Technology Mysore • ECE Department',
     category: 'ceremony',
     tag: 'GRAND COHORT',
@@ -22,22 +27,46 @@ const GALLERY = [
     rotate: -1.2,
     bg: '#ffedd5',
     border: '#fed7aa',
-    description: 'The complete HAXLR8 2.0 student participants, faculty advisors, and organizing committee assembled at the main arena.'
+    description: 'The complete HAXLR8 student innovators, faculty advisors, and organizing committee assembled at the main auditorium arena.'
   },
   {
     id: 2,
-    title: 'Faculty Mentorship & Architecture Review',
-    subtitle: 'Hands-on mentorship from experienced professors',
+    title: 'IoT & Hardware Prototyping Lab',
+    subtitle: 'Microsoft Innovation Lab bench engineering sprint',
     category: 'sprint',
-    tag: 'MENTORSHIP',
-    src: imgMentorship,
-    rotate: 1.5,
+    tag: 'HARDWARE SPRINT',
+    src: imgHardwareLab,
+    rotate: 1.4,
     bg: '#e0f2fe',
     border: '#7dd3fc',
-    description: 'Professors and technical mentors evaluating code logic, system architecture, and evaluation criteria with participating squads.'
+    description: 'Squad assembling physical embedded circuits, testing real sensors on breadboards, and measuring voltages at the hardware innovation workbench.'
   },
   {
     id: 3,
+    title: 'Faculty Mentorship & Architecture Review',
+    subtitle: 'Hands-on mentorship from senior technical professors',
+    category: 'sprint',
+    tag: 'MENTORSHIP',
+    src: imgMentorship,
+    rotate: -1.5,
+    bg: '#fef08a',
+    border: '#fde047',
+    description: 'Professors and technical mentors evaluating code logic, system architecture, and evaluation criteria with participating squads.'
+  },
+  {
+    id: 4,
+    title: 'Smart Healthcare Glasses Innovation',
+    subtitle: 'All-women innovator squad assistive tech demonstration',
+    category: 'ceremony',
+    tag: 'HEALTHCARE AI',
+    src: imgSmartGlasses,
+    rotate: 1.8,
+    bg: '#fce7f3',
+    border: '#fbcfe8',
+    description: 'All-women engineering squad presenting custom 3D-integrated smart healthcare vision glasses for patients and assistive medical monitoring.'
+  },
+  {
+    id: 5,
     title: 'Interactive Project Demonstration',
     subtitle: 'Microsoft Innovation Lab smart screen display',
     category: 'ceremony',
@@ -46,31 +75,67 @@ const GALLERY = [
     rotate: -1.8,
     bg: '#dcfce7',
     border: '#86efac',
-    description: 'Squad demonstrating live patient telemetry and connected smart dashboards on high-resolution interactive displays.'
+    description: 'Squad demonstrating live telemetry dashboards and connected IoT systems on high-resolution interactive screens.'
   },
   {
-    id: 4,
-    title: 'Jury Evaluation & Pitch Defense',
-    subtitle: 'HAXLR8 2.0 Hackathon stage presentations',
+    id: 6,
+    title: 'Technical Prototype & Circuit Scrutiny',
+    subtitle: 'Close-up jury verification of live circuits & sensors',
     category: 'ceremony',
-    tag: 'JURY PITCH',
-    src: imgJuryPitch,
+    tag: 'CIRCUIT EVALUATION',
+    src: imgPrototypeReview,
     rotate: 1.2,
-    bg: '#ffe4e6',
-    border: '#fda4af',
-    description: 'Teams pitching their working solutions, fielding tough technical questions, and demonstrating system viability to the jury panel.'
+    bg: '#ede9fe',
+    border: '#ddd6fe',
+    description: 'Jury members conducting in-depth technical inspection, inspecting microcontroller logic analyzer signals, and validating prototype reliability.'
   },
   {
-    id: 5,
+    id: 7,
+    title: 'Auditorium Main Stage Pitch Defense',
+    subtitle: 'Keynote spotlight presentation before the grand jury',
+    category: 'ceremony',
+    tag: 'STAGE SPOTLIGHT',
+    src: imgStagePitch,
+    rotate: -1.3,
+    bg: '#ffedd5',
+    border: '#fed7aa',
+    description: 'Squad leader delivering a high-energy solution pitch with mic on the auditorium stage, detailing market impact, tech stack, and execution.'
+  },
+  {
+    id: 8,
     title: 'Hands-on Technical Prototype Defense',
     subtitle: 'Sprint review with evaluators at workstation stations',
     category: 'sprint',
     tag: 'TECH DEFENSE',
     src: imgTeamDefense,
-    rotate: -1.4,
+    rotate: 1.5,
     bg: '#f3e8ff',
     border: '#d8b4fe',
-    description: 'Intense technical interrogation and code validation directly on laptops and test benches during the final prototype evaluation rounds.'
+    description: 'Intense technical interrogation and code validation directly on laptops and test benches during the prototype evaluation rounds.'
+  },
+  {
+    id: 9,
+    title: 'Stage Jury Evaluation & Q&A',
+    subtitle: 'HAXLR8 Hackathon stage presentations & defenses',
+    category: 'ceremony',
+    tag: 'JURY PITCH',
+    src: imgJuryPitch,
+    rotate: -1.6,
+    bg: '#ffe4e6',
+    border: '#fda4af',
+    description: 'Teams pitching their working solutions, fielding tough technical questions, and demonstrating system viability to the jury panel.'
+  },
+  {
+    id: 10,
+    title: 'Squad Camaraderie & Victory Smiles',
+    subtitle: 'Celebration moment after locking in final code commit',
+    category: 'sprint',
+    tag: 'SQUAD SPIRIT',
+    src: imgSquadCelebration,
+    rotate: 1.4,
+    bg: '#ccfbf1',
+    border: '#99f6e4',
+    description: 'Squad teammates celebrating triumphantly together in the hackathon arena after 24 hours of non-stop teamwork and building.'
   },
 ];
 
@@ -221,9 +286,9 @@ export default function HighlightsPage() {
             }}
           >
             {[
-              { id: 'all', label: 'All Moments (5)', icon: Sparkles },
-              { id: 'sprint', label: '🔥 Hackathon Sprint (2)', icon: Heart },
-              { id: 'ceremony', label: '🏆 Demos & Jury (3)', icon: Trophy },
+              { id: 'all', label: `All Moments (${GALLERY.length})`, icon: Sparkles },
+              { id: 'sprint', label: `🔥 Hackathon Sprint (${GALLERY.filter(p => p.category === 'sprint').length})`, icon: Heart },
+              { id: 'ceremony', label: `🏆 Demos & Jury (${GALLERY.filter(p => p.category === 'ceremony').length})`, icon: Trophy },
             ].map(tab => {
               const active = filter === tab.id;
               return (

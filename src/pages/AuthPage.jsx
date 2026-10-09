@@ -24,7 +24,6 @@ export default function AuthPage() {
 
   // Modals
   const [showImpostorModal, setShowImpostorModal] = useState(false);
-  const [showGoogleModal, setShowGoogleModal] = useState(false);
 
   // Form Fields
   const [email, setEmail] = useState('');
@@ -33,14 +32,9 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
-  // Google Login Fields
-  const [googleEmail, setGoogleEmail] = useState('');
-  const [googleName, setGoogleName] = useState('');
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [googleError, setGoogleError] = useState('');
-
   // Status & Feedback
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -165,84 +159,45 @@ export default function AuthPage() {
     }
   };
 
-  // Google Login Handlers
-  const handleGoogleAuth = () => {
+  // Native Google SSO: Direct Redirect to Google Accounts
+  const handleGoogleAuth = async () => {
     playCrewmatePopSound();
-    setGoogleError('');
-    if (!googleEmail && email && isValidEmail(email)) {
-      setGoogleEmail(email);
-    }
-    if (!googleName && name) {
-      setGoogleName(name);
-    }
-    setShowGoogleModal(true);
-  };
-
-  const submitGoogleAuth = async (e) => {
-    e.preventDefault();
-    setGoogleError('');
-    const cleanEmail = sanitizeInput(googleEmail).trim().toLowerCase();
-    const cleanName = sanitizeInput(googleName).trim() || cleanEmail.split('@')[0];
-
-    if (!cleanEmail || !isValidEmail(cleanEmail)) {
-      setGoogleError('Please enter a valid Google email address.');
-      return;
-    }
-
+    setErrorMsg('');
     setGoogleLoading(true);
+
     try {
-      // 1. Attempt registering/authenticating with Supabase backend
-      const deterministicPassword = `GoogleOAuth_${cleanEmail.replace(/[^a-zA-Z0-9]/g, '')}_2026!`;
-      try {
-        await supabase.auth.signUp({
-          email: cleanEmail,
-          password: deterministicPassword,
-          options: { data: { full_name: cleanName, provider: 'google' } }
-        });
-      } catch (e) {}
-
-      try {
-        await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password: deterministicPassword,
-        });
-      } catch (e) {}
-
-      // 2. Set resilient authenticated leader session
-      const googleUser = {
-        id: uuidv4(),
-        email: cleanEmail,
-        user_metadata: {
-          full_name: cleanName,
-          provider: 'google',
-          avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${cleanEmail}`
-        },
-        app_metadata: { provider: 'google', providers: ['google'] },
-        role: 'authenticated',
-        aud: 'authenticated',
-      };
-
+      // Clean up legacy global caches to protect account isolation
       try {
         localStorage.removeItem('haxlr8_teams_db');
         localStorage.removeItem('haxlr8_members_db');
         localStorage.removeItem('haxlr8_submissions_db');
       } catch (e) {}
 
-      localStorage.setItem('haxlr8_leader_session', JSON.stringify({ user: googleUser }));
-      localStorage.setItem('haxlr8_leader_confirmed', 'true');
+      const redirectUrl = `${window.location.origin}/dashboard`;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
+        },
+      });
 
-      // 3. Automated login notification email
-      sendLoginNotificationEmail({
-        recipientEmail: cleanEmail,
-        leaderName: cleanName,
-      }).catch(err => console.warn('Google login notification email error:', err));
+      if (error) {
+        console.error('Google OAuth error:', error);
+        setErrorMsg(error.message || 'Failed to connect to Google. Please try again.');
+        setGoogleLoading(false);
+        return;
+      }
 
-      playTaskCompleteSound();
-      setShowGoogleModal(false);
-      navigate('/dashboard');
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     } catch (err) {
-      setGoogleError(err.message || 'Google authentication encountered an issue.');
-    } finally {
+      console.error('Google OAuth exception:', err);
+      setErrorMsg(err.message || 'Unable to initialize Google Sign-In.');
       setGoogleLoading(false);
     }
   };
@@ -962,6 +917,7 @@ export default function AuthPage() {
           {/* Continue with Google */}
           <button
             type="button"
+            disabled={googleLoading || loading}
             onClick={handleGoogleAuth}
             style={{
               height: '48px',
@@ -975,11 +931,12 @@ export default function AuthPage() {
               fontSize: '14px',
               fontWeight: 700,
               color: '#1e293b',
-              cursor: 'pointer',
+              cursor: (googleLoading || loading) ? 'not-allowed' : 'pointer',
+              opacity: (googleLoading || loading) ? 0.7 : 1,
               transition: 'all 0.2s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#f8fafc'; e.currentTarget.style.borderColor = '#94a3b8'; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.borderColor = '#cbd5e1'; }}
+            onMouseEnter={e => { if (!googleLoading && !loading) { e.currentTarget.style.backgroundColor = '#f8fafc'; e.currentTarget.style.borderColor = '#94a3b8'; } }}
+            onMouseLeave={e => { if (!googleLoading && !loading) { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -987,7 +944,7 @@ export default function AuthPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            <span>Continue with Google</span>
+            <span>{googleLoading ? 'Connecting to Google SSO...' : 'Continue with Google'}</span>
           </button>
 
           {/* Impostor / Squad Member Help Pill */}
@@ -1014,217 +971,7 @@ export default function AuthPage() {
         </div>
       </motion.div>
 
-      {/* ─────────────────────────────────────────────────────────────
-          GOOGLE AUTHENTICATION MODAL (Working Zero-Downtime Google Access)
-          ───────────────────────────────────────────────────────────── */}
-      <AnimatePresence>
-        {showGoogleModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              backgroundColor: 'rgba(15, 23, 42, 0.72)',
-              backdropFilter: 'blur(8px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '20px',
-              zIndex: 9999,
-            }}
-          >
-            <motion.div
-              initial={{ scale: 0.92, y: 15 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.92, y: 15 }}
-              transition={{ type: 'spring', damping: 24, stiffness: 320 }}
-              style={{
-                width: '100%',
-                maxWidth: '430px',
-                backgroundColor: '#ffffff',
-                borderRadius: '26px',
-                padding: '34px 28px',
-                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.25)',
-                border: '2px solid #e2e8f0',
-                position: 'relative',
-              }}
-            >
-              {/* Google Brand Header */}
-              <div style={{ textAlign: 'center', marginBottom: '22px' }}>
-                <div
-                  style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '16px',
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 14px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.06)'
-                  }}
-                >
-                  <svg width="28" height="28" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                  </svg>
-                </div>
 
-                <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px' }}>
-                  Sign in with Google
-                </h3>
-                <p style={{ fontSize: '13px', color: '#64748b', margin: 0, fontWeight: 500 }}>
-                  Enter your Google Account to access HAXLR8 3.0 Flight Deck
-                </p>
-              </div>
-
-              {googleError && (
-                <div
-                  style={{
-                    backgroundColor: '#fef2f2',
-                    border: '1.5px solid #fecaca',
-                    color: '#b91c1c',
-                    padding: '10px 14px',
-                    borderRadius: '10px',
-                    fontSize: '12.5px',
-                    fontWeight: 700,
-                    marginBottom: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  <AlertTriangle size={15} style={{ flexShrink: 0 }} />
-                  <span>{googleError}</span>
-                </div>
-              )}
-
-              <form onSubmit={submitGoogleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '11.5px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    Google Email Address
-                  </label>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      padding: '0 14px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      border: '1.5px solid #cbd5e1',
-                      backgroundColor: '#f8fafc',
-                    }}
-                  >
-                    <Mail size={16} color="#94a3b8" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="yourname@gmail.com"
-                      value={googleEmail}
-                      onChange={e => setGoogleEmail(e.target.value)}
-                      autoFocus
-                      style={{
-                        border: 'none',
-                        outline: 'none',
-                        background: 'transparent',
-                        width: '100%',
-                        fontSize: '14.5px',
-                        color: '#0f172a',
-                        fontWeight: 600,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '11.5px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    Team Leader Name
-                  </label>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      padding: '0 14px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      border: '1.5px solid #cbd5e1',
-                      backgroundColor: '#f8fafc',
-                    }}
-                  >
-                    <User size={16} color="#94a3b8" />
-                    <input
-                      type="text"
-                      placeholder="Captain Full Name"
-                      value={googleName}
-                      onChange={e => setGoogleName(e.target.value)}
-                      style={{
-                        border: 'none',
-                        outline: 'none',
-                        background: 'transparent',
-                        width: '100%',
-                        fontSize: '14.5px',
-                        color: '#0f172a',
-                        fontWeight: 600,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
-                  <button
-                    type="submit"
-                    disabled={googleLoading}
-                    style={{
-                      height: '48px',
-                      borderRadius: '12px',
-                      backgroundColor: '#1a73e8',
-                      color: '#ffffff',
-                      border: 'none',
-                      fontWeight: 800,
-                      fontSize: '14.5px',
-                      cursor: googleLoading ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      boxShadow: '0 4px 14px rgba(26, 115, 232, 0.35)',
-                      transition: 'background-color 0.2s',
-                    }}
-                    onMouseEnter={e => { if (!googleLoading) e.currentTarget.style.backgroundColor = '#1557b0'; }}
-                    onMouseLeave={e => { if (!googleLoading) e.currentTarget.style.backgroundColor = '#1a73e8'; }}
-                  >
-                    <span>{googleLoading ? 'Signing in with Google...' : 'Continue as Google Leader →'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowGoogleModal(false)}
-                    style={{
-                      height: '44px',
-                      borderRadius: '12px',
-                      backgroundColor: '#f1f5f9',
-                      color: '#475569',
-                      border: '1px solid #cbd5e1',
-                      fontWeight: 700,
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ─────────────────────────────────────────────────────────────
           IMPOSTOR EMERGENCY MEETING MODAL

@@ -8,6 +8,11 @@ import goldenTrophyImg from '../assets/logo/golden-trophy-3d.png';
 import winnerPhoto1 from '../assets/highlights/haxlr8_crew_group.jpg';
 import winnerPhoto2 from '../assets/highlights/haxlr8_smart_demo.png';
 import winnerPhoto3 from '../assets/highlights/haxlr8_jury_pitch.png';
+import winnerPhoto4 from '../assets/highlights/haxlr8_prototype_review.jpg';
+import winnerPhoto5 from '../assets/highlights/haxlr8_squad_celebration.jpg';
+import winnerPhoto6 from '../assets/highlights/haxlr8_smart_glasses_pitch.jpg';
+import winnerPhoto7 from '../assets/highlights/haxlr8_stage_pitch.jpg';
+import winnerPhoto8 from '../assets/highlights/haxlr8_hardware_lab.png';
 
 // Official UN SDG Image Icons
 const SDG_IMAGES = {
@@ -1087,7 +1092,7 @@ export default function WinnersPage() {
 
                     {/* Slideshow */}
                     <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-                        <PhotoSlideshow images={[winnerPhoto1, winnerPhoto2, winnerPhoto3]} />
+                        <PhotoSlideshow images={[winnerPhoto1, winnerPhoto5, winnerPhoto4, winnerPhoto2, winnerPhoto6, winnerPhoto7, winnerPhoto3, winnerPhoto8]} />
                     </motion.div>
                 </div>
             </section>

@@ -23,7 +23,7 @@ export default function DashboardPage() {
   const [submissions, setSubmissions] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
 
-  const withTimeout = (promise, ms = 2000) =>
+  const withTimeout = (promise, ms = 5000) =>
     Promise.race([
       promise,
       new Promise((_, reject) => setTimeout(() => reject(new Error('Network timeout')), ms))
@@ -33,11 +33,25 @@ export default function DashboardPage() {
     setLoading(true);
     try {
       let activeUser = null;
+
+      // 1. Check current Supabase session (handles OAuth redirect token parsing)
       try {
-        const res = await withTimeout(supabase.auth.getUser(), 1500);
-        if (res?.data?.user) activeUser = res.data.user;
+        const sessionRes = await withTimeout(supabase.auth.getSession(), 5000);
+        if (sessionRes?.data?.session?.user) {
+          activeUser = sessionRes.data.session.user;
+        }
       } catch (e) {
-        console.warn('Supabase getUser notice:', e);
+        console.warn('Supabase getSession notice:', e);
+      }
+
+      // 2. Check getUser
+      if (!activeUser) {
+        try {
+          const res = await withTimeout(supabase.auth.getUser(), 5000);
+          if (res?.data?.user) activeUser = res.data.user;
+        } catch (e) {
+          console.warn('Supabase getUser notice:', e);
+        }
       }
 
       if (!activeUser) {
@@ -249,6 +263,21 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchDashboardData();
+
+    // Listen for auth state changes (crucial for Google OAuth redirect callback)
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        try {
+          localStorage.setItem('haxlr8_leader_confirmed', 'true');
+        } catch (e) {}
+        fetchDashboardData();
+      }
+    });
+
+    return () => {
+      authListener?.subscription?.unsubscribe?.();
+    };
   }, []);
 
   if (loading) {

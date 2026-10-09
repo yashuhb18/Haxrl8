@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const isUUID = (str) => typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
 
-const withTimeout = (promise, ms = 2000) =>
+const withTimeout = (promise, ms = 6000) =>
   Promise.race([
     promise,
     new Promise((_, reject) => setTimeout(() => reject(new Error('Auth request timeout')), ms))
@@ -287,12 +287,12 @@ export const supabase = {
       if (!isPlaceholder) {
         try {
           // Check session first (which automatically parses URL hash after OAuth redirect)
-          const sessionRes = await withTimeout(rawSupabase.auth.getSession(), 1500);
+          const sessionRes = await withTimeout(rawSupabase.auth.getSession(), 6000);
           if (sessionRes.data?.session?.user) {
             setLocalSession(sessionRes.data.session.user);
             return { data: { user: sessionRes.data.session.user }, error: null };
           }
-          const res = await withTimeout(rawSupabase.auth.getUser(), 1500);
+          const res = await withTimeout(rawSupabase.auth.getUser(), 6000);
           if (res.data?.user) {
             setLocalSession(res.data.user);
             return res;
@@ -314,7 +314,7 @@ export const supabase = {
     async getSession() {
       if (!isPlaceholder) {
         try {
-          const res = await withTimeout(rawSupabase.auth.getSession(), 1500);
+          const res = await withTimeout(rawSupabase.auth.getSession(), 6000);
           if (res.data?.session) return res;
         } catch (e) {}
       }
