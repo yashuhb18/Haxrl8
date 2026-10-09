@@ -4,6 +4,22 @@ import { Phone, Mail, MapPin, Send, CheckCircle2, User, Radio, Sparkles, Externa
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
 import { fetchCoordinators, getLocalCoordinators } from '../lib/coordinatorsService';
+import balakrishnaImg from '../assets/humans/balakrishna.png';
+import sandeshImg from '../assets/humans/sandesh.jpg';
+import yashwanthImg from '../assets/humans/yashwanth.png';
+
+const resolveContactPhoto = (c) => {
+  if (c.photo === null) return null;
+  if (c.photo && (c.photo.startsWith('http://') || c.photo.startsWith('https://') || c.photo.startsWith('data:'))) {
+    return c.photo;
+  }
+  const name = c.name?.toLowerCase() || '';
+  if (name.includes('balakrishna')) return balakrishnaImg;
+  if (name.includes('sandesh') && (c.type === 'faculty' || c.role?.toLowerCase().includes('faculty'))) return sandeshImg;
+  if (name.includes('yashwanth')) return c.photo || yashwanthImg;
+  if (c.photo && !c.photo.startsWith('/assets/')) return c.photo;
+  return c.defaultPhoto || null;
+};
 
 export default function ContactSection() {
   const [coordinators, setCoordinators] = useState(() => getLocalCoordinators());
@@ -167,7 +183,7 @@ export default function ContactSection() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {FACULTY_COORDINATORS.map((fac, idx) => {
-                  const facPhoto = fac.photo || fac.defaultPhoto;
+                  const facPhoto = resolveContactPhoto(fac);
                   const crewColor = fac.crewColor || '#9333ea';
                   const bg = fac.bg || '#f3e8ff';
                   const border = fac.border || '#d8b4fe';
@@ -189,17 +205,17 @@ export default function ContactSection() {
                         boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
                         {facPhoto ? (
                           <div
                             style={{
-                              width: '46px',
-                              height: '46px',
-                              borderRadius: '14px',
+                              width: '78px',
+                              height: '78px',
+                              borderRadius: '20px',
                               overflow: 'hidden',
-                              border: `2px solid ${border}`,
+                              border: `2.5px solid ${border}`,
                               flexShrink: 0,
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                              boxShadow: '0 4px 14px rgba(0,0,0,0.08)',
                               background: '#fff',
                             }}
                           >
@@ -215,8 +231,8 @@ export default function ContactSection() {
                             />
                           </div>
                         ) : (
-                          <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
-                            <AmongUsCrewmate color={fac.color || 'purple'} size={42} />
+                          <div style={{ width: '64px', height: '64px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <AmongUsCrewmate color={fac.color || 'purple'} size={58} />
                           </div>
                         )}
                         <div>
@@ -299,7 +315,7 @@ export default function ContactSection() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {STUDENT_COORDINATORS.map((stu, idx) => {
-                  const stuPhoto = stu.photo || stu.defaultPhoto;
+                  const stuPhoto = resolveContactPhoto(stu);
                   const crewColor = stu.crewColor || '#0284c7';
                   const bg = stu.bg || '#e0f2fe';
                   const border = stu.border || '#7dd3fc';
@@ -321,17 +337,17 @@ export default function ContactSection() {
                         boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
                         {stuPhoto ? (
                           <div
                             style={{
-                              width: '46px',
-                              height: '46px',
-                              borderRadius: '14px',
+                              width: '78px',
+                              height: '78px',
+                              borderRadius: '20px',
                               overflow: 'hidden',
-                              border: `2px solid ${border}`,
+                              border: `2.5px solid ${border}`,
                               flexShrink: 0,
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                               background: '#fff',
                             }}
                           >
@@ -347,8 +363,8 @@ export default function ContactSection() {
                             />
                           </div>
                         ) : (
-                          <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
-                            <AmongUsCrewmate color={stu.color || 'yellow'} size={42} />
+                          <div style={{ width: '64px', height: '64px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <AmongUsCrewmate color={stu.color || 'yellow'} size={58} />
                           </div>
                         )}
                         <div>

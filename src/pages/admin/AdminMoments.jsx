@@ -365,7 +365,7 @@ export default function AdminMoments({ standalone = false }) {
                   <div style={{
                     position: 'relative',
                     width: '100%',
-                    height: 220,
+                    height: 260,
                     borderRadius: 18,
                     overflow: 'hidden',
                     border: '2px solid #0284c7',
@@ -754,7 +754,7 @@ export default function AdminMoments({ standalone = false }) {
               </button>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
               {moments.map((m) => (
                 <motion.div
                   key={m.id}
@@ -774,7 +774,7 @@ export default function AdminMoments({ standalone = false }) {
                   }}
                 >
                   {/* Image Frame */}
-                  <div style={{ position: 'relative', width: '100%', height: 180, background: '#f1f5f9' }}>
+                  <div style={{ position: 'relative', width: '100%', height: 240, background: '#f1f5f9' }}>
                     <img
                       src={m.src}
                       alt={m.title}

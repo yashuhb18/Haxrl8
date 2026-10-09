@@ -135,8 +135,8 @@ export default function AdminCoordinators() {
 
   // Remove photo from coordinator
   const handleRemovePhoto = (coordId) => {
-    setFacultyList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null } : c));
-    setStudentList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null } : c));
+    setFacultyList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c));
+    setStudentList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c));
     showToast('Photo removed. Avatar will be used.', 'info');
   };
 
@@ -629,7 +629,7 @@ function CoordinatorCard({
   isUploading,
   onPreviewPhoto,
 }) {
-  const photoSrc = coordinator.photo || coordinator.defaultPhoto;
+  const photoSrc = coordinator.photo !== undefined ? coordinator.photo : (coordinator.defaultPhoto || null);
 
   return (
     <div style={{
@@ -647,9 +647,9 @@ function CoordinatorCard({
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         {/* Photo Container */}
         <div style={{
-          width: 88,
-          height: 88,
-          borderRadius: 20,
+          width: 106,
+          height: 106,
+          borderRadius: 22,
           border: `2.5px solid ${accentColor}`,
           overflow: 'hidden',
           background: accentBg,
@@ -698,7 +698,7 @@ function CoordinatorCard({
             <AmongUsCrewmate
               color={coordinator.color || (type === 'faculty' ? 'lime' : 'yellow')}
               hat={coordinator.hat || (type === 'faculty' ? 'crown' : 'pilot')}
-              size={70}
+              size={80}
             />
           )}
         </div>

@@ -9,6 +9,19 @@ import emitersSeal from '../assets/logo/emiters-seal.png';
 import mitMysoreBanner from '../assets/logo/mit-mysore-banner.png';
 import { fetchCoordinators, getLocalCoordinators } from '../lib/coordinatorsService';
 
+const resolveHumanPhoto = (c) => {
+  if (c.photo === null) return null;
+  if (c.photo && (c.photo.startsWith('http://') || c.photo.startsWith('https://') || c.photo.startsWith('data:'))) {
+    return c.photo;
+  }
+  const name = c.name?.toLowerCase() || '';
+  if (name.includes('balakrishna')) return balakrishnaImg;
+  if (name.includes('sandesh') && (c.type === 'faculty' || c.role?.toLowerCase().includes('faculty'))) return sandeshImg;
+  if (name.includes('yashwanth')) return c.photo || yashwanthImg;
+  if (c.photo && !c.photo.startsWith('/assets/')) return c.photo;
+  return c.defaultPhoto || null;
+};
+
 export default function HumansPage() {
   const [coordinators, setCoordinators] = useState(() => getLocalCoordinators());
 
@@ -147,7 +160,7 @@ export default function HumansPage() {
             }}
           >
             {staffCoordinators.map((c, i) => {
-              const photo = c.photo || c.defaultPhoto;
+              const photo = resolveHumanPhoto(c);
               return (
               <motion.div
                 key={c.id || i}
@@ -169,9 +182,9 @@ export default function HumansPage() {
                 {photo ? (
                   <div
                     style={{
-                      width: 92,
-                      height: 92,
-                      borderRadius: '22px',
+                      width: 120,
+                      height: 120,
+                      borderRadius: '26px',
                       overflow: 'hidden',
                       border: '3px solid #e2e8f0',
                       boxShadow: '0 8px 18px rgba(0,0,0,0.06)',
@@ -191,8 +204,8 @@ export default function HumansPage() {
                     />
                   </div>
                 ) : (
-                  <div style={{ flexShrink: 0 }}>
-                    <AmongUsCrewmate color={c.color || 'lime'} hat={c.hat || 'crown'} size={88} floating={true} interactive={true} />
+                  <div style={{ flexShrink: 0, width: 100, display: 'flex', justifyContent: 'center' }}>
+                    <AmongUsCrewmate color={c.color || 'lime'} hat={c.hat || 'crown'} size={96} floating={true} interactive={true} />
                   </div>
                 )}
                 <div>
@@ -261,7 +274,7 @@ export default function HumansPage() {
             }}
           >
             {studentOrganizers.map((c, i) => {
-              const photo = c.photo || c.defaultPhoto;
+              const photo = resolveHumanPhoto(c);
               return (
               <motion.div
                 key={c.id || i}
@@ -283,9 +296,9 @@ export default function HumansPage() {
                 {photo ? (
                   <div
                     style={{
-                      width: 92,
-                      height: 92,
-                      borderRadius: '22px',
+                      width: 120,
+                      height: 120,
+                      borderRadius: '26px',
                       overflow: 'hidden',
                       border: '3px solid #ffe4e6',
                       boxShadow: '0 8px 18px rgba(255, 59, 105, 0.12)',
@@ -305,8 +318,8 @@ export default function HumansPage() {
                     />
                   </div>
                 ) : (
-                  <div style={{ flexShrink: 0 }}>
-                    <AmongUsCrewmate color={c.color || 'cyan'} hat={c.hat || 'pilot'} size={88} floating={true} interactive={true} />
+                  <div style={{ flexShrink: 0, width: 100, display: 'flex', justifyContent: 'center' }}>
+                    <AmongUsCrewmate color={c.color || 'cyan'} hat={c.hat || 'pilot'} size={96} floating={true} interactive={true} />
                   </div>
                 )}
                 <div>
@@ -387,9 +400,9 @@ export default function HumansPage() {
           >
             <div
               style={{
-                width: 108,
-                height: 108,
-                borderRadius: '26px',
+                width: 140,
+                height: 140,
+                borderRadius: '30px',
                 overflow: 'hidden',
                 border: '3.5px solid #38bdf8',
                 boxShadow: '0 10px 25px rgba(2, 132, 199, 0.2)',

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Sparkles, Heart, Trophy, Users, X, ZoomIn, ArrowRight, Plus } from 'lucide-react';
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
-import { fetchMoments, getLocalMoments } from '../lib/momentsService';
+import { fetchMoments, getLocalMoments, getDeletedMomentIds } from '../lib/momentsService';
 
 // Highlight photos (HAXLR8 Real Edition)
 import imgMentorship from '../assets/highlights/haxlr8_mentorship.png';
@@ -161,8 +161,11 @@ export default function HighlightsPage() {
     return () => window.removeEventListener('haxlr8_moments_updated', handleUpdate);
   }, []);
 
-  // Dynamic user-uploaded moments appear at the top, followed by curated gallery
-  const allMoments = [...dynamicMoments, ...GALLERY];
+  // Dynamic user-uploaded moments appear at the top, followed by curated gallery, excluding any deleted moments
+  const deletedSet = new Set(getDeletedMomentIds());
+  const allMoments = [...dynamicMoments, ...GALLERY].filter(p => {
+    return !deletedSet.has(p.id) && !deletedSet.has(String(p.id)) && !deletedSet.has(p.src);
+  });
 
   const filteredPhotos = filter === 'all' 
     ? allMoments 
@@ -354,8 +357,8 @@ export default function HighlightsPage() {
           layout
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '28px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+            gap: '32px',
             marginBottom: '80px',
           }}
         >
@@ -372,10 +375,10 @@ export default function HighlightsPage() {
                 onClick={() => openLightbox(photo)}
                 style={{
                   backgroundColor: '#ffffff',
-                  borderRadius: '24px',
+                  borderRadius: '26px',
                   border: `2.5px solid ${photo.border}`,
-                  padding: '14px 14px 18px',
-                  boxShadow: '0 12px 30px rgba(0,0,0,0.06)',
+                  padding: '16px 16px 22px',
+                  boxShadow: '0 14px 34px rgba(0,0,0,0.07)',
                   cursor: 'pointer',
                   transform: `rotate(${photo.rotate}deg)`,
                   transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease',
@@ -404,8 +407,8 @@ export default function HighlightsPage() {
                   style={{
                     position: 'relative',
                     width: '100%',
-                    height: '240px',
-                    borderRadius: '16px',
+                    height: 'clamp(280px, 36vw, 380px)',
+                    borderRadius: '18px',
                     overflow: 'hidden',
                     backgroundColor: photo.bg,
                   }}
@@ -465,11 +468,11 @@ export default function HighlightsPage() {
                 </div>
 
                 {/* Caption */}
-                <div style={{ marginTop: '14px', padding: '0 4px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px' }}>
+                <div style={{ marginTop: '16px', padding: '0 4px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a', margin: '0 0 5px' }}>
                     {photo.title}
                   </h4>
-                  <p style={{ fontSize: '12px', color: '#64748b', margin: 0, fontWeight: 600 }}>
+                  <p style={{ fontSize: '13px', color: '#64748b', margin: 0, fontWeight: 600 }}>
                     {photo.subtitle || 'HAXLR8 Edition // MIT Mysore'}
                   </p>
                 </div>

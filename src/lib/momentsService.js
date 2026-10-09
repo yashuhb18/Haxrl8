@@ -29,6 +29,19 @@ export function setLocalMoments(moments) {
 }
 
 /**
+ * Get set of all deleted moment IDs and URLs (tombstones)
+ */
+export function getDeletedMomentIds() {
+  try {
+    const rawDel = localStorage.getItem('haxlr8_deleted_moments');
+    const list = rawDel ? JSON.parse(rawDel) : [];
+    return new Set(list);
+  } catch (e) {
+    return new Set();
+  }
+}
+
+/**
  * Helper to compress image to base64 fallback if storage is unavailable
  */
 export async function fileToBase64(file, maxWidth = 1200) {
@@ -109,6 +122,14 @@ export async function uploadMomentImage(file) {
 export async function fetchMoments() {
   const local = getLocalMoments();
 
+  // Load persistent tombstone list so deleted moments never resurrect
+  let deletedList = [];
+  try {
+    const rawDel = localStorage.getItem('haxlr8_deleted_moments');
+    deletedList = rawDel ? JSON.parse(rawDel) : [];
+  } catch (e) {}
+  const deletedSet = new Set(deletedList);
+
   try {
     // 1. Try public.moments table if available
     const { data: momentsData, error: mErr } = await supabase
@@ -117,11 +138,12 @@ export async function fetchMoments() {
       .order('created_at', { ascending: false });
 
     if (!mErr && momentsData && Array.isArray(momentsData)) {
-      setLocalMoments(momentsData);
-      return momentsData;
+      const filteredMoments = momentsData.filter(m => !deletedSet.has(m.id) && !deletedSet.has(m.src));
+      setLocalMoments(filteredMoments);
+      return filteredMoments;
     }
 
-    // 2. Fallback to announcements with tag 'MOMENT'
+    // 2. Fetch announcements with tag 'MOMENT'
     const { data: annData, error: aErr } = await supabase
       .from('announcements')
       .select('*')
@@ -132,6 +154,7 @@ export async function fetchMoments() {
       const parsed = annData.map(item => {
         try {
           const detail = item.content ? JSON.parse(item.content) : {};
+          if (detail.isDeleted) return null;
           return {
             id: detail.id || `moment_${item.id}`,
             dbId: item.id,
@@ -148,23 +171,13 @@ export async function fetchMoments() {
             created_at: item.created_at || detail.created_at || new Date().toISOString()
           };
         } catch (e) {
-          return {
-            id: `moment_${item.id}`,
-            dbId: item.id,
-            title: item.title,
-            subtitle: item.message || 'MIT Mysore',
-            category: 'ceremony',
-            tag: 'MOMENT',
-            src: '',
-            description: item.message || '',
-            created_at: item.created_at
-          };
+          return null;
         }
-      }).filter(m => Boolean(m.src));
+      }).filter(m => Boolean(m && m.src && !deletedSet.has(m.id) && !deletedSet.has(m.src) && !deletedSet.has(String(m.dbId))));
 
-      // Combine with any local-only moments not yet synced
+      // Combine with any local-only moments not yet synced and not deleted
       const syncedIds = new Set(parsed.map(p => p.id));
-      const unSynced = local.filter(l => !syncedIds.has(l.id) && l.isLocalOnly);
+      const unSynced = local.filter(l => !syncedIds.has(l.id) && l.isLocalOnly && !deletedSet.has(l.id) && !deletedSet.has(l.src));
       const combined = [...parsed, ...unSynced];
 
       setLocalMoments(combined);
@@ -174,7 +187,8 @@ export async function fetchMoments() {
     console.warn('Network error fetching moments, returning local cache:', err);
   }
 
-  return local;
+  const cleanLocal = local.filter(l => !deletedSet.has(l.id) && !deletedSet.has(l.src));
+  return cleanLocal;
 }
 
 /**
@@ -275,23 +289,79 @@ export async function addMoment({ title, subtitle, category, tag, description, i
 export async function deleteMoment(moment) {
   if (!moment) return;
 
-  // 1. Remove from local cache
+  const momentId = moment.id;
+  const dbId = moment.dbId;
+  const storagePath = moment.storagePath;
+
+  // 1. Maintain persistent tombstone list in localStorage
+  try {
+    const deletedRaw = localStorage.getItem('haxlr8_deleted_moments');
+    const deletedList = deletedRaw ? JSON.parse(deletedRaw) : [];
+    if (momentId && !deletedList.includes(momentId)) deletedList.push(momentId);
+    if (moment.src && !deletedList.includes(moment.src)) deletedList.push(moment.src);
+    if (dbId && !deletedList.includes(String(dbId))) deletedList.push(String(dbId));
+    localStorage.setItem('haxlr8_deleted_moments', JSON.stringify(deletedList));
+  } catch (e) {}
+
+  // 2. Remove immediately from local cache
   const current = getLocalMoments();
-  const filtered = current.filter(m => m.id !== moment.id);
+  const filtered = current.filter(m => m.id !== momentId && m.src !== moment.src && m.dbId !== dbId);
   setLocalMoments(filtered);
 
-  // 2. Remove from Supabase
+  // 3. Update Supabase backend:
+  // Note: Supabase RLS policies may disallow DELETE for anon, but permit UPDATE.
+  // By updating the tag to 'MOMENT_DELETED', queries searching for tag='MOMENT' will never return it!
   try {
-    if (moment.dbId) {
-      // Try deleting from announcements
-      await supabase.from('announcements').delete().eq('id', moment.dbId);
-      // Also try moments table if it was saved there
-      await supabase.from('moments').delete().eq('id', moment.dbId);
+    if (dbId) {
+      await supabase
+        .from('announcements')
+        .update({
+          tag: 'MOMENT_DELETED',
+          title: '[DELETED_MOMENT]',
+          message: 'DELETED',
+          content: JSON.stringify({ isDeleted: true, id: momentId, deletedAt: new Date().toISOString() })
+        })
+        .eq('id', dbId);
+      
+      // Also try hard delete in case policy allows
+      await supabase.from('announcements').delete().eq('id', dbId);
+    }
+
+    // Also scan all announcements tagged MOMENT to catch this item by ID, src, or title
+    const { data: rows } = await supabase
+      .from('announcements')
+      .select('id, content, title')
+      .eq('tag', 'MOMENT');
+
+    if (rows && rows.length > 0) {
+      for (const r of rows) {
+        const matchesId = Boolean(momentId && r.content && r.content.includes(momentId));
+        const matchesSrc = Boolean(moment.src && r.content && r.content.includes(moment.src));
+        const matchesDbId = Boolean(dbId && r.id === dbId);
+
+        if (matchesId || matchesSrc || matchesDbId) {
+          await supabase
+            .from('announcements')
+            .update({
+              tag: 'MOMENT_DELETED',
+              title: '[DELETED_MOMENT]',
+              message: 'DELETED',
+              content: JSON.stringify({ isDeleted: true, id: momentId, deletedAt: new Date().toISOString() })
+            })
+            .eq('id', r.id);
+          await supabase.from('announcements').delete().eq('id', r.id);
+        }
+      }
     }
 
     // Try deleting from storage
-    if (moment.storagePath) {
-      await supabase.storage.from(STORAGE_BUCKET).remove([moment.storagePath]);
+    if (storagePath) {
+      await supabase.storage.from(STORAGE_BUCKET).remove([storagePath]);
+    } else if (moment.src && moment.src.includes('/moments/')) {
+      const extractedPath = moment.src.split('/moments/')[1];
+      if (extractedPath) {
+        await supabase.storage.from(STORAGE_BUCKET).remove([`moments/${extractedPath}`]);
+      }
     }
   } catch (err) {
     console.warn('Error deleting moment from backend:', err);

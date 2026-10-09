@@ -107,12 +107,26 @@ export function getLocalCoordinators() {
   };
 }
 
+function resolvePhotoField(photo, defaultPhoto) {
+  if (photo === null) return null;
+  if (typeof photo === 'string') {
+    if (photo.startsWith('http://') || photo.startsWith('https://') || photo.startsWith('data:')) {
+      return photo;
+    }
+    // Stale hashed build assets fallback to current active imported image
+    if (photo.startsWith('/assets/')) {
+      return defaultPhoto || photo;
+    }
+  }
+  return photo !== undefined ? photo : (defaultPhoto || null);
+}
+
 function mergeFacultyDefaults(item) {
   const def = DEFAULT_FACULTY_COORDINATORS.find(d => d.id === item.id) || {};
   return {
     ...def,
     ...item,
-    photo: item.photo || def.defaultPhoto || null,
+    photo: resolvePhotoField(item.photo, def.defaultPhoto),
   };
 }
 
@@ -121,7 +135,7 @@ function mergeStudentDefaults(item) {
   return {
     ...def,
     ...item,
-    photo: item.photo || def.defaultPhoto || null,
+    photo: resolvePhotoField(item.photo, def.defaultPhoto),
   };
 }
 
