@@ -283,15 +283,17 @@ export const supabase = {
     },
 
     async getUser() {
-      // 1. Try real supabase if configured
+      // 1. Try getSession first to parse any active OAuth redirect or current token
+      try {
+        const sessionRes = await this.getSession();
+        if (sessionRes?.data?.session?.user) {
+          return { data: { user: sessionRes.data.session.user }, error: null };
+        }
+      } catch (e) {}
+
+      // 2. Try raw Supabase getUser
       if (!isPlaceholder) {
         try {
-          // Check session first (which automatically parses URL hash after OAuth redirect)
-          const sessionRes = await withTimeout(rawSupabase.auth.getSession(), 6000);
-          if (sessionRes.data?.session?.user) {
-            setLocalSession(sessionRes.data.session.user);
-            return { data: { user: sessionRes.data.session.user }, error: null };
-          }
           const res = await withTimeout(rawSupabase.auth.getUser(), 6000);
           if (res.data?.user) {
             setLocalSession(res.data.user);
@@ -302,7 +304,7 @@ export const supabase = {
         }
       }
 
-      // 2. Check local leader session
+      // 3. Check local leader session
       const local = getLocalSession();
       if (local?.user) {
         return { data: { user: local.user }, error: null };
@@ -312,12 +314,68 @@ export const supabase = {
     },
 
     async getSession() {
+      // 1. Explicitly check if returning from OAuth redirect with tokens in hash or code in query
+      if (typeof window !== 'undefined' && !isPlaceholder) {
+        try {
+          // Check hash for access_token (Implicit Flow)
+          const rawHash = window.location.hash.startsWith('#') ? window.location.hash.substring(1) : window.location.hash;
+          if (rawHash && rawHash.includes('access_token=')) {
+            const hashParams = new URLSearchParams(rawHash);
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
+
+            if (accessToken && refreshToken) {
+              const res = await withTimeout(rawSupabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken
+              }), 6000);
+
+              if (res.data?.session?.user) {
+                setLocalSession(res.data.session.user);
+                // Clean hash now that session is successfully hydrated
+                try {
+                  window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                } catch (e) {}
+                return res;
+              }
+            }
+          }
+
+          // Check query parameters for code (PKCE Flow)
+          if (window.location.search && window.location.search.includes('code=')) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            if (code) {
+              const res = await withTimeout(rawSupabase.auth.exchangeCodeForSession(code), 6000);
+              if (res.data?.session?.user) {
+                setLocalSession(res.data.session.user);
+                // Clean code param now that session is successfully hydrated
+                try {
+                  urlParams.delete('code');
+                  const remaining = urlParams.toString();
+                  window.history.replaceState(null, '', window.location.pathname + (remaining ? `?${remaining}` : '') + window.location.hash);
+                } catch (e) {}
+                return res;
+              }
+            }
+          }
+        } catch (oauthErr) {
+          console.warn('OAuth URL hydration notice:', oauthErr);
+        }
+      }
+
+      // 2. Fetch active session from raw Supabase
       if (!isPlaceholder) {
         try {
           const res = await withTimeout(rawSupabase.auth.getSession(), 6000);
-          if (res.data?.session) return res;
+          if (res.data?.session?.user) {
+            setLocalSession(res.data.session.user);
+            return res;
+          }
         } catch (e) {}
       }
+
+      // 3. Fallback to local session
       const local = getLocalSession();
       return { data: { session: local }, error: null };
     },
@@ -511,9 +569,3 @@ export const supabase = {
   }
 };
 
-// Globally wipe sensitive OAuth tokens from the URL instantly upon sign in
-if (typeof window !== 'undefined') {
-  if (window.location.hash.includes('access_token=')) {
-    window.history.replaceState(null, '', window.location.pathname);
-  }
-}

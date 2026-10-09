@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <!-- <title>What's Next Big Idea!</title> -->
     <title>HAXLR8 3.0 | National Level Hackathon</title>
     <meta name="description" content="HAXLR8 3.0 is a premier National Level Hackathon hosted by Maharaja Institute of Technology Mysore. Build innovative solutions across Agriculture, Smart City, and Healthcare with a ₹30,000 prize pool." />
@@ -17,16 +17,23 @@
         padding: 0;
       }
       
+      html, body, #root {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      
       html {
         scroll-behavior: smooth;
-        overflow-x: clip;
+        overflow-x: hidden;
       }
       
       body {
         font-family: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
         background: #fffaf3;
         color: #0f172a;
-        overflow-x: clip;
+        overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }

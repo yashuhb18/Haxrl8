@@ -9,6 +9,7 @@ import TicketTab      from './TicketTab';
 import ResourcesTab   from './ResourcesTab';
 import AnnouncementsTab from './AnnouncementsTab';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
+import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function DashboardPage() {
   
   // Data States
   const [loading, setLoading] = useState(true);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [hasTeam, setHasTeam] = useState(false);
   const [teamData, setTeamData] = useState(null);
@@ -23,11 +25,41 @@ export default function DashboardPage() {
   const [submissions, setSubmissions] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
 
-  const withTimeout = (promise, ms = 5000) =>
+  const withTimeout = (promise, ms = 6000) =>
     Promise.race([
       promise,
       new Promise((_, reject) => setTimeout(() => reject(new Error('Network timeout')), ms))
     ]);
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const redirectUrl = `${window.location.origin}/dashboard`;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
+        },
+      });
+
+      if (error) {
+        console.warn('Google sign-in error:', error);
+        setGoogleLoading(false);
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (e) {
+      console.warn('Google sign in exception:', e);
+      setGoogleLoading(false);
+    }
+  };
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -36,7 +68,9 @@ export default function DashboardPage() {
 
       // 1. Check current Supabase session (handles OAuth redirect token parsing)
       try {
-        const sessionRes = await withTimeout(supabase.auth.getSession(), 5000);
+        const isOAuth = typeof window !== 'undefined' && 
+          (window.location.hash.includes('access_token=') || window.location.search.includes('code='));
+        const sessionRes = await withTimeout(supabase.auth.getSession(), isOAuth ? 9000 : 5000);
         if (sessionRes?.data?.session?.user) {
           activeUser = sessionRes.data.session.user;
         }
@@ -353,13 +387,23 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
+    const isOAuthRedirect = typeof window !== 'undefined' && 
+      (window.location.hash.includes('access_token=') || window.location.search.includes('code='));
+
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', background:'#fffaf3', fontFamily:"'Fredoka', 'Plus Jakarta Sans', sans-serif" }}>
-        <div style={{ textAlign:'center' }}>
-           <div style={{ width:48, height:48, border:'4px solid #fed7aa', borderTop:'4px solid #0284c7', borderRadius:'50%', animation:'spin 0.8s linear infinite', margin:'0 auto 16px' }} />
-           <div style={{ color:'#0284c7', fontSize:'14px', fontWeight:900, letterSpacing:'0.04em', textTransform:'uppercase' }}>CONNECTING TO FLIGHT DECK...</div>
-           <p style={{ color:'#64748b', fontSize:'12px', marginTop:'6px', fontWeight:600 }}>Syncing mission telemetry &amp; squad credentials</p>
-           <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100dvh', width: '100%', background:'#fffaf3', fontFamily:"'Plus Jakarta Sans', sans-serif", padding: '20px 16px', boxSizing: 'border-box' }}>
+        <div style={{ textAlign:'center', maxWidth: 420, width: '100%', background: '#ffffff', borderRadius: 24, padding: '36px 24px', border: '2px solid #fed7aa', boxShadow: '0 12px 36px rgba(0,0,0,0.06)', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <AmongUsCrewmate color="cyan" size={64} hat="visor" speechText={isOAuthRedirect ? "Authorizing Google credentials..." : "Preparing flight controls..."} />
+          </div>
+          <div style={{ width:44, height:44, border:'4px solid #fed7aa', borderTop:'4px solid #0284c7', borderRadius:'50%', animation:'spin 0.8s linear infinite', margin:'0 auto 16px' }} />
+          <div style={{ color:'#0284c7', fontSize:'14px', fontWeight:900, letterSpacing:'0.04em', textTransform:'uppercase' }}>
+            {isOAuthRedirect ? 'VERIFYING GOOGLE SSO...' : 'CONNECTING TO FLIGHT DECK...'}
+          </div>
+          <p style={{ color:'#64748b', fontSize:'12.5px', marginTop:'8px', fontWeight:600, lineHeight: 1.5 }}>
+            {isOAuthRedirect ? 'Hydrating Commander session and establishing secure telemetry...' : 'Syncing mission telemetry & squad credentials'}
+          </p>
+          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
     );
@@ -368,27 +412,135 @@ export default function DashboardPage() {
   // If no user is logged in, show helpful Commander Authentication gate instead of a blank screen
   if (!user && !loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#fffaf3', fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 20 }}>
-        <div style={{ maxWidth: 480, width: '100%', background: '#ffffff', borderRadius: 24, padding: '40px 32px', textAlign: 'center', border: '2px solid #fed7aa', boxShadow: '0 12px 36px rgba(0,0,0,0.06)' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
-            <AmongUsCrewmate color="red" size={68} hat="cap" speechText="Identify yourself, Captain!" />
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '100dvh', 
+        width: '100%',
+        background: '#fffaf3', 
+        fontFamily: "'Plus Jakarta Sans', sans-serif", 
+        padding: '24px 16px',
+        boxSizing: 'border-box'
+      }}>
+        <div style={{ 
+          maxWidth: 440, 
+          width: '100%', 
+          background: '#ffffff', 
+          borderRadius: 24, 
+          padding: '32px 22px', 
+          textAlign: 'center', 
+          border: '2px solid #fed7aa', 
+          boxShadow: '0 14px 40px rgba(0,0,0,0.06)',
+          boxSizing: 'border-box'
+        }}>
+          {/* Logo Header */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <img src={haxlr8LogoDark} alt="HAXLR8 3.0" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>Commander Login Required</h2>
-          <p style={{ fontSize: 13.5, color: '#64748b', margin: '0 0 24px', lineHeight: 1.5 }}>
-            To access your squad manifest, challenge track, payment verification, and official Flight Pass, please verify your commander credentials.
+
+          {/* Commander Mascot */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+            <AmongUsCrewmate color="red" size={66} hat="cap" speechText="Captain ID Required! 🚀" />
+          </div>
+
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 20, padding: '4px 12px', marginBottom: 10 }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              ● Authorization Required
+            </span>
+          </div>
+
+          <h2 style={{ fontSize: 21, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>Commander Login Required</h2>
+          <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 20px', lineHeight: 1.5 }}>
+            To access your squad manifest, challenge track, payment verification, and official Flight Pass, please verify your credentials.
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* 1-Tap Google SSO Button */}
+            <button
+              type="button"
+              disabled={googleLoading}
+              onClick={handleGoogleSignIn}
+              style={{
+                height: '46px',
+                width: '100%',
+                backgroundColor: '#ffffff',
+                border: '1.5px solid #cbd5e1',
+                borderRadius: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                fontSize: '13.5px',
+                fontWeight: 800,
+                color: '#1e293b',
+                cursor: googleLoading ? 'not-allowed' : 'pointer',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s',
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              <span>{googleLoading ? 'Connecting to Google SSO...' : 'Continue with Google SSO'}</span>
+            </button>
+
+            {/* Standard Email Login */}
             <button
               onClick={() => navigate('/login')}
-              style={{ padding: '14px 20px', borderRadius: 12, background: '#0284c7', color: '#ffffff', border: 'none', fontWeight: 800, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' }}
+              style={{
+                padding: '12px 18px',
+                borderRadius: 13,
+                background: '#0284c7',
+                color: '#ffffff',
+                border: 'none',
+                fontWeight: 800,
+                fontSize: '13.5px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.28)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6
+              }}
             >
-              Sign In to Flight Deck →
+              Sign In with Email & Password →
             </button>
+
+            {/* Register */}
+            <button
+              onClick={() => navigate('/register')}
+              style={{
+                padding: '10px 14px',
+                borderRadius: 12,
+                background: '#fff7ed',
+                border: '1.5px solid #fed7aa',
+                color: '#ea580c',
+                fontSize: 12.5,
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              New Squad? Register Leader Account
+            </button>
+
+            {/* Return home */}
             <button
               onClick={() => navigate('/')}
-              style={{ padding: '10px', background: 'transparent', border: 'none', color: '#64748b', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+              style={{
+                padding: '8px',
+                background: 'transparent',
+                border: 'none',
+                color: '#64748b',
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
             >
-              ← Back to Main Site
+              ← Back to Main Base Site
             </button>
           </div>
         </div>
