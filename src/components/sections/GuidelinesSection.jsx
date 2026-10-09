@@ -38,7 +38,7 @@ const DomainArcCard = ({ num, title, color, sub, style }) => (
   }}>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
       <span style={{ fontSize: '18px', fontWeight: 900 }}>{num}</span>
-      <span style={{ fontSize: '9px', fontWeight: 800, opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.06em' }}>TRACK</span>
+      <span style={{ fontSize: '9px', fontWeight: 800, opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.06em' }}>DOMAIN</span>
     </div>
     <div>
       <div style={{ fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', lineHeight: 1.2 }}>{title}</div>

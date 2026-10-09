@@ -18,12 +18,6 @@ const DOMAIN_CARDS = [
     badgeBg: 'rgba(34, 197, 94, 0.15)',
     details: {
       overview: 'Focuses on deploying cutting-edge IoT, computer vision, AI, and autonomous technologies to revolutionize modern agrarian systems and food supply chains.',
-      tracks: [
-        'AI Crop Disease Detection & Pest Early Warning',
-        'Smart Precision Irrigation & Soil Nutrient Sensing',
-        'Post-Harvest Spoilage Prevention & Cold-Chain Telemetry',
-        'Autonomous Farming Drones & Yield Forecasting Models',
-      ],
       idealOutput: 'Hardware prototypes, computer vision models, or mobile/web applications integrating real-time telemetry.',
     },
   },
@@ -39,12 +33,6 @@ const DOMAIN_CARDS = [
     badgeBg: 'rgba(2, 132, 199, 0.15)',
     details: {
       overview: 'Tackle pressing urban challenges by engineering resilient, connected, and energy-efficient municipal and transit systems for the next decade.',
-      tracks: [
-        'Intelligent Adaptive Traffic Routing & Emergency Green Corridors',
-        'Automated Municipal Waste Segregation & Smart Bin IoT',
-        'Decentralized Renewable Microgrids & Energy Distribution',
-        'Citizen Safety Telemetry & Disaster Response Systems',
-      ],
       idealOutput: 'Scalable cloud architectures, embedded edge devices, or spatial data analytics dashboards.',
     },
   },
@@ -60,12 +48,6 @@ const DOMAIN_CARDS = [
     badgeBg: 'rgba(239, 68, 68, 0.15)',
     details: {
       overview: 'Develop life-saving healthcare tools that expand accessibility, enhance diagnostic precision, and democratize clinical support for all communities.',
-      tracks: [
-        'Low-cost Point-of-Care Diagnostic Screening with ML',
-        'Remote Patient Telemetry & Critical Vital Signs Monitors',
-        'Emergency Ambulatory Response & Hospital Bed Coordination',
-        'Mental Health & Assistive Technologies for Differently Abled',
-      ],
       idealOutput: 'Clinically grounded software tools, medical IoT prototypes, or triage decision-support systems.',
     },
   },
@@ -362,17 +344,19 @@ export default function ChooseMissionSection() {
                 {selectedDomain.details.overview}
               </p>
 
-              <h4 style={{ fontSize: '15px', fontWeight: 800, color: selectedDomain.color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '12px' }}>
-                Focus Areas & Problem Themes:
-              </h4>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-                {selectedDomain.details.tracks.map((track, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <CheckCircle2 size={18} color={selectedDomain.color} style={{ marginTop: '2px', flexShrink: 0 }} />
-                    <span style={{ fontSize: '14px', color: '#e2e8f0', lineHeight: 1.5 }}>{track}</span>
-                  </div>
-                ))}
+              <div style={{
+                background: 'rgba(234, 88, 12, 0.12)',
+                border: '1.5px solid rgba(234, 88, 12, 0.35)',
+                borderRadius: '14px',
+                padding: '16px 20px',
+                marginBottom: '24px'
+              }}>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
+                  📢 Problem Statements Reveal on November 2nd
+                </div>
+                <div style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: 1.6 }}>
+                  There are no sub-tracks for students—only the core domain is selected. The official problem statements for <strong>{selectedDomain.title}</strong> will be revealed on <strong>November 2, 2026</strong>.
+                </div>
               </div>
 
               <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '24px' }}>

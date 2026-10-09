@@ -669,7 +669,7 @@ export default function AuthPage() {
               }}
             >
               {mode === 'login'
-                ? 'Sign in to access your squad manifest, flight pass, and domain track'
+                ? 'Sign in to access your squad manifest, flight pass, and domain'
                 : 'Create your Leader account to register your squad for MIT Mysore'}
             </p>
           </div>

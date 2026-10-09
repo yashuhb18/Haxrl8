@@ -159,7 +159,7 @@ export default function PrizesPage() {
               fontFamily: "'Plus Jakarta Sans', sans-serif",
             }}
           >
-            Compete with the brightest undergraduate minds in India and claim your share of the ₹33,333 prize pool at Maharaja Institute of Technology, Mysore.
+            Compete with the brightest undergraduate minds in India and claim your share of the ₹33,333 prize pool at Maharaja Institute of Technology Mysore.
           </p>
         </div>
 

@@ -7,7 +7,7 @@ import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 const MASTER_PASSCODE = 'HAXLR8_COMMAND_2026';
 const ORGANIZER_SESSION_KEY = 'haxlr8_organizer_session';
 const ORGANIZER_TIMESTAMP_KEY = 'haxlr8_organizer_timestamp';
-const ADMIN_IDLE_TIMEOUT_MS = 60 * 1000; // Strictly 1-minute security auto-logout
+const ADMIN_IDLE_TIMEOUT_MS = 8 * 60 * 60 * 1000; // 8-hour session window for mobile & desktop organizers
 
 export const AdminAuthContext = React.createContext({
   isAuthenticated: false,
@@ -28,10 +28,10 @@ export default function AdminAuthGate({ children }) {
   const [showPasscode, setShowPasscode] = useState(false);
 
   const handleLogout = async () => {
-    sessionStorage.removeItem(ORGANIZER_SESSION_KEY);
-    sessionStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
-    localStorage.removeItem(ORGANIZER_SESSION_KEY);
-    localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
+    try { sessionStorage.removeItem(ORGANIZER_SESSION_KEY); } catch (e) {}
+    try { sessionStorage.removeItem(ORGANIZER_TIMESTAMP_KEY); } catch (e) {}
+    try { localStorage.removeItem(ORGANIZER_SESSION_KEY); } catch (e) {}
+    try { localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY); } catch (e) {}
     try {
       await supabase.auth.signOut();
     } catch (e) {}
@@ -42,24 +42,39 @@ export default function AdminAuthGate({ children }) {
 
   useEffect(() => {
     const checkSession = async () => {
-      // 1. Purge legacy persistent localStorage tokens so mobile never remains logged in overnight
-      localStorage.removeItem(ORGANIZER_SESSION_KEY);
-      localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
+      let savedSession = null;
+      let savedTimestamp = 0;
 
-      // 2. Check current session with strict 1-minute inactivity timestamp
-      const savedSession = sessionStorage.getItem(ORGANIZER_SESSION_KEY);
-      const savedTimestamp = parseInt(sessionStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
+      try {
+        savedSession = sessionStorage.getItem(ORGANIZER_SESSION_KEY);
+        savedTimestamp = parseInt(sessionStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
+      } catch (e) {}
+
+      // Fallback to localStorage for mobile browsers where sessionStorage resets on tab suspend
+      if (savedSession !== 'active' || !savedTimestamp) {
+        try {
+          const lSession = localStorage.getItem(ORGANIZER_SESSION_KEY);
+          const lTime = parseInt(localStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
+          if (lSession === 'active' && lTime) {
+            savedSession = lSession;
+            savedTimestamp = lTime;
+          }
+        } catch (e) {}
+      }
+
       const now = Date.now();
 
       if (savedSession === 'active' && savedTimestamp && (now - savedTimestamp < ADMIN_IDLE_TIMEOUT_MS)) {
-        sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, now.toString());
+        const nowStr = now.toString();
+        try { sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr); } catch (e) {}
+        try { localStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr); } catch (e) {}
         setIsAuthenticated(true);
         setLoading(false);
         return;
       }
 
       if (savedSession === 'active' && savedTimestamp && (now - savedTimestamp >= ADMIN_IDLE_TIMEOUT_MS)) {
-        setErrorMsg('🔒 Admin session automatically locked after 1 minute of inactivity for security.');
+        setErrorMsg('🔒 Admin session expired after 8 hours. Please re-enter master passcode.');
       }
 
       setIsAuthenticated(false);
@@ -76,24 +91,30 @@ export default function AdminAuthGate({ children }) {
     return () => window.removeEventListener('haxlr8_organizer_logout', onLogoutEvent);
   }, []);
 
-  // Inactivity detection: auto-lock after 60 seconds of no interaction
+  // Inactivity detection & mobile visibility resume
   useEffect(() => {
     if (!isAuthenticated) return;
 
     const updateActivity = () => {
-      sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, Date.now().toString());
+      const nowStr = Date.now().toString();
+      try { sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr); } catch (e) {}
+      try { localStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr); } catch (e) {}
     };
 
-    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'touchmove', 'click', 'visibilitychange'];
     activityEvents.forEach(evt => window.addEventListener(evt, updateActivity, { passive: true }));
 
     const timer = setInterval(() => {
-      const lastActive = parseInt(sessionStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
+      let lastActive = 0;
+      try {
+        lastActive = parseInt(sessionStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || localStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
+      } catch (e) {}
+
       if (!lastActive || (Date.now() - lastActive >= ADMIN_IDLE_TIMEOUT_MS)) {
-        setErrorMsg('🔒 Admin session automatically locked after 1 minute of inactivity for security.');
+        setErrorMsg('🔒 Admin session expired. Please re-enter master passcode.');
         handleLogout();
       }
-    }, 2500);
+    }, 15000); // Check every 15s instead of 2.5s to preserve mobile battery and performance
 
     return () => {
       activityEvents.forEach(evt => window.removeEventListener(evt, updateActivity));
@@ -101,16 +122,25 @@ export default function AdminAuthGate({ children }) {
     };
   }, [isAuthenticated]);
 
+  const setAuthStorage = () => {
+    const nowStr = Date.now().toString();
+    try {
+      sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+      sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr);
+    } catch (e) {}
+    try {
+      localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+      localStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr);
+    } catch (e) {}
+    setIsAuthenticated(true);
+  };
+
   const handlePasscodeLogin = (e) => {
     e.preventDefault();
     setErrorMsg('');
     const cleanKey = passcode.trim().toUpperCase();
     if (cleanKey === MASTER_PASSCODE || cleanKey === 'HAXLR8_2026' || cleanKey === 'HAXLR82026' || cleanKey === 'HAXLR8' || cleanKey === 'ADMIN' || cleanKey === 'MITM') {
-      sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-      sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, Date.now().toString());
-      localStorage.removeItem(ORGANIZER_SESSION_KEY);
-      localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
-      setIsAuthenticated(true);
+      setAuthStorage();
     } else {
       setErrorMsg('Incorrect Master Passcode. Access denied.');
     }
@@ -125,19 +155,11 @@ export default function AdminAuthGate({ children }) {
       if (res.error) throw res.error;
       const user = res.data?.user;
       if (user?.email === 'yashuhb18@gmail.com' || user?.email === 'haxlr8ecemitm@gmail.com') {
-        sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-        sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, Date.now().toString());
-        localStorage.removeItem(ORGANIZER_SESSION_KEY);
-        localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
-        setIsAuthenticated(true);
+        setAuthStorage();
       } else {
         const { data: adminList } = await supabase.from('admins').select('email').eq('email', user.email);
         if (adminList && adminList.length > 0) {
-          sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-          sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, Date.now().toString());
-          localStorage.removeItem(ORGANIZER_SESSION_KEY);
-          localStorage.removeItem(ORGANIZER_TIMESTAMP_KEY);
-          setIsAuthenticated(true);
+          setAuthStorage();
         } else {
           setErrorMsg('Account authenticated, but this email is not in the authorized Organizers roster.');
         }

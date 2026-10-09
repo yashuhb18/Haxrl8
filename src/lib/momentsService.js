@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService';
 
 const LOCAL_MOMENTS_KEY = 'haxlr8_dynamic_moments';
 const STORAGE_BUCKET = 'id-cards';
@@ -80,6 +81,23 @@ export async function uploadMomentImage(file) {
     throw new Error('Please select an image file (JPG, PNG, WebP)');
   }
 
+  // 1. Try Cloudinary first if configured (prevents Supabase from getting overwhelmed)
+  if (isCloudinaryConfigured()) {
+    try {
+      const cloudRes = await uploadToCloudinary(file, { folder: 'haxlr8_moments' });
+      if (cloudRes?.secureUrl) {
+        return {
+          url: cloudRes.secureUrl,
+          path: cloudRes.publicId,
+          storageType: 'cloudinary'
+        };
+      }
+    } catch (cloudErr) {
+      console.warn('Cloudinary upload notice, falling back to Supabase:', cloudErr);
+    }
+  }
+
+  // 2. Supabase Storage fallback
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(2, 8);
   const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_').toLowerCase();
@@ -107,7 +125,7 @@ export async function uploadMomentImage(file) {
     console.warn('Storage upload error, falling back to compressed data URL:', storageErr);
   }
 
-  // Fallback to compressed base64 if storage call failed
+  // 3. Fallback to compressed base64 if storage calls fail
   const base64Url = await fileToBase64(file);
   return {
     url: base64Url,

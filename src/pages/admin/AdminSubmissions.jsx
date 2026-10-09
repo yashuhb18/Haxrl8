@@ -213,7 +213,7 @@ export default function AdminSubmissions() {
       supabase.from('submissions').select('*').in('team_id', teamIds)
     ]);
 
-    const headers = ['S.No', 'Squad Name', 'Domain Track', 'Squad Commander', 'Email', 'Phone', 'College', 'Crew Count', 'Registration Fee', 'Payment Status', 'Registered On'];
+    const headers = ['S.No', 'Squad Name', 'Domain', 'Squad Commander', 'Email', 'Phone', 'College', 'Crew Count', 'Registration Fee', 'Payment Status', 'Registered On'];
     const csvRows = [headers.join(',')];
 
     data.forEach((t, i) => {
@@ -329,7 +329,7 @@ export default function AdminSubmissions() {
               <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
                 <thead>
                   <tr style={{ background:'#FAFAFA', borderBottom:'1px solid '+S.border }}>
-                    {['S.No', 'Squad Name', 'Domain Track', 'Commander', 'Crew Size', 'Fee / Squad', 'Payment / QR Proof', 'Actions'].map(h => (
+                    {['S.No', 'Squad Name', 'Domain', 'Commander', 'Crew Size', 'Fee / Squad', 'Payment / QR Proof', 'Actions'].map(h => (
                       <th key={h} style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>{h}</th>
                     ))}
                   </tr>

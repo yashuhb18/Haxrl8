@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService';
 import balakrishnaImg from '../assets/humans/balakrishna.png';
 import sandeshImg from '../assets/humans/sandesh.jpg';
 import yashwanthImg from '../assets/humans/yashwanth.png';
@@ -245,6 +246,19 @@ export async function saveCoordinators({ faculty, students }) {
 export async function uploadCoordinatorPhoto(file, coordinatorId) {
   if (!file) throw new Error('No file provided');
 
+  // 1. Prioritize Cloudinary if configured
+  if (isCloudinaryConfigured()) {
+    try {
+      const cloudRes = await uploadToCloudinary(file, { folder: 'haxlr8_coordinators' });
+      if (cloudRes?.secureUrl) {
+        return cloudRes.secureUrl;
+      }
+    } catch (cErr) {
+      console.warn('Cloudinary coordinator photo upload notice, falling back to Supabase:', cErr);
+    }
+  }
+
+  // 2. Supabase Storage fallback
   const fileExt = file.name.split('.').pop() || 'jpg';
   const cleanId = String(coordinatorId || 'coord').replace(/[^a-zA-Z0-9_-]/g, '_');
   const fileName = `coord_${cleanId}_${Date.now()}.${fileExt}`;

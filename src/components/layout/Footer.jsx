@@ -189,7 +189,7 @@ export default function Footer() {
           className="footer-bottom-line"
         >
           <div>
-            Department of Electronics & Communication Engineering, Maharaja Institute of Technology, Mysore
+            Department of Electronics & Communication Engineering, Maharaja Institute of Technology Mysore
           </div>
           <div>
             © 2026 HAXLR8 3.0 · All Rights Reserved

@@ -650,7 +650,7 @@ export default function PlayfulTimelineSection() {
               lineHeight: 1.6,
             }}
           >
-            Follow the crew’s journey across 5 spaceship sectors from onboarding to the 24-hour hackathon finale at Maharaja Institute of Technology, Mysore. Click any crewmate to see what they’re up to!
+            Follow the crew’s journey across 5 spaceship sectors from onboarding to the 24-hour hackathon finale at Maharaja Institute of Technology Mysore. Click any crewmate to see what they’re up to!
           </p>
 
           {/* Interactive Crew Task Progress Indicator */}

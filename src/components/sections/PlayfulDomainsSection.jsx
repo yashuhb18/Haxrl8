@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sprout, HeartPulse, Building2, ArrowRight, X, CheckCircle2 } from 'lucide-react';
+import { Sprout, HeartPulse, Building2, ArrowRight, X, Calendar, Lock, Sparkles } from 'lucide-react';
 
 const DOMAINS = [
   {
@@ -12,12 +12,6 @@ const DOMAINS = [
     border: '#86efac',
     textCol: '#15803d',
     icon: Sprout,
-    details: [
-      'AI Crop Disease Detection & Pest Early Warning',
-      'Smart Precision Irrigation & Soil Nutrient Sensing',
-      'Post-Harvest Cold-Chain Telemetry & Waste Reduction',
-      'Autonomous Farming Drones & Yield Forecasting Models',
-    ],
   },
   {
     id: 'healthcare',
@@ -28,12 +22,6 @@ const DOMAINS = [
     border: '#fecdd3',
     textCol: '#e11d48',
     icon: HeartPulse,
-    details: [
-      'Low-Cost Point-of-Care Diagnostics with Edge AI',
-      'Remote Patient Telemetry & Critical Vital Monitors',
-      'Emergency Ambulatory Routing & Hospital Bed Coordination',
-      'Assistive Tech & Rehabilitation for Differently Abled',
-    ],
   },
   {
     id: 'smart-city',
@@ -44,12 +32,6 @@ const DOMAINS = [
     border: '#7dd3fc',
     textCol: '#0284c7',
     icon: Building2,
-    details: [
-      'Intelligent Adaptive Traffic Routing & Green Corridors',
-      'Automated Municipal Waste Segregation & Smart Bin IoT',
-      'Decentralized Renewable Microgrids & Energy Distribution',
-      'Citizen Safety Telemetry & Emergency Disaster Networks',
-    ],
   },
 ];
 
@@ -221,13 +203,54 @@ export default function PlayfulDomainsSection() {
                     gap: '4px',
                   }}
                 >
-                  <span>Explore Track</span>
+                  <span>Explore Domain</span>
                   <ArrowRight size={14} />
                 </div>
               </motion.div>
             );
           })}
         </div>
+
+        {/* Global Directive Notice: No tracks, Problem Statements unlock Nov 2nd */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          style={{
+            marginTop: '36px',
+            background: '#ffffff',
+            border: '2px dashed #fed7aa',
+            borderRadius: '20px',
+            padding: '18px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '14px',
+            textAlign: 'center',
+            flexWrap: 'wrap',
+            boxShadow: '0 4px 14px rgba(234, 88, 12, 0.05)',
+          }}
+        >
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: '#fff7ed',
+              color: '#ea580c',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Calendar size={18} />
+          </div>
+          <span style={{ fontSize: '14px', fontWeight: 700, color: '#334155' }}>
+            <strong style={{ color: '#0f172a' }}>Zero Sub-Tracks Policy:</strong> You only choose from the 3 core innovation domains. Official Problem Statements will be revealed on <span style={{ color: '#ea580c', fontWeight: 900 }}>November 2nd, 2026</span>.
+          </span>
+        </motion.div>
       </div>
 
       {/* Domain Details Modal */}
@@ -296,12 +319,12 @@ export default function PlayfulDomainsSection() {
                 <X size={18} />
               </button>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '22px' }}>
                 <div
                   style={{
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '16px',
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '18px',
                     background: selectedDomain.bg,
                     display: 'flex',
                     alignItems: 'center',
@@ -309,29 +332,58 @@ export default function PlayfulDomainsSection() {
                     color: selectedDomain.textCol,
                   }}
                 >
-                  {React.createElement(selectedDomain.icon, { size: 26, strokeWidth: 2.4 })}
+                  {React.createElement(selectedDomain.icon, { size: 28, strokeWidth: 2.4 })}
                 </div>
                 <div>
+                  <div style={{ fontSize: '11px', fontWeight: 900, color: selectedDomain.textCol, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' }}>
+                    HAXLR8 3.0 DOMAIN
+                  </div>
                   <h3 style={{ fontSize: '24px', fontWeight: 900, margin: 0, color: '#0f172a' }}>
                     {selectedDomain.title}
                   </h3>
-                  <p style={{ margin: 0, fontSize: '14px', color: '#64748b', fontWeight: 600 }}>
-                    {selectedDomain.desc}
-                  </p>
                 </div>
               </div>
 
-              <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>
-                Sample Focus Areas:
-              </h4>
+              <p style={{ margin: '0 0 24px 0', fontSize: '14.5px', color: '#475569', fontWeight: 500, lineHeight: 1.6 }}>
+                {selectedDomain.desc}
+              </p>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
-                {selectedDomain.details.map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <CheckCircle2 size={18} color={selectedDomain.textCol} style={{ marginTop: '2px', flexShrink: 0 }} />
-                    <span style={{ fontSize: '14px', color: '#334155', fontWeight: 500, lineHeight: 1.5 }}>{item}</span>
-                  </div>
-                ))}
+              {/* Problem Statements Reveal Block */}
+              <div
+                style={{
+                  background: '#fff7ed',
+                  border: '2px dashed #fb923c',
+                  borderRadius: '22px',
+                  padding: '24px 20px',
+                  marginBottom: '26px',
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '7px',
+                    background: '#ffedd5',
+                    color: '#ea580c',
+                    padding: '5px 14px',
+                    borderRadius: '100px',
+                    fontSize: '11px',
+                    fontWeight: 900,
+                    marginBottom: '10px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  <Calendar size={13} strokeWidth={2.5} />
+                  <span>SCHEDULE DIRECTIVE</span>
+                </div>
+                <h4 style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a', margin: '0 0 8px 0' }}>
+                  Problem Statements Reveal on November 2nd
+                </h4>
+                <p style={{ fontSize: '13.5px', color: '#475569', margin: 0, lineHeight: 1.6, fontWeight: 500 }}>
+                  There are no tracks for students in this hackathon—only the domain is selected. The official problem statements and challenges for <strong>{selectedDomain.title}</strong> will be revealed on <strong>November 2, 2026</strong>.
+                </p>
               </div>
 
               <a

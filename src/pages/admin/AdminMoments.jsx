@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Camera, Upload, Image as ImageIcon, Trash2, ExternalLink, 
   Sparkles, CheckCircle2, AlertCircle, RefreshCw, Copy, Check, 
-  Eye, Plus, Tag, ArrowRight, ShieldCheck, Clock, MapPin
+  Eye, Plus, Tag, ArrowRight, ShieldCheck, Clock, MapPin, Cloud
 } from 'lucide-react';
 import { 
   fetchMoments, addMoment, deleteMoment, getLocalMoments 
 } from '../../lib/momentsService';
+import { isCloudinaryConfigured } from '../../lib/cloudinaryService';
+import CloudinaryConfigModal from '../../components/admin/CloudinaryConfigModal';
 import { playCrewmatePopSound } from '../../components/amongus/AmongUsSound';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
@@ -30,6 +32,7 @@ export default function AdminMoments({ standalone = false }) {
   const [notification, setNotification] = useState(null);
   const [viewingMoment, setViewingMoment] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [showCloudinaryModal, setShowCloudinaryModal] = useState(false);
 
   const fileInputRef = useRef(null);
   const batchInputRef = useRef(null);
@@ -314,6 +317,27 @@ export default function AdminMoments({ standalone = false }) {
           >
             {copiedLink ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
             <span>{copiedLink ? 'Link Copied!' : 'Copy Mobile Link'}</span>
+          </button>
+
+          <button
+            onClick={() => setShowCloudinaryModal(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              background: isCloudinaryConfigured() ? '#f0fdf4' : '#f8fafc',
+              color: isCloudinaryConfigured() ? '#166534' : '#0369a1',
+              border: `1.5px solid ${isCloudinaryConfigured() ? '#bbf7d0' : '#bae6fd'}`,
+              padding: '10px 16px',
+              borderRadius: 14,
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            }}
+          >
+            <Cloud size={15} color={isCloudinaryConfigured() ? '#16a34a' : '#0284c7'} />
+            <span>{isCloudinaryConfigured() ? 'Cloudinary CDN Active' : 'Configure Cloudinary'}</span>
           </button>
         </div>
       </div>
@@ -961,6 +985,11 @@ export default function AdminMoments({ standalone = false }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <CloudinaryConfigModal 
+        isOpen={showCloudinaryModal} 
+        onClose={() => setShowCloudinaryModal(false)} 
+      />
     </div>
   );
 }

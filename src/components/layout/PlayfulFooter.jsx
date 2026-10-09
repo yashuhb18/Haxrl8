@@ -127,7 +127,7 @@ export default function PlayfulFooter() {
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
-              National Level 24-Hour Hackathon hosted by the Department of Electronics & Communication Engineering at Maharaja Institute of Technology, Mysore.
+              National Level 24-Hour Hackathon hosted by the Department of Electronics & Communication Engineering at Maharaja Institute of Technology Mysore.
             </p>
           </div>
 
@@ -348,7 +348,7 @@ export default function PlayfulFooter() {
           }}
         >
           <div>
-            © 2026 HAXLR8 3.0 · Maharaja Institute of Technology, Mysore
+            © 2026 HAXLR8 3.0 · Maharaja Institute of Technology Mysore
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Link to="/terms" style={{ color: '#64748b', textDecoration: 'none' }}>Terms & Conditions</Link>

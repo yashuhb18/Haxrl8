@@ -1,7 +1,7 @@
 /**
  * HAXLR8 3.0 - Automated Participant Email Dispatch Service
  * Official Host Sender: haxlr8ecemitm@gmail.com
- * Maharaja Institute of Technology, Mysore
+ * Maharaja Institute of Technology Mysore
  */
 
 export const HAXLR8_HOST_EMAIL = 'haxlr8ecemitm@gmail.com';
@@ -231,8 +231,8 @@ export function generateSubmissionEmailHtml({ leaderName, teamName, trackName, p
             <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${teamName || 'Registered Squad'}</td>
           </tr>
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Domain Track</td>
-            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${trackName || 'General Track'}</td>
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Domain</td>
+            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${trackName || 'General'}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Project Title</td>
@@ -447,7 +447,7 @@ export function generateLoginEmailHtml({ leaderName, recipientEmail }) {
       </div>
 
       <p style="font-size: 13.5px; color: #475569;">
-        Your flight command deck is active. You can manage your 3–4 crew roster, monitor payment verification, and review challenge track problem statements.
+        Your flight command deck is active. You can manage your 3–4 crew roster, monitor payment verification, and review official problem statements once released on <strong>November 2nd, 2026</strong>.
       </p>
 
       <div style="text-align: center; margin-top: 26px;">

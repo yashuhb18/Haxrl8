@@ -201,7 +201,7 @@ export default function AdminJury() {
                 <div style={{ position:'relative', minWidth:260 }}>
                   <Search size={16} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:S.t3 }}/>
                   <input 
-                    placeholder="Search by squad name, domain track, or commander..." 
+                    placeholder="Search by squad name, domain, or commander..." 
                     value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                     style={{ paddingLeft:36, paddingRight:16, paddingTop:10, paddingBottom:10, background:S.card, border:'1px solid '+S.border, borderRadius:8, fontSize:13, width:'100%', outline:'none', color:S.t1 }}
                   />
@@ -215,7 +215,7 @@ export default function AdminJury() {
                   <tr style={{ background:'#FAFAFA', borderBottom:'1px solid '+S.border }}>
                     <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>S.No</th>
                     <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Squad Name</th>
-                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Domain Track</th>
+                    <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Domain</th>
                     <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Squad Commander</th>
                     <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>Crew Count</th>
                     <th style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>College &amp; Location</th>

@@ -227,7 +227,7 @@ export default function PlayfulAboutSection() {
                   fontWeight: 500,
                 }}
               >
-                A national level hackathon organized by the Department of Electronics & Communication Engineering, Maharaja Institute of Technology, Mysore.
+                A national level hackathon organized by the Department of Electronics & Communication Engineering, Maharaja Institute of Technology Mysore.
               </p>
 
               <p

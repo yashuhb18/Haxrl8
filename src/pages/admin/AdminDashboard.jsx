@@ -13,41 +13,102 @@ const S = {
   activeBg: '#EEE8FF', radius: '14px', pad: '24px', gap: '20px',
 };
 
+const DASHBOARD_CACHE_KEY = 'haxlr8_admin_dashboard_cache';
+
+const getCachedDashboard = () => {
+  try {
+    const raw = localStorage.getItem(DASHBOARD_CACHE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
+};
+
+const setCachedDashboard = (data) => {
+  try {
+    localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(data));
+  } catch (e) {}
+};
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const basePath = location.pathname.startsWith('/admin') ? '/admin' : '/udview';
   const [isAdmin, setIsAdmin] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
-  const [teams, setTeams] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [submissions, setSubmissions] = useState([]);
+
+  // Initialize from cache so mobile users immediately see data on open without lag
+  const initialCache = getCachedDashboard();
+  const [teams, setTeams] = useState(initialCache?.teams || []);
+  const [members, setMembers] = useState(initialCache?.members || []);
+  const [submissions, setSubmissions] = useState(initialCache?.submissions || []);
+  const [exactCounts, setExactCounts] = useState(initialCache?.exactCounts || { teams: initialCache?.teams?.length || 0, members: initialCache?.members?.length || 0, subs: initialCache?.submissions?.length || 0, evals: initialCache?.teams?.length || 0 });
   const [adminEmail, setAdminEmail] = useState('');
   const [showEmail, setShowEmail] = useState(false);
-  const [exactCounts, setExactCounts] = useState({ teams: 0, members: 0, subs: 0, evals: 0 });
   const [emailLogs, setEmailLogs] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [dataError, setDataError] = useState('');
 
   const fetchData = useCallback(async () => {
-    // 1. Fetch exact counts (instant, reliable)
-    const [cT, cM, cS] = await Promise.all([
-      supabase.from('teams').select('*', { count: 'exact', head: true }),
-      supabase.from('team_members').select('*', { count: 'exact', head: true }),
-      supabase.from('submissions').select('*', { count: 'exact', head: true }),
-    ]);
-    const teamCount = cT.count || 0;
-    const memberCount = cM.count || 0;
-    const subCount = cS.count || 0;
-    setExactCounts({ teams: teamCount, members: memberCount, subs: subCount, evals: teamCount });
+    setDataError('');
+    try {
+      // 1. Fetch exact counts (with fallback if head fails)
+      let teamCount = 0;
+      let memberCount = 0;
+      let subCount = 0;
 
-    // 2. Fetch data for charts & tables
-    const [{ data: t }, { data: m }, { data: s }] = await Promise.all([
-      supabase.from('teams').select('*').order('created_at', { ascending: false }),
-      supabase.from('team_members').select('*').order('created_at', { ascending: false }),
-      supabase.from('submissions').select('*').order('created_at', { ascending: false }),
-    ]);
-    if (t) setTeams(t); if (m) setMembers(m); if (s) setSubmissions(s);
-    setEmailLogs(getEmailDispatchLogs());
+      try {
+        const [cT, cM, cS] = await Promise.all([
+          supabase.from('teams').select('*', { count: 'exact', head: true }),
+          supabase.from('team_members').select('*', { count: 'exact', head: true }),
+          supabase.from('submissions').select('*', { count: 'exact', head: true }),
+        ]);
+        teamCount = cT.count ?? 0;
+        memberCount = cM.count ?? 0;
+        subCount = cS.count ?? 0;
+      } catch (countErr) {
+        console.warn('Head count notice, falling back to full table count:', countErr);
+      }
+
+      // 2. Fetch data for charts & tables
+      const [tRes, mRes, sRes] = await Promise.all([
+        supabase.from('teams').select('*').order('created_at', { ascending: false }),
+        supabase.from('team_members').select('*').order('created_at', { ascending: false }),
+        supabase.from('submissions').select('*').order('created_at', { ascending: false }),
+      ]);
+
+      const t = tRes.data || [];
+      const m = mRes.data || [];
+      const s = sRes.data || [];
+
+      const finalTeamCount = teamCount || t.length;
+      const finalMemberCount = memberCount || m.length;
+      const finalSubCount = subCount || s.length;
+
+      const newCounts = {
+        teams: finalTeamCount,
+        members: finalMemberCount,
+        subs: finalSubCount,
+        evals: finalTeamCount,
+      };
+
+      if (t.length > 0 || !initialCache?.teams?.length) setTeams(t);
+      if (m.length > 0 || !initialCache?.members?.length) setMembers(m);
+      if (s.length > 0 || !initialCache?.submissions?.length) setSubmissions(s);
+      setExactCounts(newCounts);
+      setEmailLogs(getEmailDispatchLogs());
+
+      // Save to cache for offline/mobile zero-delay loads
+      setCachedDashboard({
+        teams: t,
+        members: m,
+        submissions: s,
+        exactCounts: newCounts,
+        savedAt: Date.now()
+      });
+    } catch (err) {
+      console.warn('Dashboard fetch notice (using cache):', err);
+      setDataError('Network connectivity blip on mobile. Displaying cached roster data.');
+    }
   }, []);
 
   useEffect(() => {
@@ -319,7 +380,7 @@ export default function AdminDashboard() {
                   <table style={{ width:'100%', minWidth:540, borderCollapse:'collapse', fontSize:12 }}>
                     <thead>
                       <tr style={{ background:'#FAFAFA', borderBottom:'1px solid #F1F5F9' }}>
-                        {['Squad Name','Domain Track','Crew Size','Registered On','Status'].map(h => (
+                        {['Squad Name','Domain','Crew Size','Registered On','Status'].map(h => (
                           <th key={h} style={{ padding:'12px 18px', fontWeight:600, color:S.t2, textAlign: 'left' }}>{h}</th>
                         ))}
                       </tr>

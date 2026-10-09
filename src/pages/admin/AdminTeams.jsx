@@ -562,7 +562,7 @@ export default function AdminTeams() {
                 <div>
                   <h3 style={{ margin:0, fontSize:19, fontWeight:800, color:'#0F172A' }}>{selectedRosterTeam.team_name}</h3>
                   <div style={{ fontSize:12, color:'#0284C7', fontWeight:700, marginTop:3 }}>
-                    Domain Track: {selectedRosterTeam.domain} · Fee: ₹1,200 (Finale Direct Pass)
+                    Domain: {selectedRosterTeam.domain} · Fee: ₹1,200 (Finale Direct Pass)
                   </div>
                 </div>
                 <button onClick={() => setSelectedRosterTeam(null)} style={{ background:'none', border:'none', cursor:'pointer', padding:4, color:'#64748B' }}>

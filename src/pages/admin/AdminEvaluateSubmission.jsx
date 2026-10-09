@@ -121,7 +121,7 @@ export default function AdminEvaluateSubmission() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
             <div>
               <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 800, background: '#E0F2FE', color: '#0369A1', border: '1px solid #BAE6FD', textTransform: 'uppercase' }}>
-                Track: {domainTrack}
+                Domain: {domainTrack}
               </span>
               <h2 style={{ fontSize: 24, fontWeight: 900, color: S.t1, margin: '8px 0 4px' }}>{team?.team_name || 'Squad'}</h2>
               <div style={{ fontSize: 13, color: S.t2 }}>Squad ID: {team?.id}</div>

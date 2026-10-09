@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Award, Sparkles, Camera, Upload, Trash2, Plus, 
   Check, RefreshCw, AlertCircle, CheckCircle2, Phone, 
-  ExternalLink, RotateCcw, Save, ShieldCheck, UserCheck, Eye
+  ExternalLink, RotateCcw, Save, ShieldCheck, UserCheck, Eye, Cloud
 } from 'lucide-react';
 import { 
   fetchCoordinators, saveCoordinators, uploadCoordinatorPhoto, 
   resetCoordinatorsToDefault, getLocalCoordinators 
 } from '../../lib/coordinatorsService';
+import { isCloudinaryConfigured } from '../../lib/cloudinaryService';
+import CloudinaryConfigModal from '../../components/admin/CloudinaryConfigModal';
 import { playCrewmatePopSound } from '../../components/amongus/AmongUsSound';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
@@ -21,6 +23,7 @@ export default function AdminCoordinators() {
   const [uploadingCoordId, setUploadingCoordId] = useState(null);
   const [notification, setNotification] = useState(null);
   const [previewModalImg, setPreviewModalImg] = useState(null);
+  const [showCloudinaryModal, setShowCloudinaryModal] = useState(false);
 
   // Hidden file inputs
   const fileInputRef = useRef(null);
@@ -349,6 +352,27 @@ export default function AdminCoordinators() {
           </button>
 
           <button
+            onClick={() => setShowCloudinaryModal(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              background: isCloudinaryConfigured() ? '#f0fdf4' : '#f8fafc',
+              color: isCloudinaryConfigured() ? '#166534' : '#0369a1',
+              border: `1.5px solid ${isCloudinaryConfigured() ? '#bbf7d0' : '#bae6fd'}`,
+              padding: '10px 16px',
+              borderRadius: 14,
+              fontSize: 13,
+              fontWeight: 800,
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+            }}
+          >
+            <Cloud size={15} color={isCloudinaryConfigured() ? '#16a34a' : '#0284c7'} />
+            <span>{isCloudinaryConfigured() ? 'Cloudinary CDN Active' : 'Configure Cloudinary'}</span>
+          </button>
+
+          <button
             onClick={handleSaveAll}
             disabled={saving}
             style={{
@@ -610,6 +634,11 @@ export default function AdminCoordinators() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <CloudinaryConfigModal 
+        isOpen={showCloudinaryModal} 
+        onClose={() => setShowCloudinaryModal(false)} 
+      />
     </div>
   );
 }

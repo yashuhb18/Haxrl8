@@ -291,7 +291,7 @@ export default function ProblemStatements() {
             </p>
           ) : (
             <p style={{ margin: '10px 0 0', fontSize: '13px', color: '#999' }}>
-              ↕ Scroll down to explore domains — click or hover any track to inspect challenges
+              ↕ Scroll down to explore domains — click or hover any domain to inspect challenges
             </p>
           )}
         </div>
