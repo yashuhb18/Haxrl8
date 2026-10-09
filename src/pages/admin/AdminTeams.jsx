@@ -329,7 +329,7 @@ export default function AdminTeams() {
                 <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
                   <thead>
                     <tr style={{ background:'#FAFAFA', borderBottom:'1px solid '+S.border }}>
-                      {['S.No', 'Squad Name', 'Domain Track', 'Squad Commander', 'Crew Members', 'Payment / QR Proof', 'Registered On', 'Actions'].map(h => (
+                      {['S.No', 'Squad Name', 'Domain', 'Squad Commander', 'Crew Members', 'Payment / QR Proof', 'Registered On', 'Actions'].map(h => (
                         <th key={h} style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>{h}</th>
                       ))}
                     </tr>

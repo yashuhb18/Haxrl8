@@ -322,7 +322,7 @@ export default function PlayfulDomainsSection() {
               </div>
 
               <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>
-                Sample Project Tracks:
+                Sample Focus Areas:
               </h4>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>

@@ -188,7 +188,6 @@ export default function AuthPage() {
         options: {
           redirectTo: redirectUrl,
           queryParams: {
-            access_type: 'offline',
             prompt: 'select_account',
           },
         },

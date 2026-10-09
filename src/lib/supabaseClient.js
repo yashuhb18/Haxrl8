@@ -322,12 +322,20 @@ export const supabase = {
     },
 
     async getSession() {
-      // 1. Explicitly check if returning from OAuth redirect with tokens in hash or code in query
-      if (typeof window !== 'undefined' && !isPlaceholder) {
+      // 1. Fetch active session from raw Supabase (handles PKCE code exchange automatically)
+      if (!isPlaceholder) {
         try {
-          // Check hash for access_token (Implicit Flow)
-          const rawHash = window.location.hash.startsWith('#') ? window.location.hash.substring(1) : window.location.hash;
-          if (rawHash && rawHash.includes('access_token=')) {
+          const res = await withTimeout(rawSupabase.auth.getSession(), 6000);
+          if (res.data?.session?.user) {
+            setLocalSession(res.data.session.user, false);
+            return res;
+          }
+        } catch (e) {}
+
+        // Fallback for Implicit Flow hash tokens (#access_token=...&refresh_token=...)
+        if (typeof window !== 'undefined' && window.location.hash && window.location.hash.includes('access_token=')) {
+          try {
+            const rawHash = window.location.hash.startsWith('#') ? window.location.hash.substring(1) : window.location.hash;
             const hashParams = new URLSearchParams(rawHash);
             const accessToken = hashParams.get('access_token');
             const refreshToken = hashParams.get('refresh_token');
@@ -340,35 +348,12 @@ export const supabase = {
 
               if (res.data?.session?.user) {
                 setLocalSession(res.data.session.user);
-                // Clean hash now that session is successfully hydrated
-                try {
-                  window.history.replaceState(null, '', window.location.pathname + window.location.search);
-                } catch (e) {}
                 return res;
               }
             }
+          } catch (hashErr) {
+            console.warn('OAuth hash fallback notice:', hashErr);
           }
-
-          // Check query parameters for code (PKCE Flow)
-          if (window.location.search && window.location.search.includes('code=')) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            if (code) {
-              const res = await withTimeout(rawSupabase.auth.exchangeCodeForSession(code), 6000);
-              if (res.data?.session?.user) {
-                setLocalSession(res.data.session.user);
-                // Clean code param now that session is successfully hydrated
-                try {
-                  urlParams.delete('code');
-                  const remaining = urlParams.toString();
-                  window.history.replaceState(null, '', window.location.pathname + (remaining ? `?${remaining}` : '') + window.location.hash);
-                } catch (e) {}
-                return res;
-              }
-            }
-          }
-        } catch (oauthErr) {
-          console.warn('OAuth URL hydration notice:', oauthErr);
         }
       }
 

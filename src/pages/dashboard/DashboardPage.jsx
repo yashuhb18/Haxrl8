@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import OverviewTab    from './OverviewTab';
 import TeamTab        from './TeamTab';
@@ -13,7 +13,8 @@ import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'overview');
   
   // Data States
   const [loading, setLoading] = useState(true);
@@ -44,7 +45,6 @@ export default function DashboardPage() {
         options: {
           redirectTo: redirectUrl,
           queryParams: {
-            access_type: 'offline',
             prompt: 'select_account',
           },
         },
@@ -65,36 +65,38 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchDashboardData = async () => {
-    if (fetchingRef.current) return;
+  const fetchDashboardData = async (overrideUser = null) => {
+    if (fetchingRef.current && !overrideUser) return;
     fetchingRef.current = true;
 
     try {
-      let activeUser = null;
+      let activeUser = overrideUser || null;
 
       // 1. Instant Cache Hydration: Render instantly if cached session exists
-      const local = localStorage.getItem('haxlr8_leader_session');
-      if (local) {
-        try {
-          const parsed = JSON.parse(local);
-          activeUser = parsed?.user || (parsed?.email ? parsed : null);
-          if (activeUser) {
-            setUser(activeUser);
-            userRef.current = activeUser;
-            // Pre-hydrate team data so UI loads with 0ms delay
-            const cachedTeam = localStorage.getItem(`haxlr8_team_${activeUser.id}`);
-            if (cachedTeam) {
-              const pt = JSON.parse(cachedTeam);
-              setHasTeam(true);
-              setTeamData(pt);
-              const cm = localStorage.getItem(`haxlr8_members_${activeUser.id}`);
-              if (cm) setTeamMembers(JSON.parse(cm));
-              const cs = localStorage.getItem(`haxlr8_subs_${activeUser.id}`);
-              if (cs) setSubmissions(JSON.parse(cs));
+      if (!activeUser) {
+        const local = localStorage.getItem('haxlr8_leader_session');
+        if (local) {
+          try {
+            const parsed = JSON.parse(local);
+            activeUser = parsed?.user || (parsed?.email ? parsed : null);
+            if (activeUser) {
+              setUser(activeUser);
+              userRef.current = activeUser;
+              // Pre-hydrate team data so UI loads with 0ms delay
+              const cachedTeam = localStorage.getItem(`haxlr8_team_${activeUser.id}`);
+              if (cachedTeam) {
+                const pt = JSON.parse(cachedTeam);
+                setHasTeam(true);
+                setTeamData(pt);
+                const cm = localStorage.getItem(`haxlr8_members_${activeUser.id}`);
+                if (cm) setTeamMembers(JSON.parse(cm));
+                const cs = localStorage.getItem(`haxlr8_subs_${activeUser.id}`);
+                if (cs) setSubmissions(JSON.parse(cs));
+              }
+              setLoading(false);
             }
-            setLoading(false);
-          }
-        } catch (e) {}
+          } catch (e) {}
+        }
       }
 
       // 2. Check current Supabase session (handles OAuth redirect token parsing)
@@ -103,13 +105,20 @@ export default function DashboardPage() {
 
       if (!activeUser || isOAuth) {
         setLoading(true);
-        try {
-          const sessionRes = await withTimeout(supabase.auth.getSession(), isOAuth ? 7000 : 3500);
-          if (sessionRes?.data?.session?.user) {
-            activeUser = sessionRes.data.session.user;
+        const maxAttempts = isOAuth ? 6 : 1;
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          try {
+            const sessionRes = await withTimeout(supabase.auth.getSession(), 4500);
+            if (sessionRes?.data?.session?.user) {
+              activeUser = sessionRes.data.session.user;
+              break;
+            }
+          } catch (e) {
+            console.warn('Supabase getSession notice:', e);
           }
-        } catch (e) {
-          console.warn('Supabase getSession notice:', e);
+          if (isOAuth && attempt < maxAttempts - 1) {
+            await new Promise(r => setTimeout(r, 350));
+          }
         }
 
         if (!activeUser) {
@@ -139,9 +148,17 @@ export default function DashboardPage() {
         }));
       } catch (e) {}
 
-      // Security: Clean up OAuth tokens from the URL if they are present after redirect
-      if (window.location.hash.includes('access_token=')) {
-        window.history.replaceState(null, '', window.location.pathname);
+      // Clean up OAuth tokens from URL if present
+      if (typeof window !== 'undefined') {
+        try {
+          if (window.location.hash.includes('access_token=') || window.location.search.includes('code=')) {
+            const cleanUrl = new URL(window.location.href);
+            cleanUrl.searchParams.delete('code');
+            cleanUrl.searchParams.delete('state');
+            cleanUrl.hash = '';
+            window.history.replaceState(null, '', cleanUrl.pathname + (cleanUrl.search ? cleanUrl.search : ''));
+          }
+        } catch (e) {}
       }
 
       // Fetch announcements with safe default fallback
@@ -397,15 +414,19 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchDashboardData();
 
-    // Listen for auth state changes (strictly re-fetch only if user identity actually changed)
+    // Listen for auth state changes (strictly re-fetch if user identity changed or on SIGNED_IN event)
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user && session.user.id !== userRef.current?.id) {
+      if (session?.user) {
+        const isNewUser = session.user.id !== userRef.current?.id;
         setUser(session.user);
         userRef.current = session.user;
         try {
           localStorage.setItem('haxlr8_leader_confirmed', 'true');
         } catch (e) {}
-        fetchDashboardData();
+        if (isNewUser || event === 'SIGNED_IN') {
+          fetchingRef.current = false;
+          fetchDashboardData(session.user);
+        }
       }
     });
 
@@ -480,7 +501,7 @@ export default function DashboardPage() {
 
           <h2 style={{ fontSize: 21, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>Commander Login Required</h2>
           <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 20px', lineHeight: 1.5 }}>
-            To access your squad manifest, challenge track, payment verification, and official Flight Pass, please verify your credentials.
+            To access your squad manifest, challenge domain, payment verification, and official Flight Pass, please verify your credentials.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

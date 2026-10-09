@@ -746,41 +746,41 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
               {/* 1. DOMAIN SELECTION FIRST */}
               <div>
                 <label style={styles.label}>1. Select Challenge Domain *</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginTop: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginTop: 8 }}>
                   {[
-                    { id: 'Agriculture', icon: '🌾', title: 'Agriculture', desc: 'Smart Farming, IoT Irrigation, Crop Disease AI, Supply Chain' },
-                    { id: 'Healthcare', icon: '🏥', title: 'Healthcare', desc: 'Diagnostic AI, Patient Telemetry, MedTech, Assistive Robotics' },
-                    { id: 'Smart City', icon: '🏙️', title: 'Smart City', desc: 'Urban Mobility, Intelligent Grid, Waste Management, Public Safety' }
-                  ].map(track => {
-                    const isSelected = formData.domain === track.id;
+                    { id: 'Agriculture', icon: '🌾', title: 'Agriculture' },
+                    { id: 'Healthcare', icon: '🏥', title: 'Healthcare' },
+                    { id: 'Smart City', icon: '🏙️', title: 'Smart City' }
+                  ].map(domOpt => {
+                    const isSelected = formData.domain === domOpt.id;
                     return (
                       <div
-                        key={track.id}
-                        onClick={() => setFormData({ ...formData, domain: track.id })}
+                        key={domOpt.id}
+                        onClick={() => setFormData({ ...formData, domain: domOpt.id })}
                         style={{
                           border: isSelected ? '2.5px solid #0284c7' : '1.5px solid #cbd5e1',
                           background: isSelected ? '#f0f9ff' : '#ffffff',
                           borderRadius: 14,
-                          padding: '14px',
+                          padding: '16px 14px',
                           cursor: 'pointer',
                           transition: 'all 0.2s',
-                          boxShadow: isSelected ? '0 4px 14px rgba(2, 132, 199, 0.18)' : 'none'
+                          boxShadow: isSelected ? '0 4px 14px rgba(2, 132, 199, 0.18)' : 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                          <span style={{ fontSize: 24 }}>{track.icon}</span>
-                          {isSelected && (
-                            <span style={{ fontSize: 10.5, fontWeight: 800, color: '#0284c7', background: '#e0f2fe', padding: '2px 8px', borderRadius: 10, border: '1px solid #bae6fd' }}>
-                              SELECTED ✓
-                            </span>
-                          )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <span style={{ fontSize: 26 }}>{domOpt.icon}</span>
+                          <div style={{ fontSize: 16, fontWeight: 900, color: isSelected ? '#0369a1' : '#0f172a' }}>
+                            {domOpt.title}
+                          </div>
                         </div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: isSelected ? '#0369a1' : '#0f172a', marginBottom: 4 }}>
-                          {track.title}
-                        </div>
-                        <div style={{ fontSize: 11.5, color: '#64748b', lineHeight: 1.4 }}>
-                          {track.desc}
-                        </div>
+                        {isSelected && (
+                          <span style={{ fontSize: 10.5, fontWeight: 800, color: '#0284c7', background: '#e0f2fe', padding: '3px 8px', borderRadius: 10, border: '1px solid #bae6fd' }}>
+                            SELECTED ✓
+                          </span>
+                        )}
                       </div>
                     );
                   })}

@@ -164,7 +164,7 @@ export default function EmergencyMeetingModal() {
                 >
                   <AmongUsCrewmate color="lime" size={60} hat="sprout" interactive={false} />
                   <span style={{ fontSize: '12px', fontWeight: 900, color: '#50ef39' }}>HYDROPONICS</span>
-                  <span style={{ fontSize: '11px', color: '#cbd5e1' }}>Agriculture Track</span>
+                  <span style={{ fontSize: '11px', color: '#cbd5e1' }}>Agriculture</span>
                 </div>
 
                 {/* Sector 2: Smart City */}
@@ -182,7 +182,7 @@ export default function EmergencyMeetingModal() {
                 >
                   <AmongUsCrewmate color="blue" size={60} hat="cap" interactive={false} />
                   <span style={{ fontSize: '12px', fontWeight: 900, color: '#38fedc' }}>NAVIGATION</span>
-                  <span style={{ fontSize: '11px', color: '#cbd5e1' }}>Smart City Track</span>
+                  <span style={{ fontSize: '11px', color: '#cbd5e1' }}>Smart City</span>
                 </div>
 
                 {/* Sector 3: Healthcare */}
@@ -200,7 +200,7 @@ export default function EmergencyMeetingModal() {
                 >
                   <AmongUsCrewmate color="cyan" size={60} hat="med" interactive={false} />
                   <span style={{ fontSize: '12px', fontWeight: 900, color: '#f43f5e' }}>MEDBAY</span>
-                  <span style={{ fontSize: '11px', color: '#cbd5e1' }}>Healthcare Track</span>
+                  <span style={{ fontSize: '11px', color: '#cbd5e1' }}>Healthcare</span>
                 </div>
               </div>
 

@@ -214,7 +214,7 @@ export default function FaqSection() {
             {[
               { id: 'all', label: `All Queries (${FAQS.length})` },
               { id: 'registration', label: 'Squad & Registration' },
-              { id: 'domains', label: 'Tracks & Guidelines' },
+              { id: 'domains', label: 'Domains & Guidelines' },
               { id: 'logistics', label: 'Venue & Prizes' },
             ].map(cat => {
               const active = activeCategory === cat.id;

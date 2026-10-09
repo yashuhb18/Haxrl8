@@ -291,7 +291,7 @@ export default function PaymentTab({
 
           const subPayload = {
             team_id: teamData.id,
-            project_title: `${teamData.team_name} - ${teamDomain} Track`,
+            project_title: `${teamData.team_name} - ${teamDomain}`,
             sdg_goal: teamDomain,
             category: 'Registration Verified',
             project_description: `Registration fee ₹1200 verified. UTR: ${cleanUtr}. Payer: ${sanitizeInput(payerName)} (${sanitizeInput(payerPhone || 'N/A')}). Leader: ${user?.user_metadata?.full_name || 'Leader'} (${user?.email}).`,

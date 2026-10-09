@@ -140,7 +140,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
     } else if (step === 1) {
       const errors = {};
       if (!form.title.trim()) errors.title = 'Project title is required.';
-      if (!form.sdg || form.sdg.length === 0) errors.sdg = 'Select at least one track.';
+      if (!form.sdg || form.sdg.length === 0) errors.sdg = 'Select at least one domain.';
       if (!form.category) errors.category = 'Select a project category.';
       if (form.category === 'Other' && !form.category_other.trim()) errors.category_other = 'Specify category.';
       if (!form.description.trim()) errors.description = 'Project description is required.';
@@ -275,7 +275,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
               <div style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', marginTop: 2 }}>{s.project_title || form.title}</div>
             </div>
             <div>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Sector Track</span>
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Domain</span>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginTop: 2 }}>{s.sdg_goal || (Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg)}</div>
             </div>
             <div>
@@ -373,7 +373,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
             
             <div className="dash-grid-2 submission-track-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }} ref={sdgRef}>
-                <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Domain / Track</label>
+                <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Domain</label>
                 <div style={{ position: 'relative', minWidth: 0 }}>
                   <div
                     onClick={() => setSdgOpen(!sdgOpen)}
@@ -450,7 +450,7 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
         {step === 2 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <h3 style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>Review Submission Deck</h3>
-            {[['Project Title', form.title], ['Domain / Track', Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg], ['Category', form.category === 'Other' ? form.category_other : form.category], ['Presentation PDF', form.pdf ? form.pdf.name : 'Ready for upload']].map(([k, v]) => (
+            {[['Project Title', form.title], ['Domain', Array.isArray(form.sdg) ? form.sdg.join(', ') : form.sdg], ['Category', form.category === 'Other' ? form.category_other : form.category], ['Presentation PDF', form.pdf ? form.pdf.name : 'Ready for upload']].map(([k, v]) => (
               <div key={k} className="submission-review-row" style={{ display: 'flex', gap: 14, padding: '12px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
                 <span style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', minWidth: 130, flexShrink: 0, textTransform: 'uppercase' }}>{k}</span>
                 <span style={{ fontSize: 13.5, color: '#0f172a', wordBreak: 'break-word', fontWeight: 700 }}>{v || '-'}</span>

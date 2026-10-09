@@ -95,7 +95,7 @@ const DOMAINS = [
     imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop',
     description: 'Download the comprehensive catalog of problem statements and guidelines. You are fully welcome to formulate and present your own innovative problem statement within the 3 domains.',
     challenges: [
-      'Open Innovation Track: Teams are invited to submit their own original problem statement as long as it maps to Agriculture, Smart City, or Healthcare.',
+      'Open Innovation: Teams are invited to submit their own original problem statement as long as it maps to Agriculture, Smart City, or Healthcare.',
       'Official Reference PDF: Download the complete competition brochure with evaluation rubrics and submission instructions.',
     ],
   },
@@ -230,7 +230,7 @@ export default function ProblemStatements() {
             fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.22em',
             color: '#38fedc', marginBottom: '0.5rem', textTransform: 'uppercase',
           }}>
-            ✦ SKELD INNOVATION TRACKS ✦
+            ✦ SKELD INNOVATION DOMAINS ✦
           </p>
           <p style={{
             fontSize: 'clamp(1.05rem, 1.8vw, 1.35rem)', fontWeight: 600, color: '#94a3b8', 
@@ -499,7 +499,7 @@ export default function ProblemStatements() {
 
                   <div style={{ flex: 1, minWidth: 220 }}>
                     <p style={{ fontSize: 'clamp(13px, 2vh, 15px)', color: '#94a3b8', lineHeight: 1.7, margin: 0 }}>
-                      Curated challenge statements across Agriculture, Smart City, and Healthcare. You are also encouraged to propose your own innovative solution within these 3 core tracks.
+                      Curated challenge statements across Agriculture, Smart City, and Healthcare. You are also encouraged to propose your own innovative solution within these 3 core domains.
                     </p>
                   </div>
 
@@ -625,7 +625,7 @@ export default function ProblemStatements() {
                 Download Problem Statements
               </p>
               <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: 0 }}>
-                HAXLR8 3.0 Curated Tracks PDF
+                HAXLR8 3.0 Curated Domains PDF
               </p>
             </div>
             <div style={{

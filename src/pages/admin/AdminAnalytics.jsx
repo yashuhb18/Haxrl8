@@ -356,10 +356,10 @@ export default function AdminAnalytics() {
 
         {/* Section B: Domains */}
         <div>
-          <SectionTitle title="B. Squad Domain Distribution" sub="Domain tracks chosen by squads across India" />
+          <SectionTitle title="B. Squad Domain Distribution" sub="Domains chosen by squads across India" />
 
           {/* Domain Chart */}
-          <ChartCard title="Squads by Domain Track">
+          <ChartCard title="Squads by Domain">
             {sdgData.length > 0 ? (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={sdgData} margin={{ left: 0, right: 20 }}>

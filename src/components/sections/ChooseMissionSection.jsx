@@ -363,7 +363,7 @@ export default function ChooseMissionSection() {
               </p>
 
               <h4 style={{ fontSize: '15px', fontWeight: 800, color: selectedDomain.color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '12px' }}>
-                Sample Tracks & Problem Themes:
+                Focus Areas & Problem Themes:
               </h4>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
