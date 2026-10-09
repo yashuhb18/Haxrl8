@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
@@ -25,7 +25,11 @@ export default function DashboardPage() {
   const [submissions, setSubmissions] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
 
-  const withTimeout = (promise, ms = 6000) =>
+  // Concurrency and Loop Protection Refs
+  const fetchingRef = useRef(false);
+  const userRef = useRef(null);
+
+  const withTimeout = (promise, ms = 4000) =>
     Promise.race([
       promise,
       new Promise((_, reject) => setTimeout(() => reject(new Error('Network timeout')), ms))
@@ -62,50 +66,71 @@ export default function DashboardPage() {
   };
 
   const fetchDashboardData = async () => {
-    setLoading(true);
+    if (fetchingRef.current) return;
+    fetchingRef.current = true;
+
     try {
       let activeUser = null;
 
-      // 1. Check current Supabase session (handles OAuth redirect token parsing)
-      try {
-        const isOAuth = typeof window !== 'undefined' && 
-          (window.location.hash.includes('access_token=') || window.location.search.includes('code='));
-        const sessionRes = await withTimeout(supabase.auth.getSession(), isOAuth ? 9000 : 5000);
-        if (sessionRes?.data?.session?.user) {
-          activeUser = sessionRes.data.session.user;
-        }
-      } catch (e) {
-        console.warn('Supabase getSession notice:', e);
-      }
-
-      // 2. Check getUser
-      if (!activeUser) {
+      // 1. Instant Cache Hydration: Render instantly if cached session exists
+      const local = localStorage.getItem('haxlr8_leader_session');
+      if (local) {
         try {
-          const res = await withTimeout(supabase.auth.getUser(), 5000);
-          if (res?.data?.user) activeUser = res.data.user;
-        } catch (e) {
-          console.warn('Supabase getUser notice:', e);
-        }
+          const parsed = JSON.parse(local);
+          activeUser = parsed?.user || (parsed?.email ? parsed : null);
+          if (activeUser) {
+            setUser(activeUser);
+            userRef.current = activeUser;
+            // Pre-hydrate team data so UI loads with 0ms delay
+            const cachedTeam = localStorage.getItem(`haxlr8_team_${activeUser.id}`);
+            if (cachedTeam) {
+              const pt = JSON.parse(cachedTeam);
+              setHasTeam(true);
+              setTeamData(pt);
+              const cm = localStorage.getItem(`haxlr8_members_${activeUser.id}`);
+              if (cm) setTeamMembers(JSON.parse(cm));
+              const cs = localStorage.getItem(`haxlr8_subs_${activeUser.id}`);
+              if (cs) setSubmissions(JSON.parse(cs));
+            }
+            setLoading(false);
+          }
+        } catch (e) {}
       }
 
-      if (!activeUser) {
-        // Check local leader session
-        const local = localStorage.getItem('haxlr8_leader_session');
-        if (local) {
+      // 2. Check current Supabase session (handles OAuth redirect token parsing)
+      const isOAuth = typeof window !== 'undefined' && 
+        (window.location.hash.includes('access_token=') || window.location.search.includes('code='));
+
+      if (!activeUser || isOAuth) {
+        setLoading(true);
+        try {
+          const sessionRes = await withTimeout(supabase.auth.getSession(), isOAuth ? 7000 : 3500);
+          if (sessionRes?.data?.session?.user) {
+            activeUser = sessionRes.data.session.user;
+          }
+        } catch (e) {
+          console.warn('Supabase getSession notice:', e);
+        }
+
+        if (!activeUser) {
           try {
-            const parsed = JSON.parse(local);
-            activeUser = parsed?.user || (parsed?.email ? parsed : null);
-          } catch (e) {}
+            const res = await withTimeout(supabase.auth.getUser(), 3500);
+            if (res?.data?.user) activeUser = res.data.user;
+          } catch (e) {
+            console.warn('Supabase getUser notice:', e);
+          }
         }
       }
 
       if (!activeUser) {
         setLoading(false);
         setUser(null);
+        userRef.current = null;
         return;
       }
 
       setUser(activeUser);
+      userRef.current = activeUser;
       try {
         localStorage.setItem('haxlr8_leader_session', JSON.stringify({
           user: activeUser,
@@ -364,16 +389,18 @@ export default function DashboardPage() {
       console.warn('Dashboard telemetry notice:', error);
     } finally {
       setLoading(false);
+      fetchingRef.current = false;
     }
   };
 
   useEffect(() => {
     fetchDashboardData();
 
-    // Listen for auth state changes (crucial for Google OAuth redirect callback)
+    // Listen for auth state changes (strictly re-fetch only if user identity actually changed)
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
+      if (session?.user && session.user.id !== userRef.current?.id) {
         setUser(session.user);
+        userRef.current = session.user;
         try {
           localStorage.setItem('haxlr8_leader_confirmed', 'true');
         } catch (e) {}

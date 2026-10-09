@@ -177,18 +177,11 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
   const [deadlinePassed, setDeadlinePassed] = useState(false);
 
   useEffect(() => {
-    const checkDeadline = async () => {
-      try {
-        const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
-        const data = await res.json();
-        const currentTime = new Date(data.datetime);
-        const deadline = new Date('2026-10-28T18:29:59Z');
-        if (currentTime > deadline) setDeadlinePassed(true);
-      } catch (err) {
-        if (new Date() > new Date('2026-10-28T18:29:59Z')) setDeadlinePassed(true);
-      }
-    };
-    checkDeadline();
+    // Official Registration Deadline: October 28, 2026 at 23:59:59 IST
+    const deadline = new Date('2026-10-28T23:59:59+05:30');
+    if (new Date() > deadline) {
+      setDeadlinePassed(true);
+    }
   }, []);
 
   const startEditTeam = (stepToOpen = 0) => {
@@ -579,15 +572,15 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         <div className="team-member-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
           {/* Personal Details */}
           <div>
-            <label style={styles.label}>Full Name</label>
-            <input type="text" value={member.full_name} onChange={e => updateMember('full_name', e.target.value)} disabled={isLeader} style={isLeader ? styles.inputDisabled : styles.input} placeholder="Full Name" />
+            <label style={styles.label}>Full Name *</label>
+            <input type="text" value={member.full_name} onChange={e => updateMember('full_name', e.target.value)} style={styles.input} placeholder="Full Name as per College ID" />
           </div>
           <div>
-            <label style={styles.label}>Email Address</label>
-            <input type="email" value={member.email} onChange={e => updateMember('email', e.target.value)} disabled={isLeader} style={isLeader ? styles.inputDisabled : styles.input} placeholder="Email Address" />
+            <label style={styles.label}>Email Address *</label>
+            <input type="email" value={member.email} onChange={e => updateMember('email', e.target.value)} style={styles.input} placeholder="Email Address" />
           </div>
           <div>
-            <label style={styles.label}>Phone Number</label>
+            <label style={styles.label}>Phone Number *</label>
             <div style={{ display: 'flex', borderRadius: 12, border: '1.5px solid #cbd5e1', overflow: 'hidden', background: '#fafafa' }}>
               <span style={{ padding: '12px 14px', background: '#f1f5f9', borderRight: '1.5px solid #cbd5e1', color: '#0284c7', fontSize: 14, fontWeight: 800 }}>+91</span>
               <input type="tel" value={member.phone_number} onChange={e => updateMember('phone_number', e.target.value.replace(/\D/g, '').slice(0, 10))} style={{ width: '100%', padding: '12px 14px', border: 'none', outline: 'none', fontSize: 14, fontFamily: 'inherit', background: 'transparent', color: '#0f172a' }} placeholder="10-digit mobile number" />
@@ -596,18 +589,18 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
 
           {/* Location Details */}
           <div>
-            <label style={styles.label}>State</label>
+            <label style={styles.label}>State *</label>
             <select value={member.state} onChange={e => { updateMember('state', e.target.value); if (isLeader) setFormData(p => ({ ...p, leader: { ...p.leader, state: e.target.value, city: '' } })); }} style={{ ...styles.input, cursor: 'pointer' }}>
               <option value="" disabled>Select State</option>
               {Object.keys(INDIA_STATES_CITIES).map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <label style={styles.label}>City / District</label>
-            <select value={member.city} onChange={e => updateMember('city', e.target.value)} disabled={!member.state} style={!member.state ? styles.inputDisabled : { ...styles.input, cursor: 'pointer' }}>
+            <label style={styles.label}>City / District *</label>
+            <select value={member.city} onChange={e => updateMember('city', e.target.value)} style={{ ...styles.input, cursor: 'pointer' }}>
               <option value="" disabled>Select City</option>
               {member.state && INDIA_STATES_CITIES[member.state]?.map(c => <option key={c} value={c}>{c}</option>)}
-              {member.state && <option value="Other">Other (Please Specify)</option>}
+              <option value="Other">Other (Please Specify)</option>
             </select>
           </div>
           {member.city === 'Other' && (

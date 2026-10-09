@@ -48,19 +48,27 @@ function getLocalSession() {
   }
 }
 
-function setLocalSession(user) {
-  if (user && !isUUID(user.id)) {
+function setLocalSession(user, notify = true) {
+  if (!user) return null;
+  if (!isUUID(user.id)) {
     user.id = uuidv4();
   }
+  const current = getLocalSession();
+  const isSameUser = current?.user?.id === user.id && current?.user?.email === user.email;
+
   const session = {
-    access_token: 'haxlr8_token_' + Date.now(),
+    access_token: current?.access_token || ('haxlr8_token_' + Date.now()),
     token_type: 'bearer',
     expires_in: 86400 * 7,
-    refresh_token: 'haxlr8_refresh_' + Date.now(),
+    refresh_token: current?.refresh_token || ('haxlr8_refresh_' + Date.now()),
     user,
   };
   localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(session));
-  notifyAuthListeners('SIGNED_IN', session);
+
+  // Only notify if user state genuinely changed and notify flag is true
+  if (notify && !isSameUser) {
+    notifyAuthListeners('SIGNED_IN', session);
+  }
   return session;
 }
 
@@ -369,7 +377,7 @@ export const supabase = {
         try {
           const res = await withTimeout(rawSupabase.auth.getSession(), 6000);
           if (res.data?.session?.user) {
-            setLocalSession(res.data.session.user);
+            setLocalSession(res.data.session.user, false);
             return res;
           }
         } catch (e) {}
