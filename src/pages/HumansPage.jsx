@@ -1,27 +1,33 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, Terminal, ShieldCheck, Award, Sparkles } from 'lucide-react';
+import { Users, Terminal, ShieldCheck, Award, Sparkles, Phone } from 'lucide-react';
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
-import meImg from '../assets/my image/me.png';
+import balakrishnaImg from '../assets/humans/balakrishna.png';
+import sandeshImg from '../assets/humans/sandesh.jpg';
+import yashwanthImg from '../assets/humans/yashwanth.png';
 import emitersSeal from '../assets/logo/emiters-seal.png';
 import mitMysoreBanner from '../assets/logo/mit-mysore-banner.png';
 
 const studentOrganizers = [
   {
     name: 'Yashwanth H B',
-    role: 'Student Coordinator (8050614849)',
-    station: 'Chief Flight Engineer',
+    role: 'Student Coordinator',
+    phone: '+91 80506 14849',
+    station: 'Chief Flight Engineer & Tech Lead',
     org: 'HAXLR8 3.0 · MIT Mysore',
     color: 'cyan',
     hat: 'pilot',
+    photo: yashwanthImg,
   },
   {
     name: 'Chethan Kumar B',
-    role: 'Student Coordinator (99455 07099)',
+    role: 'Student Coordinator',
+    phone: '+91 99455 07099',
     station: 'Mission Operations Lead',
     org: 'HAXLR8 3.0 · MIT Mysore',
     color: 'yellow',
     hat: 'pilot',
+    photo: null,
   },
 ];
 
@@ -29,18 +35,24 @@ const staffCoordinators = [
   {
     name: 'Balakrishna K',
     role: 'Faculty Coordinator',
+    designation: 'Associate Prof & HoD, Dept of ECE',
     station: 'Flight Director // Mission Advisor',
     org: 'Maharaja Institute of Technology Mysore',
+    phone: '+91 98864 78574',
     color: 'lime',
     hat: 'crown',
+    photo: balakrishnaImg,
   },
   {
     name: 'Sandesh NG',
     role: 'Faculty Coordinator',
+    designation: 'Assistant Professor, Dept of ECE',
     station: 'Flight Director // Mission Advisor',
     org: 'Maharaja Institute of Technology Mysore',
+    phone: '+91 94813 36585',
     color: 'purple',
     hat: 'crown',
+    photo: sandeshImg,
   },
 ];
 
@@ -164,23 +176,50 @@ export default function HumansPage() {
             {staffCoordinators.map((c, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.1 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
                 whileHover={{ y: -6 }}
                 style={{
                   background: '#ffffff',
                   borderRadius: '28px',
-                  padding: '32px 28px',
+                  padding: '28px 24px',
                   border: '2px solid #e2e8f0',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.04)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '24px',
+                  gap: '22px',
                 }}
               >
-                <AmongUsCrewmate color={c.color} hat={c.hat} size={88} floating={true} interactive={true} />
+                {c.photo ? (
+                  <div
+                    style={{
+                      width: 92,
+                      height: 92,
+                      borderRadius: '22px',
+                      overflow: 'hidden',
+                      border: '3px solid #e2e8f0',
+                      boxShadow: '0 8px 18px rgba(0,0,0,0.06)',
+                      background: '#f8fafc',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <img
+                      src={c.photo}
+                      alt={c.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center 15%',
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ flexShrink: 0 }}>
+                    <AmongUsCrewmate color={c.color} hat={c.hat} size={88} floating={true} interactive={true} />
+                  </div>
+                )}
                 <div>
                   <span
                     style={{
@@ -197,12 +236,32 @@ export default function HumansPage() {
                   >
                     {c.role}
                   </span>
-                  <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px 0' }}>
+                  <h3 style={{ fontSize: '21px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px 0' }}>
                     {c.name}
                   </h3>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
-                    {c.org}
+                  <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 8px 0', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
+                    {c.designation || c.org}
                   </p>
+                  {c.phone && (
+                    <a
+                      href={`tel:${c.phone.replace(/\s+/g, '')}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        color: '#0284c7',
+                        textDecoration: 'none',
+                        background: '#f0f9ff',
+                        padding: '3px 10px',
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <Phone size={12} />
+                      <span>{c.phone}</span>
+                    </a>
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -228,23 +287,50 @@ export default function HumansPage() {
             {studentOrganizers.map((c, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.1 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
                 whileHover={{ y: -6 }}
                 style={{
                   background: '#ffffff',
                   borderRadius: '28px',
-                  padding: '32px 28px',
+                  padding: '28px 24px',
                   border: '2px solid #e2e8f0',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.04)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '24px',
+                  gap: '22px',
                 }}
               >
-                <AmongUsCrewmate color={c.color} hat={c.hat} size={88} floating={true} interactive={true} />
+                {c.photo ? (
+                  <div
+                    style={{
+                      width: 92,
+                      height: 92,
+                      borderRadius: '22px',
+                      overflow: 'hidden',
+                      border: '3px solid #ffe4e6',
+                      boxShadow: '0 8px 18px rgba(255, 59, 105, 0.12)',
+                      background: '#fff1f2',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <img
+                      src={c.photo}
+                      alt={c.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center 15%',
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ flexShrink: 0 }}>
+                    <AmongUsCrewmate color={c.color} hat={c.hat} size={88} floating={true} interactive={true} />
+                  </div>
+                )}
                 <div>
                   <span
                     style={{
@@ -261,31 +347,52 @@ export default function HumansPage() {
                   >
                     {c.role}
                   </span>
-                  <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px 0' }}>
+                  <h3 style={{ fontSize: '21px', fontWeight: 900, color: '#0f172a', margin: '0 0 4px 0' }}>
                     {c.name}
                   </h3>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
+                  <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 8px 0', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>
                     {c.org}
                   </p>
+                  {c.phone && (
+                    <a
+                      href={`tel:${c.phone.replace(/\s+/g, '')}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        color: '#ff3b69',
+                        textDecoration: 'none',
+                        background: '#fff1f2',
+                        padding: '3px 10px',
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <Phone size={12} />
+                      <span>{c.phone}</span>
+                    </a>
+                  )}
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
 
-        {/* 3. Developer / Lead Architect */}
+        {/* 3. Lead Platform Architect */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '28px' }}>
-            <Terminal size={22} color="#16a34a" />
+            <Terminal size={22} color="#0284c7" />
             <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', margin: 0 }}>
-              LEAD PLATFORM DEVELOPER
+              LEAD PLATFORM ARCHITECT
             </h2>
           </div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            whileHover={{ y: -4 }}
             style={{
               background: '#ffffff',
               borderRadius: '28px',
@@ -296,44 +403,87 @@ export default function HumansPage() {
               alignItems: 'center',
               gap: '28px',
               flexWrap: 'wrap',
+              transition: 'all 0.3s ease',
             }}
           >
             <div
               style={{
-                width: 90,
-                height: 90,
-                borderRadius: '50%',
+                width: 108,
+                height: 108,
+                borderRadius: '26px',
                 overflow: 'hidden',
-                border: '3px solid #fde047',
-                boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                border: '3.5px solid #38bdf8',
+                boxShadow: '0 10px 25px rgba(2, 132, 199, 0.2)',
                 flexShrink: 0,
+                background: '#f0f9ff',
               }}
             >
-              <img src={meImg} alt="Lead Developer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img
+                src={yashwanthImg}
+                alt="Yashwanth H B - Lead Platform Architect"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
+              />
             </div>
 
-            <div>
-              <span
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 900,
-                  color: '#16a34a',
-                  background: '#dcfce7',
-                  padding: '4px 12px',
-                  borderRadius: 100,
-                  display: 'inline-block',
-                  marginBottom: 8,
-                  textTransform: 'uppercase',
-                }}
-              >
-                Lead Platform Developer
-              </span>
-              <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px 0' }}>
-                Full-Stack Systems & Architecture
+            <div style={{ flex: '1 1 300px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 900,
+                    color: '#0284c7',
+                    background: '#e0f2fe',
+                    padding: '4px 12px',
+                    borderRadius: 100,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  Lead Platform Architect
+                </span>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    color: '#64748b',
+                    background: '#f1f5f9',
+                    padding: '4px 10px',
+                    borderRadius: 100,
+                  }}
+                >
+                  Systems Engineer
+                </span>
+              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px 0' }}>
+                Yashwanth H B
               </h3>
-              <p style={{ fontSize: '14px', color: '#64748b', margin: 0, maxWidth: 580, lineHeight: 1.6, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                Engineered the registration portals, team management systems, live evaluations, and interactive experiences powering HAXLR8 3.0.
+              <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 16px 0', maxWidth: 640, lineHeight: 1.6, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
+                Architected and engineered the end-to-end HAXLR8 3.0 digital platform, real-time registration sync, Supabase authentication & database infrastructure, automated flight pass generation, and digital jury evaluation systems.
               </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                <a
+                  href="tel:8050614849"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: '13px',
+                    fontWeight: 800,
+                    color: '#0284c7',
+                    background: '#f0f9ff',
+                    border: '1px solid #bae6fd',
+                    padding: '6px 14px',
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <Phone size={14} />
+                  <span>+91 80506 14849</span>
+                </a>
+                <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>
+                  Dept. of ECE · Maharaja Institute of Technology Mysore
+                </span>
+              </div>
             </div>
           </motion.div>
         </div>

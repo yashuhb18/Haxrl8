@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import meImg from '../assets/my image/me.png';
+import balakrishnaImg from '../assets/humans/balakrishna.png';
+import sandeshImg from '../assets/humans/sandesh.jpg';
+import yashwanthImg from '../assets/humans/yashwanth.png';
 import handImg from '../assets/my image/hand.png';
 
 /* ─── Data ─── */
@@ -8,29 +10,33 @@ export const organizers = [
   {
     name: 'Balakrishna K',
     role: 'Faculty Coordinator',
-    org: '@ MIT Mysore',
-    photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
+    org: 'Associate Prof & HoD, Dept of ECE · MIT Mysore',
+    photo: balakrishnaImg,
+    phone: '+91 98864 78574',
     linkedin: '#'
   },
   {
     name: 'Sandesh NG',
     role: 'Faculty Coordinator',
-    org: '@ MIT Mysore',
-    photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&q=80',
+    org: 'Assistant Professor, Dept of ECE · MIT Mysore',
+    photo: sandeshImg,
+    phone: '+91 94813 36585',
     linkedin: '#'
   },
   {
     name: 'Yashwanth H B',
     role: 'Student Coordinator',
     org: '8050614849 · @ MIT Mysore',
-    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
+    photo: yashwanthImg,
+    phone: '+91 80506 14849',
     linkedin: '#'
   },
   {
     name: 'Chethan Kumar B',
     role: 'Student Coordinator',
     org: '99455 07099 · @ MIT Mysore',
-    photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80',
+    photo: null,
+    phone: '+91 99455 07099',
     linkedin: '#'
   },
 ];
@@ -109,50 +115,45 @@ export default function OrganizersCommittee() {
                   flexDirection: 'column',
                 }}
               >
-                {/* Photo Container with Hover Effect 
-                <div
-                  className="group relative"
-                  style={{
-                    width: '100%',
-                    height: 380,
-                    background: '#f3f4f6',
-                    position: 'relative',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {m.photo ? (
+                {/* Photo Container */}
+                {m.photo ? (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: 320,
+                      background: '#f8fafc',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
                     <img
                       src={m.photo}
                       alt={m.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center 15%',
+                      }}
                     />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center text-5xl font-black text-gray-400 transition-transform duration-500 group-hover:scale-110"
-                    >
-                      {m.initials}
-                    </div>
-                  )}
-
-                  {/* Gradient overlay on hover
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-                  {/* Connect Button 
-                  <a
-                    href={m.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white text-black rounded-full font-bold text-sm shadow-xl translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out hover:bg-gray-100"
-                    style={{ textDecoration: 'none', padding: '10px 24px' }}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: 220,
+                      background: 'linear-gradient(135deg, #e0f2fe 0%, #ffe4e6 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '3rem',
+                      fontWeight: 900,
+                      color: '#0284c7',
+                    }}
                   >
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                      <rect x="2" y="9" width="4" height="12"></rect>
-                      <circle cx="4" cy="4" r="2"></circle>
-                    </svg>
-                    Connect
-                  </a>
-                </div> */}
+                    {m.name.charAt(0)}
+                  </div>
+                )}
 
                 {/* Content */}
                 <div
@@ -207,8 +208,10 @@ export default function OrganizersCommittee() {
 
       {/* ── DEVELOPER SECTION ── */}
       
+      {/* ── LEAD PLATFORM ARCHITECT SECTION ── */}
+      
       <motion.div {...fadeUp(0)} style={{ marginBottom: 40 }}>
-            <SectionLabel>Developer</SectionLabel>
+            <SectionLabel>Lead Platform Architect</SectionLabel>
       </motion.div> 
           
       <section style={{ padding: '0 20px 100px' }}>
@@ -224,100 +227,70 @@ export default function OrganizersCommittee() {
             {/* Developer Text Top Left */}
             <div className="absolute top-8 left-8 lg:left-10 flex items-center gap-4 z-20">
               {/* Icon */}
-              <div className="w-11 h-11 bg-[#111] rounded-[0.8rem] flex items-center justify-center text-white font-mono font-bold text-[1.1rem] shadow-sm">
+              <div className="w-11 h-11 bg-[#0284c7] rounded-[0.8rem] flex items-center justify-center text-white font-mono font-bold text-[1.1rem] shadow-sm">
                 &lt;/&gt;
               </div>
               {/* Text */}
               <div className="flex flex-col mt-1">
-                <span className="text-[#111] font-extrabold text-[0.85rem] tracking-[0.25em] uppercase">
-                  Developer
+                <span className="text-[#0f172a] font-extrabold text-[0.85rem] tracking-[0.2em] uppercase">
+                  Lead Platform Architect
                 </span>
-                <div className="w-7 h-[3px] bg-[#111] mt-1.5 rounded-full"></div>
+                <div className="w-10 h-[3px] bg-[#0284c7] mt-1.5 rounded-full"></div>
               </div>
             </div>
 
             {/* Content Wrapper */}
-            <div className="w-full flex flex-col items-center justify-center relative" style={{ minHeight: 300, padding: '30px 20px 10px' }}>
+            <div className="w-full flex flex-col items-center justify-center relative" style={{ minHeight: 320, padding: '70px 20px 20px' }}>
 
               {/* Image & Hand Wrapper */}
-              <div className="relative w-full max-w-[480px] flex justify-center items-center mb-4">
-
-                
+              <div className="relative w-full max-w-[360px] flex justify-center items-center mb-4">
 
                 {/* Sparkles */}
-                <div className="absolute top-12 -right-8 pointer-events-none z-10">
-                  <svg viewBox="0 0 24 24" width="28" height="28" fill="#111">
+                <div className="absolute top-6 -right-6 pointer-events-none z-10">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="#0284c7">
                     <path d="M12 0C12 6.62742 17.3726 12 24 12C17.3726 12 12 17.3726 12 24C12 17.3726 6.62742 12 0 12C6.62742 12 12 6.62742 12 0Z" />
                   </svg>
                 </div>
-                <div className="absolute top-[45%] -left-10 pointer-events-none z-10">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="#111">
-                    <path d="M12 0C12 6.62742 17.3726 12 24 12C17.3726 12 12 17.3726 12 24C12 17.3726 6.62742 12 0 12C6.62742 12 12 6.62742 12 0Z" />
-                  </svg>
-                </div>
-                <div className="absolute top-[75%] -right-10 pointer-events-none z-10">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="#111">
+                <div className="absolute top-[45%] -left-8 pointer-events-none z-10">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="#38bdf8">
                     <path d="M12 0C12 6.62742 17.3726 12 24 12C17.3726 12 12 17.3726 12 24C12 17.3726 6.62742 12 0 12C6.62742 12 12 6.62742 12 0Z" />
                   </svg>
                 </div>
 
-                {/* Blob Image */}
+                {/* Photo Frame */}
                 <div
-                  className="w-full overflow-hidden bg-gray-900 shadow-xl z-10 transition-all duration-700 group-hover:scale-[1.05]"
-                  style={{ borderRadius: '90% 60% 70% 90% / 60% 30% 70% 100%', animation: 'blob 8s ease-in-out infinite' }}
+                  className="w-48 h-48 rounded-[28px] overflow-hidden border-4 border-[#38bdf8] shadow-2xl z-10 transition-all duration-500 group-hover:scale-[1.03]"
+                  style={{ background: '#f0f9ff' }}
                 >
-                  <img src={meImg} alt="Developer" className="w-full h-auto object-contain grayscale transition-all duration-700 group-hover:grayscale-0" />
-                </div>
-
-                {/* Say Hi — visible on card hover */}
-                <div className="absolute -right-32 top-[20%] flex flex-col items-center gap-1 z-20 pointer-events-none">
-                  <p
-                    className="text-2xl font-bold text-[#0070f3] rotate-6 opacity-0 -translate-y-2 transition-all duration-500 delay-100 group-hover:opacity-100 group-hover:translate-y-0"
-                    style={{ fontFamily: "'Caveat', 'Dancing Script', cursive" }}
-                  >
-                    Say Hi!
-                  </p>
-                  {/* Curved arrow pointing down-left */}
-                  <svg width="40" height="48" viewBox="0 0 32 40" fill="none" className="opacity-0 transition-all duration-500 delay-150 group-hover:opacity-100" stroke="#555" strokeWidth="2" strokeLinecap="round">
-                    <path d="M20 2 C24 10 26 20 16 34" />
-                    <polyline points="10,30 16,34 18,26" />
-                  </svg>
-                  {/* Hand in dashed circle */}
-                  <div
-                    className="w-40 h-40 flex items-center justify-center opacity-0 scale-50 transition-all duration-500 delay-200 group-hover:opacity-100 group-hover:scale-100 dev-wave-hand"
-                    style={{ border: '2px dashed #bbb', borderRadius: '50%', background: 'rgba(255,255,255,0.6)' }}
-                  >
-                    <img src={handImg} alt="Wave" className="w-24 h-24 drop-shadow-md rotate-[15deg]" />
-                  </div>
+                  <img src={yashwanthImg} alt="Yashwanth H B - Lead Platform Architect" className="w-full h-full object-cover" style={{ objectPosition: 'center 15%' }} />
                 </div>
               </div>
 
-              {/* Dashed loop decoration bottom-left */}
-              <div className="absolute bottom-24 left-4 opacity-30 pointer-events-none">
-                <svg width="60" height="30" viewBox="0 0 80 30" fill="none" stroke="#999" strokeWidth="1.5" strokeDasharray="4 3" strokeLinecap="round">
-                  <path d="M4 26 C10 4 40 4 50 14 C60 24 70 20 76 10" />
-                </svg>
+              {/* Name & Role Text */}
+              <div style={{ textAlign: 'center', marginBottom: 14 }}>
+                <h3 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#0f172a', margin: '0 0 4px' }}>
+                  Yashwanth H B
+                </h3>
+                <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0284c7', margin: '0 0 6px' }}>
+                  Systems Engineer & Lead Platform Architect
+                </p>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0, maxWidth: 500, lineHeight: 1.5 }}>
+                  Architected and engineered the end-to-end HAXLR8 3.0 digital platform, live registration sync, and evaluation infrastructure.
+                </p>
               </div>
 
-              {/* Icon Capsule — always visible, label tooltip on icon hover */}
+              {/* Icon Capsule */}
               <div
-                className="relative z-30 flex items-center gap-1 bg-white rounded-[1.2rem] border border-gray-100"
-                style={{ margin: '20px', padding: '6px', boxShadow: '0 12px 40px -8px rgba(0,0,0,0.14)' }}
+                className="relative z-30 flex items-center gap-2 bg-white rounded-[1.2rem] border border-gray-100"
+                style={{ padding: '8px 16px', boxShadow: '0 10px 30px -6px rgba(0,0,0,0.1)' }}
               >
-                <a href="https://udhayasankar.vercel.app" target="_blank" rel="noopener noreferrer" className="group/pt flex flex-col items-center justify-center w-20 h-16 rounded-xl hover:bg-gray-50 transition-colors relative overflow-hidden">
-                  <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" className="text-gray-700 transition-all duration-300 transform group-hover/pt:-translate-y-2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[0.6rem] font-semibold text-gray-500 opacity-0 group-hover/pt:opacity-100 transition-all duration-300 transform translate-y-2 group-hover/pt:translate-y-0 pointer-events-none">Portfolio</span>
+                <a href="tel:8050614849" className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-[#0284c7] hover:bg-sky-50 rounded-lg transition-colors" style={{ textDecoration: 'none' }}>
+                  📞 <span>+91 80506 14849</span>
                 </a>
-                <div className="w-px h-8 bg-gray-100" />
-                <a href="https://www.linkedin.com/in/udhayasankaru" target="_blank" rel="noopener noreferrer" className="group/li flex flex-col items-center justify-center w-20 h-16 rounded-xl hover:bg-[#0a66c2]/5 transition-colors relative overflow-hidden">
-                  <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" className="text-gray-700 group-hover/li:text-[#0a66c2] transition-all duration-300 transform group-hover/li:-translate-y-2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
-                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[0.6rem] font-semibold text-[#0a66c2] opacity-0 group-hover/li:opacity-100 transition-all duration-300 transform translate-y-2 group-hover/li:translate-y-0 pointer-events-none">LinkedIn</span>
-                </a>
-                <div className="w-px h-8 bg-gray-100" />
-                <a href="https://github.com/udhayasankar-UD" target="_blank" rel="noopener noreferrer" className="group/gh flex flex-col items-center justify-center w-20 h-16 rounded-xl hover:bg-gray-50 transition-colors relative overflow-hidden">
-                  <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" className="text-gray-700 group-hover/gh:text-black transition-all duration-300 transform group-hover/gh:-translate-y-2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[0.6rem] font-semibold text-gray-700 opacity-0 group-hover/gh:opacity-100 transition-all duration-300 transform translate-y-2 group-hover/gh:translate-y-0 pointer-events-none">GitHub</span>
-                </a>
+                <div className="w-px h-5 bg-gray-200" />
+                <span className="text-xs font-semibold text-gray-500 px-2">
+                  Dept. of ECE · MIT Mysore
+                </span>
               </div>
             </div>
           </motion.div>

@@ -4,6 +4,10 @@ import { Phone, Mail, MapPin, Send, CheckCircle2, User, Radio, Sparkles, Externa
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
 
+import balakrishnaImg from '../assets/humans/balakrishna.png';
+import sandeshImg from '../assets/humans/sandesh.jpg';
+import yashwanthImg from '../assets/humans/yashwanth.png';
+
 const FACULTY_COORDINATORS = [
   {
     name: 'Balakrishna K',
@@ -13,6 +17,7 @@ const FACULTY_COORDINATORS = [
     border: '#d8b4fe',
     badge: 'FACULTY LEAD',
     crewColor: '#9333ea',
+    photo: balakrishnaImg,
   },
   {
     name: 'Sandesh N G',
@@ -22,6 +27,7 @@ const FACULTY_COORDINATORS = [
     border: '#fed7aa',
     badge: 'FACULTY CO-LEAD',
     crewColor: '#ea580c',
+    photo: sandeshImg,
   },
 ];
 
@@ -34,6 +40,7 @@ const STUDENT_COORDINATORS = [
     border: '#7dd3fc',
     badge: 'CHIEF COORDINATOR',
     crewColor: '#0284c7',
+    photo: yashwanthImg,
   },
   {
     name: 'Chethan Kumar B',
@@ -43,6 +50,7 @@ const STUDENT_COORDINATORS = [
     border: '#86efac',
     badge: 'STUDENT COORDINATOR',
     crewColor: '#16a34a',
+    photo: null,
   },
 ];
 
@@ -205,9 +213,35 @@ export default function ContactSection() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
-                        <AmongUsCrewmate color={fac.crewColor} size={42} />
-                      </div>
+                      {fac.photo ? (
+                        <div
+                          style={{
+                            width: '46px',
+                            height: '46px',
+                            borderRadius: '14px',
+                            overflow: 'hidden',
+                            border: `2px solid ${fac.border}`,
+                            flexShrink: 0,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                            background: '#fff',
+                          }}
+                        >
+                          <img
+                            src={fac.photo}
+                            alt={fac.name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              objectPosition: 'center 15%',
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
+                          <AmongUsCrewmate color={fac.crewColor} size={42} />
+                        </div>
+                      )}
                       <div>
                         <span
                           style={{
@@ -300,9 +334,35 @@ export default function ContactSection() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
-                        <AmongUsCrewmate color={stu.crewColor} size={42} />
-                      </div>
+                      {stu.photo ? (
+                        <div
+                          style={{
+                            width: '46px',
+                            height: '46px',
+                            borderRadius: '14px',
+                            overflow: 'hidden',
+                            border: `2px solid ${stu.border}`,
+                            flexShrink: 0,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                            background: '#fff',
+                          }}
+                        >
+                          <img
+                            src={stu.photo}
+                            alt={stu.name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              objectPosition: 'center 15%',
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div style={{ width: '42px', height: '48px', flexShrink: 0 }}>
+                          <AmongUsCrewmate color={stu.crewColor} size={42} />
+                        </div>
+                      )}
                       <div>
                         <span
                           style={{
