@@ -162,7 +162,40 @@ export default function PaymentTab({
     }, 2500);
   };
 
-  const handleScreenshotChange = (e) => {
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1000;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          resolve(compressedDataUrl);
+        };
+        img.onerror = () => resolve(e.target?.result);
+        img.src = e.target?.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleScreenshotChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -170,18 +203,23 @@ export default function PaymentTab({
       setErrorMsg('Please upload a valid image file (PNG, JPG, or JPEG).');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setErrorMsg('Screenshot file size must be under 5MB.');
+    if (file.size > 8 * 1024 * 1024) {
+      setErrorMsg('Screenshot file size must be under 8MB.');
       return;
     }
 
     setErrorMsg('');
     setScreenshotFile(file);
-    const reader = new FileReader();
-    reader.onload = (uploadEvent) => {
-      setScreenshotPreview(uploadEvent.target?.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file);
+      setScreenshotPreview(compressed);
+    } catch (err) {
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        setScreenshotPreview(uploadEvent.target?.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmitVerification = async (e) => {
@@ -219,27 +257,10 @@ export default function PaymentTab({
     try {
       let finalScreenshotUrl = screenshotPreview;
 
-      // Upload screenshot to Supabase storage if file is present
-      if (screenshotFile) {
+      if (screenshotFile && !finalScreenshotUrl.startsWith('data:image/')) {
         try {
-          const timestamp = Date.now();
-          const cleanTeam = (teamData?.team_name || 'team').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-          const ext = screenshotFile.name.split('.').pop() || 'png';
-          const filePath = `payments/${timestamp}_${cleanTeam}_receipt.${ext}`;
-
-          const { error: storageError } = await supabase.storage
-            .from('id-cards')
-            .upload(filePath, screenshotFile, { cacheControl: '3600', upsert: true });
-
-          if (!storageError) {
-            const { data } = supabase.storage.from('id-cards').getPublicUrl(filePath);
-            if (data?.publicUrl) {
-              finalScreenshotUrl = data.publicUrl;
-            }
-          }
-        } catch (uploadErr) {
-          console.warn('Storage upload fallback:', uploadErr);
-        }
+          finalScreenshotUrl = await compressImage(screenshotFile);
+        } catch (e) {}
       }
 
       const paymentPayload = {
@@ -257,33 +278,32 @@ export default function PaymentTab({
         localStorage.setItem(`haxlr8_payment_${user.id}`, JSON.stringify(paymentPayload));
       }
 
-      // 2. Persist to Supabase teams table
+      // 2. Persist to Supabase submissions table with QR screenshot in pdf_url
       if (teamData?.id) {
         try {
-          await supabase.from('teams').update({
-            payment_status: 'submitted',
-            payment_utr: cleanUtr,
-            payer_name: paymentPayload.payer_name,
-            payer_phone: paymentPayload.payer_phone,
-            payment_amount: REGISTRATION_FEE_INR,
-            payment_screenshot_url: finalScreenshotUrl,
-            payment_date: paymentPayload.submitted_at
-          }).eq('id', teamData.id);
-        } catch (dbErr) {
-          console.warn('Supabase teams payment update notice:', dbErr);
-        }
-
-        // Also ensure a verified submission entry exists so Admin dashboard sees it
-        try {
           const teamDomain = teamData.domain || 'Agriculture';
-          await supabase.from('submissions').upsert({
+          const { data: existingSubs } = await supabase
+            .from('submissions')
+            .select('id')
+            .eq('team_id', teamData.id)
+            .limit(1);
+          const existingSub = existingSubs?.[0];
+
+          const subPayload = {
             team_id: teamData.id,
             project_title: `${teamData.team_name} - ${teamDomain} Track`,
             sdg_goal: teamDomain,
             category: 'Registration Verified',
-            project_description: `Registration fee ₹1200 verified. UTR: ${cleanUtr}. Leader: ${user?.user_metadata?.full_name || 'Leader'} (${user?.email}).`,
-            status: 'Shortlisted' // Sets as confirmed participant
-          });
+            project_description: `Registration fee ₹1200 verified. UTR: ${cleanUtr}. Payer: ${sanitizeInput(payerName)} (${sanitizeInput(payerPhone || 'N/A')}). Leader: ${user?.user_metadata?.full_name || 'Leader'} (${user?.email}).`,
+            pdf_url: finalScreenshotUrl,
+            status: 'Shortlisted'
+          };
+
+          if (existingSub?.id) {
+            await supabase.from('submissions').update(subPayload).eq('id', existingSub.id);
+          } else {
+            await supabase.from('submissions').insert(subPayload);
+          }
         } catch (subErr) {
           console.warn('Submissions record sync notice:', subErr);
         }

@@ -312,11 +312,26 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
       let currentTeamId = teamData?.id;
       let finalTeamData = teamData;
 
-      // 1. Create or Update Team
       const cleanTeamName = sanitizeInput(formData.teamName);
       const cleanDomain = formData.domain || 'Agriculture';
+      const validLeaderId = ensureUUID(user?.id);
 
-      if (isEditingTeam) {
+      // Check if user already has an existing team in Supabase to prevent duplicate inserts
+      let existingTeam = null;
+      try {
+        const { data: foundTeams } = await supabase
+          .from('teams')
+          .select('*')
+          .eq('leader_id', validLeaderId)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (foundTeams && foundTeams.length > 0) {
+          existingTeam = foundTeams[0];
+        }
+      } catch (e) {}
+
+      if (isEditingTeam || existingTeam) {
+        currentTeamId = (existingTeam || teamData)?.id;
         try {
           await supabase.from('teams').update({
             team_name: cleanTeamName
@@ -327,7 +342,12 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
 
         // Persist domain track into submissions table
         try {
-          const { data: existingSub } = await supabase.from('submissions').select('id').eq('team_id', currentTeamId).maybeSingle();
+          const { data: existingSubs } = await supabase
+            .from('submissions')
+            .select('id')
+            .eq('team_id', currentTeamId)
+            .limit(1);
+          const existingSub = existingSubs?.[0];
           if (existingSub?.id) {
             await supabase.from('submissions').update({
               project_title: `${cleanTeamName} - ${cleanDomain}`,
@@ -348,12 +368,11 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           console.warn('Submissions domain track notice:', subErr);
         }
 
-        finalTeamData = { ...teamData, team_name: cleanTeamName, domain: cleanDomain };
-        localStorage.setItem(`haxlr8_team_${user?.id}`, JSON.stringify(finalTeamData));
+        finalTeamData = { ...(existingTeam || teamData), team_name: cleanTeamName, domain: cleanDomain };
+        localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(finalTeamData));
       } else {
         let team = null;
         currentTeamId = ensureUUID(currentTeamId || teamData?.id);
-        const validLeaderId = ensureUUID(user?.id);
         
         try {
           const { data: createdTeam, error: teamErr } = await supabase.from('teams').insert({
@@ -471,20 +490,30 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
         ...formData.teammates.map(t => formatMember(t, false))
       ];
 
-      // 3. Upsert Members
+      // 3. Clear old members for this team and insert fresh roster
       let savedMembers = allMembers;
       try {
-        const { data: members, error: memErr } = await supabase.from('team_members').upsert(allMembers).select();
+        await supabase.from('team_members').delete().eq('team_id', currentTeamId);
+        const membersPayload = allMembers.map(m => {
+          const copy = { ...m, team_id: currentTeamId };
+          delete copy.id; // Let DB generate fresh clean UUID
+          return copy;
+        });
+        const { data: insertedMembers, error: memErr } = await supabase
+          .from('team_members')
+          .insert(membersPayload)
+          .select();
         if (memErr) throw memErr;
-        if (members) savedMembers = members;
-        localStorage.setItem(`haxlr8_members_${validLeaderId}`, JSON.stringify(savedMembers));
-        localStorage.removeItem('haxlr8_members_db');
+        if (insertedMembers && insertedMembers.length > 0) {
+          savedMembers = insertedMembers;
+        }
       } catch (mErr) {
-        console.warn('Supabase members upsert notice:', mErr);
-        savedMembers = allMembers.map((m) => ({ ...m, id: ensureUUID(m.id) }));
-        localStorage.setItem(`haxlr8_members_${validLeaderId}`, JSON.stringify(savedMembers));
-        localStorage.removeItem('haxlr8_members_db');
+        console.warn('Supabase members insert fallback:', mErr);
+        savedMembers = allMembers.map((m) => ({ ...m, team_id: currentTeamId, id: ensureUUID(m.id) }));
       }
+
+      localStorage.setItem(`haxlr8_members_${validLeaderId}`, JSON.stringify(savedMembers));
+      localStorage.removeItem('haxlr8_members_db');
 
       setTeamData(finalTeamData);
       setTeamMembers(savedMembers);
@@ -843,9 +872,11 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
   }
 
   // --- SUMMARY VIEW (After Registration) ---
-  const teamLeader = teamMembers.find(m => m.id === teamData.leader_id) || teamMembers.find(m => m.email === user.email);
-  const leaderName = teamLeader?.full_name || 'Flight Captain';
-  const registeredDate = teamData.created_at ? new Date(teamData.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+  const teamLeader = teamMembers?.find(m => m.is_leader === true) || 
+                     teamMembers?.find(m => m.id === teamData?.leader_id) || 
+                     teamMembers?.find(m => m.email?.toLowerCase() === user?.email?.toLowerCase());
+  const leaderName = teamLeader?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Flight Captain';
+  const registeredDate = teamData?.created_at ? new Date(teamData.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, width: '100%', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

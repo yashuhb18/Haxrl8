@@ -3,15 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
-import { Users, Flag, BookOpen, Shield, Search, ChevronDown, Download, ChevronRight, Plus, ChevronLeft, Eye, CheckCircle, X, Clock } from 'lucide-react';
+import { Users, Flag, BookOpen, Shield, Search, ChevronDown, Download, ChevronRight, Plus, ChevronLeft, Eye, CheckCircle, X, Clock, Trash2 } from 'lucide-react';
 
 const S = {
   bg: '#F8FAFC', card: '#FFFFFF', border: '#E5E7EB', primary: '#6C4EFF',
   t1: '#111827', t2: '#6B7280', t3: '#9CA3AF', green: '#16A34A',
   activeBg: '#EEE8FF', radius: '14px', pad: '24px', gap: '20px',
 };
-
-
 
 export default function AdminUsers() {
   const navigate = useNavigate();
@@ -61,6 +59,69 @@ export default function AdminUsers() {
     };
     checkAuth();
   }, [fetchData]);
+
+  const getIsLeader = (member) => {
+    return member.is_leader === true;
+  };
+
+  const handleVerify = async () => {
+    if (!idModal || !verifyConfirmed) return;
+    setVerifying(true);
+    const { error } = await supabase.from('team_members').update({
+      id_card_verified: true,
+      id_card_verified_by: adminEmail || 'Admin'
+    }).eq('id', idModal.id);
+    if (error) {
+      alert('Failed to verify: ' + error.message + '. Please check RLS policies on team_members table.');
+    } else {
+      setMembers(prev => prev.map(m => m.id === idModal.id ? { ...m, id_card_verified: true, id_card_verified_by: adminEmail || 'Admin' } : m));
+    }
+    setVerifying(false);
+    setIdModal(null);
+    setVerifyConfirmed(false);
+  };
+
+  // Permanently delete participant from DB
+  const handleDeleteUser = async (memberId, memberName) => {
+    if (!window.confirm(`⚠️ DANGER: Permanently delete participant "${memberName}" from the database?\n\nThis action cannot be undone.`)) return;
+    try {
+      const { error } = await supabase.from('team_members').delete().eq('id', memberId);
+      if (error) throw error;
+      setMembers(prev => prev.filter(m => m.id !== memberId));
+      setTotalFilteredCount(prev => Math.max(0, prev - 1));
+      setTotalUsersDB(prev => Math.max(0, prev - 1));
+      alert(`Participant "${memberName}" deleted from database.`);
+    } catch (err) {
+      console.error('Delete user error:', err);
+      alert('Failed to delete participant: ' + (err.message || err));
+    }
+  };
+
+  // Delete ID card photo from DB
+  const handleDeleteIdPhotos = async (memberId, memberName) => {
+    if (!window.confirm(`Are you sure you want to delete the ID card photos for "${memberName}" from the database?`)) return;
+    try {
+      const { error } = await supabase.from('team_members').update({
+        id_card_front_url: null,
+        id_card_back_url: null,
+        id_card_verified: false,
+        id_card_verified_by: null
+      }).eq('id', memberId);
+      if (error) throw error;
+
+      setMembers(prev => prev.map(m => m.id === memberId ? {
+        ...m,
+        id_card_front_url: null,
+        id_card_back_url: null,
+        id_card_verified: false,
+        id_card_verified_by: null
+      } : m));
+      setIdModal(null);
+      alert(`ID card photos for "${memberName}" were removed from the database.`);
+    } catch (err) {
+      alert('Failed to delete photos: ' + (err.message || err));
+    }
+  };
 
 
   const buildQuery = async (isExport = false) => {
@@ -131,27 +192,6 @@ export default function AdminUsers() {
       </div>
     );
   }
-
-  const getIsLeader = (member) => {
-    return member.is_leader === true;
-  };
-
-  const handleVerify = async () => {
-    if (!idModal || !verifyConfirmed) return;
-    setVerifying(true);
-    const { error } = await supabase.from('team_members').update({
-      id_card_verified: true,
-      id_card_verified_by: adminEmail
-    }).eq('id', idModal.id);
-    if (error) {
-      alert('Failed to verify: ' + error.message + '. Please check RLS policies on team_members table.');
-    } else {
-      setMembers(prev => prev.map(m => m.id === idModal.id ? { ...m, id_card_verified: true, id_card_verified_by: adminEmail } : m));
-    }
-    setVerifying(false);
-    setIdModal(null);
-    setVerifyConfirmed(false);
-  };
 
   const totalPages = Math.ceil(totalFilteredCount / itemsPerPage);
   const currentMembers = members;
@@ -290,7 +330,7 @@ export default function AdminUsers() {
                 <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13, tableLayout:'auto' }}>
                   <thead>
                     <tr style={{ background:'#FAFAFA', borderBottom:'1px solid '+S.border }}>
-                      {['S.No', 'User', 'Role', 'Team', 'Email', 'College', 'Location', 'Year', 'ID Card', 'Verified By', 'Registered On'].map(h => (
+                      {['S.No', 'User', 'Role', 'Team', 'Email', 'College', 'Location', 'Year', 'ID Card', 'Verified By', 'Registered On', 'Actions'].map(h => (
                         <th key={h} style={{ padding:'14px 16px', fontWeight:600, color:S.t2, textAlign: 'left', whiteSpace: 'nowrap' }}>{h}</th>
                       ))}
                     </tr>
@@ -373,12 +413,23 @@ export default function AdminUsers() {
                             {new Date(m.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} <br/>
                             <span style={{ fontSize: 11, color: S.t3 }}>{new Date(m.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                           </td>
+
+                          {/* Actions Column */}
+                          <td style={{ padding:'14px 16px' }}>
+                            <button 
+                              onClick={() => handleDeleteUser(m.id, m.full_name)}
+                              style={{ padding:'6px 10px', borderRadius:8, background:'#FEF2F2', border:'1px solid #FECACA', color:'#DC2626', fontWeight:700, fontSize:12, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4 }}
+                              title="Permanently delete user from database"
+                            >
+                              <Trash2 size={13} /> Delete
+                            </button>
+                          </td>
                         </tr>
                       );
                     })}
                     {currentMembers.length === 0 && (
                       <tr>
-                        <td colSpan="11" style={{ padding:40, textAlign:'center', color:S.t3 }}>No participants found.</td>
+                        <td colSpan="12" style={{ padding:40, textAlign:'center', color:S.t3 }}>No participants found.</td>
                       </tr>
                     )}
                   </tbody>
@@ -443,26 +494,42 @@ export default function AdminUsers() {
             {/* Modal Footer */}
             <div style={{ padding:'20px 28px', borderTop:'1px solid #e5e7eb', background:'#fff' }}>
               {idModal.id_card_verified ? (
-                <div style={{ display:'flex', alignItems:'center', gap:10, background:'#f0fdf4', padding:'14px 18px', borderRadius:12, border:'1.5px solid #bbf7d0' }}>
-                  <CheckCircle size={20} color="#16a34a"/>
-                  <div>
-                    <div style={{ fontSize:14, fontWeight:700, color:'#166534' }}>Already Verified</div>
-                    <div style={{ fontSize:12, color:'#15803d' }}>Verified by: {idModal.id_card_verified_by || 'Admin'}</div>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:12 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:10, background:'#f0fdf4', padding:'12px 16px', borderRadius:12, border:'1.5px solid #bbf7d0' }}>
+                    <CheckCircle size={20} color="#16a34a"/>
+                    <div>
+                      <div style={{ fontSize:14, fontWeight:700, color:'#166534' }}>Already Verified</div>
+                      <div style={{ fontSize:12, color:'#15803d' }}>Verified by: {idModal.id_card_verified_by || 'Admin'}</div>
+                    </div>
                   </div>
+                  <button 
+                    onClick={() => handleDeleteIdPhotos(idModal.id, idModal.full_name)}
+                    style={{ padding:'10px 16px', borderRadius:10, background:'#FEF2F2', border:'1.5px solid #FECACA', fontSize:13, fontWeight:700, color:'#DC2626', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:6 }}
+                  >
+                    <Trash2 size={15}/> Delete ID Photos from DB
+                  </button>
                 </div>
               ) : (
-                <>
-                  <label style={{ display:'flex', alignItems:'center', gap:12, cursor:'pointer', background:'#f0fdf4', padding:'14px 18px', borderRadius:12, border:'1.5px solid #bbf7d0', marginBottom:16 }}>
+                <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                  <label style={{ display:'flex', alignItems:'center', gap:12, cursor:'pointer', background:'#f0fdf4', padding:'14px 18px', borderRadius:12, border:'1.5px solid #bbf7d0' }}>
                     <input type="checkbox" checked={verifyConfirmed} onChange={e => setVerifyConfirmed(e.target.checked)} style={{ width:18, height:18, accentColor:'#16a34a', cursor:'pointer' }}/>
                     <span style={{ fontSize:14, fontWeight:700, color:'#166534' }}>I verify this is a correct and valid student ID card.</span>
                   </label>
-                  <div style={{ display:'flex', justifyContent:'flex-end', gap:12 }}>
-                    <button onClick={() => { setIdModal(null); setVerifyConfirmed(false); }} style={{ padding:'10px 20px', borderRadius:10, background:'#fff', border:'1.5px solid #e5e7eb', fontSize:14, fontWeight:600, color:'#374151', cursor:'pointer' }}>Cancel</button>
-                    <button onClick={handleVerify} disabled={!verifyConfirmed || verifying} style={{ padding:'10px 24px', borderRadius:10, background:(!verifyConfirmed || verifying) ? '#9ca3af' : '#16a34a', border:'none', fontSize:14, fontWeight:700, color:'#fff', cursor:(!verifyConfirmed || verifying) ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:8 }}>
-                      <CheckCircle size={16}/> {verifying ? 'Verifying...' : 'Verify'}
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:12 }}>
+                    <button 
+                      onClick={() => handleDeleteIdPhotos(idModal.id, idModal.full_name)}
+                      style={{ padding:'10px 16px', borderRadius:10, background:'#FEF2F2', border:'1.5px solid #FECACA', fontSize:13, fontWeight:700, color:'#DC2626', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:6 }}
+                    >
+                      <Trash2 size={15}/> Delete ID Photos from DB
                     </button>
+                    <div style={{ display:'flex', gap:10 }}>
+                      <button onClick={() => { setIdModal(null); setVerifyConfirmed(false); }} style={{ padding:'10px 20px', borderRadius:10, background:'#fff', border:'1.5px solid #e5e7eb', fontSize:14, fontWeight:600, color:'#374151', cursor:'pointer' }}>Cancel</button>
+                      <button onClick={handleVerify} disabled={!verifyConfirmed || verifying} style={{ padding:'10px 24px', borderRadius:10, background:(!verifyConfirmed || verifying) ? '#9ca3af' : '#16a34a', border:'none', fontSize:14, fontWeight:700, color:'#fff', cursor:(!verifyConfirmed || verifying) ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:8 }}>
+                        <CheckCircle size={16}/> {verifying ? 'Verifying...' : 'Verify'}
+                      </button>
+                    </div>
                   </div>
-                </>
+                </div>
               )}
             </div>
 

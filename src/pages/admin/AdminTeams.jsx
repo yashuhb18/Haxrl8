@@ -3,15 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
-import { Users, Flag, CheckSquare, Search, ChevronDown, Download, ChevronRight, MoreVertical, ChevronLeft, Trophy } from 'lucide-react';
+import { Users, Flag, CheckSquare, Search, ChevronDown, Download, ChevronRight, MoreVertical, ChevronLeft, Trophy, Trash2, Eye, Receipt, X, ExternalLink, Image } from 'lucide-react';
 
 const S = {
   bg: '#F8FAFC', card: '#FFFFFF', border: '#E5E7EB', primary: '#6C4EFF',
   t1: '#111827', t2: '#6B7280', t3: '#9CA3AF', green: '#16A34A',
   activeBg: '#EEE8FF', radius: '14px', pad: '24px', gap: '20px',
 };
-
-
 
 export default function AdminTeams() {
   const navigate = useNavigate();
@@ -21,6 +19,11 @@ export default function AdminTeams() {
   const [members, setMembers] = useState([]);
   const [submissions, setSubmissions] = useState([]);
   
+  // Modals & Actions
+  const [selectedRosterTeam, setSelectedRosterTeam] = useState(null);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+
   // Filters and Pagination
   const [searchTerm, setSearchTerm] = useState('');
   const [trackFilter, setTrackFilter] = useState('All Tracks');
@@ -80,7 +83,7 @@ export default function AdminTeams() {
         if (teamIds.length > 0) {
           const [{ data: m }, { data: s }] = await Promise.all([
             supabase.from('team_members').select('*').in('team_id', teamIds),
-            supabase.from('submissions').select('team_id, category').in('team_id', teamIds)
+            supabase.from('submissions').select('id, team_id, category, project_title, pdf_url, project_description, created_at').in('team_id', teamIds)
           ]);
           if (m) setMembers(m);
           if (s) setSubmissions(s);
@@ -92,6 +95,73 @@ export default function AdminTeams() {
     };
     fetchPage();
   }, [loading, isAdmin, currentPage, searchTerm]);
+
+  // Permanently delete a squad and all its related records from DB
+  const handleDeleteTeam = async (teamId, teamName) => {
+    if (!window.confirm(`⚠️ DANGER: Are you sure you want to PERMANENTLY delete squad "${teamName}" from the database?\n\nThis will remove all associated crew members, submissions, and payment receipts. This action CANNOT be undone.`)) {
+      return;
+    }
+    try {
+      setDeletingId(teamId);
+      // 1. Delete submissions for this team
+      await supabase.from('submissions').delete().eq('team_id', teamId);
+      // 2. Delete team members for this team
+      await supabase.from('team_members').delete().eq('team_id', teamId);
+      // 3. Delete the team itself
+      const { error } = await supabase.from('teams').delete().eq('id', teamId);
+      if (error) throw error;
+
+      // Update UI state
+      setTeams(prev => prev.filter(t => t.id !== teamId));
+      setMembers(prev => prev.filter(m => m.team_id !== teamId));
+      setSubmissions(prev => prev.filter(s => s.team_id !== teamId));
+      setTotalFilteredCount(prev => Math.max(0, prev - 1));
+      setTotalTeamsDB(prev => Math.max(0, prev - 1));
+      if (selectedRosterTeam?.id === teamId) setSelectedRosterTeam(null);
+      if (selectedReceipt?.teamId === teamId) setSelectedReceipt(null);
+      alert(`Squad "${teamName}" was completely deleted from the database.`);
+    } catch (err) {
+      console.error('Delete squad error:', err);
+      alert('Failed to delete squad: ' + (err.message || err));
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  // Delete an individual crew member from DB
+  const handleDeleteMember = async (memberId, memberName) => {
+    if (!window.confirm(`Are you sure you want to remove member "${memberName}" from the database?`)) return;
+    try {
+      const { error } = await supabase.from('team_members').delete().eq('id', memberId);
+      if (error) throw error;
+
+      setMembers(prev => prev.filter(m => m.id !== memberId));
+      if (selectedRosterTeam) {
+        setSelectedRosterTeam(prev => prev ? {
+          ...prev,
+          members: prev.members.filter(m => m.id !== memberId)
+        } : null);
+      }
+      alert(`Member "${memberName}" removed.`);
+    } catch (err) {
+      alert('Failed to remove member: ' + (err.message || err));
+    }
+  };
+
+  // Delete payment receipt photo directly from DB
+  const handleDeleteReceiptPhoto = async (submissionId, teamName) => {
+    if (!window.confirm(`Are you sure you want to delete the payment receipt photo for squad "${teamName}" from the database?`)) return;
+    try {
+      const { error } = await supabase.from('submissions').update({ pdf_url: null }).eq('id', submissionId);
+      if (error) throw error;
+
+      setSubmissions(prev => prev.map(s => s.id === submissionId ? { ...s, pdf_url: null } : s));
+      setSelectedReceipt(null);
+      alert(`Payment receipt photo for squad "${teamName}" was removed from the database.`);
+    } catch (err) {
+      alert('Failed to delete receipt photo: ' + (err.message || err));
+    }
+  };
 
   if (loading) return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:S.bg}}><div style={{width:40,height:40,border:'3px solid '+S.primary,borderTopColor:'transparent',borderRadius:'50%',animation:'spin 1s linear infinite'}}/></div>;
   if (!isAdmin) {
@@ -147,13 +217,14 @@ export default function AdminTeams() {
     const { data } = await query;
     if (!data) return;
 
-    let csv = "data:text/csv;charset=utf-8,S.No,Squad Name,Domain Track,Team Lead,Email,Phone,Members Count,Status,Registered On\n";
+    let csv = "data:text/csv;charset=utf-8,S.No,Squad Name,Domain Track,Team Lead,Email,Phone,Members Count,Status,Has Receipt,Registered On\n";
     data.forEach((t, i) => {
       const sub = submissions.find(s => s.team_id === t.id);
       const teamMems = members.filter(m => m.team_id === t.id);
       const lead = teamMems.find(m => m.is_leader === true) || teamMems[0];
       const track = sub?.category || 'General';
-      csv += `${i + 1},"${t.team_name || ''}","${track}","${lead?.full_name || ''}","${lead?.email || ''}","${lead?.phone_number || ''}",${teamMems.length || 1},"Finale Ready","${t.created_at || ''}"\n`;
+      const hasReceipt = sub?.pdf_url ? 'Yes' : 'No';
+      csv += `${i + 1},"${t.team_name || ''}","${track}","${lead?.full_name || ''}","${lead?.email || ''}","${lead?.phone_number || ''}",${teamMems.length || 1},"Finale Ready","${hasReceipt}","${t.created_at || ''}"\n`;
     });
     const a = document.createElement("a");
     a.href = encodeURI(csv);
@@ -189,7 +260,7 @@ export default function AdminTeams() {
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
               <div>
                 <h2 style={{ fontSize:20, fontWeight:700, margin:0 }}>Squads &amp; Teams Roster</h2>
-                <p style={{ fontSize:13, color:S.t2, margin:'4px 0 0' }}>All registered 3–4 member squads. Every registered squad has direct entry to the 24H offline finale!</p>
+                <p style={{ fontSize:13, color:S.t2, margin:'4px 0 0' }}>All registered 3–4 member squads with direct entry to the 24H Grand Finale. Manage squads, inspect payment QR proofs, and edit rosters directly.</p>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:12 }}>
                 <button onClick={exportCSV} style={{ display:'flex', alignItems:'center', gap:6, background:S.card, color:S.t1, border:'1px solid '+S.border, padding:'10px 16px', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', boxShadow:'0 1px 2px rgba(0,0,0,.04)' }}>
@@ -220,7 +291,7 @@ export default function AdminTeams() {
                 <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
                   <thead>
                     <tr style={{ background:'#FAFAFA', borderBottom:'1px solid '+S.border }}>
-                      {['S.No', 'Squad Name', 'Domain Track', 'Squad Commander', 'Crew Members', 'Registered On', 'Finale Status'].map(h => (
+                      {['S.No', 'Squad Name', 'Domain Track', 'Squad Commander', 'Crew Members', 'Payment / QR Proof', 'Registered On', 'Actions'].map(h => (
                         <th key={h} style={{ padding:'16px 20px', fontWeight:600, color:S.t2, textAlign:'left' }}>{h}</th>
                       ))}
                     </tr>
@@ -231,6 +302,7 @@ export default function AdminTeams() {
                       const track = sub?.category || 'General';
                       const teamMembers = members.filter(m => m.team_id === t.id);
                       const lead = teamMembers.find(m => m.is_leader === true) || teamMembers[0];
+                      const hasReceipt = Boolean(sub?.pdf_url);
                       
                       const avatarColors = [
                         {bg: '#EEE8FF', text: '#6C4EFF'}, {bg: '#DBEAFE', text: '#2563EB'},
@@ -287,12 +359,45 @@ export default function AdminTeams() {
                             </div>
                           </td>
 
-                          <td style={{ padding:'16px 20px', color:S.t2 }}>{t.created_at ? new Date(t.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-'}</td>
-
+                          {/* Payment / QR Proof Column */}
                           <td style={{ padding:'16px 20px' }}>
-                            <span style={{ padding:'5px 12px', borderRadius:20, fontSize:11, fontWeight:800, background:'#DCFCE7', color:'#15803D', border:'1px solid #86EFAC', display:'inline-flex', alignItems:'center', gap:4 }}>
-                              ● Finale Confirmed
-                            </span>
+                            {hasReceipt ? (
+                              <button 
+                                onClick={() => setSelectedReceipt({ teamId: t.id, teamName: t.team_name, domain: track, sub })}
+                                style={{ padding:'5px 12px', borderRadius:8, background:'#ECFDF5', border:'1px solid #A7F3D0', color:'#059669', fontWeight:700, fontSize:12, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:5, transition:'all 0.15s' }}
+                              >
+                                <Receipt size={13} /> View Proof
+                              </button>
+                            ) : (
+                              <span style={{ padding:'4px 10px', borderRadius:8, background:'#F1F5F9', border:'1px solid #E2E8F0', color:'#94A3B8', fontWeight:600, fontSize:11 }}>
+                                No Receipt
+                              </span>
+                            )}
+                          </td>
+
+                          <td style={{ padding:'16px 20px', color:S.t2, fontSize:12 }}>
+                            {t.created_at ? new Date(t.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-'}
+                          </td>
+
+                          {/* Actions Column */}
+                          <td style={{ padding:'16px 20px' }}>
+                            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                              <button 
+                                onClick={() => setSelectedRosterTeam({ ...t, domain: track, members: teamMembers, sub })}
+                                style={{ padding:'6px 12px', borderRadius:8, background:'#F0F9FF', border:'1px solid #BAE6FD', color:'#0284C7', fontWeight:700, fontSize:12, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:5 }}
+                                title="View team roster and members"
+                              >
+                                <Eye size={13} /> Roster
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteTeam(t.id, t.team_name)}
+                                disabled={deletingId === t.id}
+                                style={{ padding:'6px 10px', borderRadius:8, background:'#FEF2F2', border:'1px solid #FECACA', color:'#DC2626', fontWeight:700, fontSize:12, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4, opacity: deletingId === t.id ? 0.5 : 1 }}
+                                title="Delete squad permanently from database"
+                              >
+                                <Trash2 size={13} /> Delete
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -328,7 +433,170 @@ export default function AdminTeams() {
             </div>
           </div>
         </div>
-      
+
+        {/* PAYMENT RECEIPT / QR PROOF MODAL */}
+        {selectedReceipt && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(15, 23, 42, 0.55)', backdropFilter:'blur(4px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:99999, padding:20 }}>
+            <div style={{ background:'#fff', borderRadius:20, maxWidth:580, width:'100%', maxHeight:'90vh', overflowY:'auto', padding:'24px', boxShadow:'0 25px 50px rgba(0,0,0,0.25)', border:'2px solid #86EFAC' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16, borderBottom:'1px solid #E2E8F0', paddingBottom:14 }}>
+                <div>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <span style={{ padding:'3px 8px', borderRadius:6, background:'#DCFCE7', color:'#15803D', fontSize:11, fontWeight:800 }}>Verified Payment Proof</span>
+                    <span style={{ fontSize:12, color:'#64748B', fontWeight:600 }}>{selectedReceipt.domain}</span>
+                  </div>
+                  <h3 style={{ margin:'6px 0 0', fontSize:19, fontWeight:800, color:'#0F172A' }}>{selectedReceipt.teamName}</h3>
+                </div>
+                <button onClick={() => setSelectedReceipt(null)} style={{ background:'none', border:'none', cursor:'pointer', padding:6, color:'#64748B', borderRadius:8 }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Transaction details box */}
+              {selectedReceipt.sub?.project_description && (
+                <div style={{ background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:12, padding:'12px 16px', marginBottom:16 }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:'#64748B', textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:4 }}>Transaction &amp; UTR Details:</div>
+                  <div style={{ fontSize:13, color:'#1E293B', fontWeight:600, lineHeight:1.5 }}>
+                    {selectedReceipt.sub.project_description}
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Proof Image Display */}
+              <div style={{ background:'#0F172A', borderRadius:12, padding:12, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:240, marginBottom:18, border:'1px solid #334155' }}>
+                {selectedReceipt.sub?.pdf_url ? (
+                  selectedReceipt.sub.pdf_url.startsWith('data:image/') || selectedReceipt.sub.pdf_url.startsWith('http') || selectedReceipt.sub.pdf_url.startsWith('blob:') ? (
+                    <img 
+                      src={selectedReceipt.sub.pdf_url} 
+                      alt="Payment receipt proof" 
+                      style={{ maxWidth:'100%', maxHeight:'420px', objectFit:'contain', borderRadius:8 }}
+                    />
+                  ) : (
+                    <div style={{ textAlign:'center', padding:20, color:'#fff' }}>
+                      <p style={{ margin:0, fontSize:14, fontWeight:600 }}>PDF Document Submitted</p>
+                      <a href={selectedReceipt.sub.pdf_url} target="_blank" rel="noopener noreferrer" style={{ display:'inline-flex', alignItems:'center', gap:6, marginTop:10, color:'#38BDF8', fontWeight:700, fontSize:13 }}>
+                        <ExternalLink size={14} /> Open Document in New Tab
+                      </a>
+                    </div>
+                  )
+                ) : (
+                  <div style={{ color:'#94A3B8', fontSize:13, fontWeight:600 }}>No payment proof file attached.</div>
+                )}
+              </div>
+
+              {/* Modal Footer Controls */}
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10, borderTop:'1px solid #E2E8F0', paddingTop:14 }}>
+                <div style={{ display:'flex', gap:8 }}>
+                  {selectedReceipt.sub?.pdf_url && (
+                    <a 
+                      href={selectedReceipt.sub.pdf_url} 
+                      download={`Payment_Proof_${selectedReceipt.teamName.replace(/\s+/g,'_')}.png`}
+                      style={{ padding:'8px 14px', borderRadius:8, background:'#F1F5F9', color:'#334155', fontWeight:700, fontSize:12, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:5, border:'1px solid #CBD5E1' }}
+                    >
+                      <Download size={13} /> Download Image
+                    </a>
+                  )}
+                  {selectedReceipt.sub?.id && selectedReceipt.sub?.pdf_url && (
+                    <button 
+                      onClick={() => handleDeleteReceiptPhoto(selectedReceipt.sub.id, selectedReceipt.teamName)}
+                      style={{ padding:'8px 12px', borderRadius:8, background:'#FEF2F2', color:'#DC2626', fontWeight:700, fontSize:12, border:'1px solid #FECACA', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:5 }}
+                      title="Permanently remove photo from database"
+                    >
+                      <Trash2 size={13} /> Delete Photo from DB
+                    </button>
+                  )}
+                </div>
+                <button 
+                  onClick={() => setSelectedReceipt(null)} 
+                  style={{ padding:'8px 18px', borderRadius:8, background:'#0F172A', color:'#fff', border:'none', fontWeight:700, fontSize:12, cursor:'pointer' }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SQUAD ROSTER MODAL */}
+        {selectedRosterTeam && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(15, 23, 42, 0.45)', backdropFilter:'blur(4px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:99999, padding:20 }}>
+            <div style={{ background:'#fff', borderRadius:20, maxWidth:640, width:'100%', maxHeight:'85vh', overflowY:'auto', padding:'24px', boxShadow:'0 20px 40px rgba(0,0,0,0.15)', border:'2px solid #BAE6FD' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:16, borderBottom:'1px solid #E2E8F0', paddingBottom:14 }}>
+                <div>
+                  <h3 style={{ margin:0, fontSize:19, fontWeight:800, color:'#0F172A' }}>{selectedRosterTeam.team_name}</h3>
+                  <div style={{ fontSize:12, color:'#0284C7', fontWeight:700, marginTop:3 }}>
+                    Domain Track: {selectedRosterTeam.domain} · Fee: ₹1,200 (Finale Direct Pass)
+                  </div>
+                </div>
+                <button onClick={() => setSelectedRosterTeam(null)} style={{ background:'none', border:'none', cursor:'pointer', padding:4, color:'#64748B' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+                <div style={{ fontSize:13, fontWeight:800, color:'#0F172A' }}>
+                  Crew Manifest ({selectedRosterTeam.members.length} Members):
+                </div>
+                {selectedRosterTeam.sub?.pdf_url && (
+                  <button 
+                    onClick={() => {
+                      const item = selectedRosterTeam;
+                      setSelectedReceipt({ teamId: item.id, teamName: item.team_name, domain: item.domain, sub: item.sub });
+                    }}
+                    style={{ padding:'4px 10px', borderRadius:6, background:'#ECFDF5', color:'#059669', border:'1px solid #A7F3D0', fontSize:11, fontWeight:700, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4 }}
+                  >
+                    <Receipt size={12} /> View Payment Proof
+                  </button>
+                )}
+              </div>
+
+              <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:20 }}>
+                {selectedRosterTeam.members.map((m, i) => (
+                  <div key={m.id || i} style={{ background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:12, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3 }}>
+                        <span style={{ fontWeight:800, color:'#0F172A', fontSize:14 }}>{m.full_name}</span>
+                        {m.is_leader && (
+                          <span style={{ background:'#FEF3C7', color:'#B45309', padding:'2px 8px', borderRadius:6, fontSize:10, fontWeight:800 }}>Squad Commander</span>
+                        )}
+                        <span style={{ fontSize:11, color:'#64748B' }}>{m.dept || 'Engineering'} · Year {m.year || '3'}</span>
+                      </div>
+                      <div style={{ fontSize:12, color:'#475569' }}>
+                        📧 {m.email} {m.phone_number ? `· 📱 ${m.phone_number}` : ''}
+                      </div>
+                      <div style={{ fontSize:11, color:'#94A3B8', marginTop:2 }}>
+                        🏛️ {m.college_name || 'College N/A'} {m.reg_no ? `· Reg: ${m.reg_no}` : ''}
+                      </div>
+                    </div>
+                    <div>
+                      <button 
+                        onClick={() => handleDeleteMember(m.id, m.full_name)}
+                        style={{ padding:'5px 8px', borderRadius:6, background:'#FEF2F2', border:'1px solid #FECACA', color:'#DC2626', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontWeight:700 }}
+                        title="Delete member from database"
+                      >
+                        <Trash2 size={12} /> Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {selectedRosterTeam.members.length === 0 && (
+                  <div style={{ padding:20, textAlign:'center', color:'#94A3B8', fontSize:13 }}>No crew members found in database.</div>
+                )}
+              </div>
+
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderTop:'1px solid #E2E8F0', paddingTop:14 }}>
+                <button 
+                  onClick={() => handleDeleteTeam(selectedRosterTeam.id, selectedRosterTeam.team_name)}
+                  style={{ padding:'8px 14px', borderRadius:8, background:'#FEF2F2', color:'#DC2626', border:'1px solid #FECACA', fontWeight:700, fontSize:12, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:5 }}
+                >
+                  <Trash2 size={13} /> Delete Entire Squad from DB
+                </button>
+                <button onClick={() => setSelectedRosterTeam(null)} style={{ padding:'8px 18px', borderRadius:8, background:'#0284C7', color:'#fff', border:'none', fontWeight:700, fontSize:12, cursor:'pointer' }}>
+                  Close Roster
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </>
   );
 }
