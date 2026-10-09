@@ -312,12 +312,20 @@ export default function PaymentTab({
       // 3. Dispatch confirmation notification
       try {
         if (user?.email) {
+          const emailMembersList = (teamMembers || []).map(m => ({
+            name: m.full_name,
+            phone: m.phone_number || m.phone || ''
+          }));
+
           sendPaymentConfirmationEmail?.({
             recipientEmail: user.email,
             leaderName: user?.user_metadata?.full_name || 'Leader',
+            leaderPhone: payerPhone || '',
             teamName: teamData?.team_name || 'Your Squad',
+            domain: teamData?.domain || 'Agriculture',
             teamId: teamData?.id,
-            transactionId: cleanUtr
+            transactionId: cleanUtr,
+            members: emailMembersList
           }).catch(e => console.warn('Email dispatch log:', e));
         }
       } catch (e) {}

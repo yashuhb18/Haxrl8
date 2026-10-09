@@ -56,38 +56,20 @@ const FAQS = [
   {
     id: 9,
     category: 'domains',
-    question: "Are we allowed to use AI tools or 'vibe code'?",
-    answer: "Yes! 'Vibe coding' and AI coding assistants (GitHub Copilot, Cursor, Gemini, Claude, etc.) are allowed during the 24-hour hackathon. We encourage using modern tools to build faster, as long as the architecture, development, and logic are executed during the event.",
+    question: "Can we choose any of the three domains?",
+    answer: "Yes! Squads can select from Agriculture, Healthcare, or Smart City during team registration in their dashboard. Problem statement details will unlock on November 2nd.",
   },
   {
     id: 10,
-    category: 'domains',
-    question: "We are building an IoT/Hardware project. Do we build hardware from scratch?",
-    answer: "No. Hardware teams may procure their required sensors, microcontrollers, and peripherals and test them beforehand. However, during the 24-hour hackathon window, you must build the software, firmware, and integration logic from scratch.",
-  },
-  {
-    id: 11,
-    category: 'domains',
-    question: "Can I start working on my software project before the event?",
-    answer: "No. All core software development, database design, and application logic must begin after the countdown starts at the hackathon venue.",
-  },
-  {
-    id: 12,
-    category: 'logistics',
-    question: "How are the winners selected?",
-    answer: "Projects are evaluated by a distinguished panel of industry leaders and senior faculty based on Innovation & Originality, Technical Depth, Practical Feasibility, User Experience, and Final Pitch Quality.",
-  },
-  {
-    id: 13,
     category: 'logistics',
     question: "Will the hackathon be in-person or online?",
     answer: "HAXLR8 3.0 is a 100% in-person 24-hour Grand Hackathon hosted at Maharaja Institute of Technology Mysore on November 6–7, 2026. There are no screening or elimination rounds—all registered and verified teams participate directly on campus!",
   },
   {
-    id: 14,
-    category: 'domains',
-    question: "Is there an Impostor Among Us?",
-    answer: "Only if someone submits plagiarized code or tries to push a pre-built template! Complete your tasks honestly with your 3–4 crewmates and don't get ejected during the final jury review.",
+    id: 11,
+    category: 'logistics',
+    question: "What amenities are provided during the 24-hour event?",
+    answer: "Participants receive continuous high-speed Wi-Fi, power supply, meals, snacks, midnight refreshments, workspace, and rest areas at the MIT Mysore campus.",
   },
 ];
 

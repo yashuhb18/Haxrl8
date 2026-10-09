@@ -128,26 +128,34 @@ export default function AdminJury() {
 
   const exportExcel = () => {
     const headers = [
-      "S.no", "Squad Name", "Domain Track", "Team Lead Name", "TL Email", "TL Phone",
-      "TM1 Name", "TM1 Email", "TM1 Phone", "TM2 Name", "TM2 Email", "TM2 Phone",
-      "TM3 Name", "TM3 Email", "TM3 Phone", "College Name", "Location (City, State)",
-      "Crew Count", "Registration Fee", "Finale Status", "Registered Date"
+      "Sl No", "Team Name", "Team Lead", "Team Members", "Members Count",
+      "Payment Transaction ID", "Phone", "Date and Time of Registration"
     ];
 
-    const excelData = filteredData.map((row, i) => ([
-      i + 1, row.teamName, row.domain, row.tlName, row.tlEmail, row.tlPhone,
-      row.tm1Name, row.tm1Email, row.tm1Phone, row.tm2Name, row.tm2Email, row.tm2Phone,
-      row.tm3Name, row.tm3Email, row.tm3Phone, row.collegeName, row.location,
-      row.crewCount, row.regFee, row.status, row.submitDate
-    ]));
+    const excelData = filteredData.map((row, i) => {
+      const memberNames = [row.tlName, row.tm1Name, row.tm2Name, row.tm3Name]
+        .filter(n => n && n !== 'N/A' && n !== '-')
+        .join(', ');
+
+      return [
+        i + 1,
+        row.teamName,
+        row.tlName,
+        memberNames || row.tlName,
+        row.crewCount,
+        row.regFee || '₹1,200 Verified',
+        row.tlPhone || 'N/A',
+        row.submitDate || 'N/A'
+      ];
+    });
 
     excelData.unshift(headers);
 
     const worksheet = XLSX.utils.aoa_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Jury Export");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Teams Roster");
 
-    XLSX.writeFile(workbook, "jury_export.xlsx");
+    XLSX.writeFile(workbook, "haxlr8_teams_registered.xlsx");
   };
 
   return (

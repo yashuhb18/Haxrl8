@@ -27,21 +27,21 @@ const FACULTY_COORDINATORS = [
 
 const STUDENT_COORDINATORS = [
   {
-    name: 'Yeshwant H B',
-    role: 'Lead Student Flight Director',
-    phone: '+91 91136 67351',
+    name: 'Yashwanth H B',
+    role: 'Student Coordinator',
+    phone: '+91 80506 14849',
     bg: '#e0f2fe',
     border: '#7dd3fc',
     badge: 'CHIEF COORDINATOR',
     crewColor: '#0284c7',
   },
   {
-    name: 'Saket Bahamad',
+    name: 'Chethan Kumar B',
     role: 'Student Coordinator',
-    phone: '+91 97412 18926',
+    phone: '+91 99455 07099',
     bg: '#dcfce7',
     border: '#86efac',
-    badge: 'STUDENT LEAD',
+    badge: 'STUDENT COORDINATOR',
     crewColor: '#16a34a',
   },
 ];

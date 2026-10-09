@@ -240,7 +240,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
   const validateCurrentStep = () => {
     setErrorMsg('');
     if (currentStep === 0) {
-      if (!formData.domain) return "Please select a challenge domain track.";
+      if (!formData.domain) return "Please select a challenge domain.";
       if (!formData.teamName.trim()) return "Team Name is required.";
       if (!/^[a-zA-Z0-9 ]+$/.test(formData.teamName)) return "Team Name can only contain letters, numbers, and spaces.";
       return true;
@@ -515,13 +515,27 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
 
       // Automated email dispatch from haxlr8ecemitm@gmail.com
       try {
+        const emailMembersList = savedMembers.map(m => ({
+          name: m.full_name,
+          phone: m.phone_number,
+          role: m.is_leader ? 'Team Lead' : 'Member'
+        }));
+
+        const commonPayload = {
+          leaderName: formData?.leader?.full_name || 'Team Captain',
+          leaderPhone: formData?.leader?.phone_number || '',
+          teamName: finalTeamData.team_name,
+          domain: finalTeamData.domain || formData.domain || 'Agriculture',
+          feeStatus: finalTeamData.payment_status === 'submitted' ? '₹1,200 (Verified / Paid)' : '₹1,200 (Pending Verification)',
+          members: emailMembersList,
+          teamId: finalTeamData.id,
+          crewCount: savedMembers.length
+        };
+
         if (formData?.leader?.email) {
           sendParticipantWelcomeEmail({
             recipientEmail: formData.leader.email,
-            leaderName: formData.leader.full_name,
-            teamName: finalTeamData.team_name,
-            teamId: finalTeamData.id,
-            crewCount: savedMembers.length
+            ...commonPayload
           }).catch(e => console.warn('Leader email notification log:', e));
         }
         // Also dispatch confirmation to all teammates
@@ -529,10 +543,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           if (tm?.email && tm.email.trim()) {
             sendParticipantWelcomeEmail({
               recipientEmail: tm.email.trim(),
-              leaderName: tm.full_name || 'Crewmate',
-              teamName: finalTeamData.team_name,
-              teamId: finalTeamData.id,
-              crewCount: savedMembers.length
+              ...commonPayload
             }).catch(e => console.warn('Teammate email notification log:', e));
           }
         });
@@ -727,14 +738,14 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
                 <div>
                   <h3 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px 0', fontSize: 15 }}>Station Roster Directives</h3>
                   <p style={{ color: '#475569', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
-                    Select your domain track, choose a squad name, and add <strong>3 to 4 members</strong> (including captain). Inter-college teams are welcome! Registration fee is ₹1,200 per team.
+                    Select your domain, choose a squad name, and add <strong>3 to 4 members</strong> (including captain). Inter-college teams are welcome! Registration fee is ₹1,200 per team.
                   </p>
                 </div>
               </div>
 
               {/* 1. DOMAIN SELECTION FIRST */}
               <div>
-                <label style={styles.label}>1. Select Challenge Domain Track *</label>
+                <label style={styles.label}>1. Select Challenge Domain *</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginTop: 8 }}>
                   {[
                     { id: 'Agriculture', icon: '🌾', title: 'Agriculture', desc: 'Smart Farming, IoT Irrigation, Crop Disease AI, Supply Chain' },
@@ -967,9 +978,9 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
             <div style={{ position: 'absolute', top: 16, bottom: 16, left: 15, width: 2, background: '#f1e7db', zIndex: 0 }}></div>
 
             {[
-              { num: 1, title: 'Squad Manifest Locked In', desc: `Crew of ${teamMembers.length} confirmed in ${teamData?.domain || 'Agriculture'} track.` },
-              { num: 2, title: 'Pay Registration Fee (₹1,200)', desc: 'Pay via UPI QR scanner & submit Google Form details.' },
-              { num: 3, title: 'Unlock Official Flight Pass', desc: 'Download your verified 24-hour hackathon entry ticket with QR code.' }
+              { num: 1, title: 'Squad Manifest Locked In', desc: `Crew of ${teamMembers.length} confirmed in ${teamData?.domain || 'Agriculture'} domain.` },
+              { num: 2, title: 'Pay Registration Fee (₹1,200)', desc: 'Pay ₹1,200 team fee & submit verification details.' },
+              { num: 3, title: 'Unlock Official Flight Pass', desc: 'Download your verified 24-hour hackathon entry flight pass.' }
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: 20, position: 'relative', zIndex: 1 }}>
                 <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#16a34a' : '#ffffff', border: `2px solid ${i === 0 ? '#16a34a' : '#0284c7'}`, color: i === 0 ? '#ffffff' : '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, flexShrink: 0, boxShadow: '0 2px 8px rgba(2, 132, 199, 0.2)' }}>

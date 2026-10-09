@@ -21,12 +21,12 @@ const FAQS = [
     a: 'The registration fee is ₹1,200 per team (for 3 to 4 members). Registrations open tomorrow evening (Oct 09). There are no screening or elimination rounds—all registered and verified teams advance directly to the 24-hour offline hackathon at Maharaja Institute of Technology Mysore!',
   },
   {
-    q: 'Can we work on pre-existing ideas?',
-    a: 'You can develop ideas based on our fixed challenge domains (Agriculture, Healthcare, Smart City). However, all actual prototype code, hardware circuitry, and features must be built live during the 24-hour offline hackathon.',
+    q: 'Where and when is the hackathon held?',
+    a: 'HAXLR8 3.0 is a 24-hour offline hackathon taking place on November 6–7, 2026, hosted at Maharaja Institute of Technology Mysore. Food, refreshments, Wi-Fi, and workspace are provided throughout the event.',
   },
   {
-    q: 'What are the judging criteria?',
-    a: 'Projects are evaluated on: Innovation & Originality (25%), Technical Feasibility & Execution (25%), Scalability & Real-world Impact (25%), and Presentation & Live Demonstration (25%).',
+    q: 'What should we bring to MIT Mysore?',
+    a: 'Please bring your laptops, chargers, valid college student ID cards, and required components/hardware for your team project.',
   },
 ];
 

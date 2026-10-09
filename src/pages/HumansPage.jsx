@@ -8,16 +8,16 @@ import mitMysoreBanner from '../assets/logo/mit-mysore-banner.png';
 
 const studentOrganizers = [
   {
-    name: 'Yeshwant HB',
-    role: 'Student Coordinator',
+    name: 'Yashwanth H B',
+    role: 'Student Coordinator (8050614849)',
     station: 'Chief Flight Engineer',
     org: 'HAXLR8 3.0 · MIT Mysore',
     color: 'cyan',
     hat: 'pilot',
   },
   {
-    name: 'Saket Bahamad',
-    role: 'Student Coordinator',
+    name: 'Chethan Kumar B',
+    role: 'Student Coordinator (99455 07099)',
     station: 'Mission Operations Lead',
     org: 'HAXLR8 3.0 · MIT Mysore',
     color: 'yellow',

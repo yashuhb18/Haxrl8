@@ -20,16 +20,16 @@ export const organizers = [
     linkedin: '#'
   },
   {
-    name: 'Yeshwant HB',
+    name: 'Yashwanth H B',
     role: 'Student Coordinator',
-    org: '@ MIT Mysore',
+    org: '8050614849 · @ MIT Mysore',
     photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
     linkedin: '#'
   },
   {
-    name: 'Saket Bahamad',
+    name: 'Chethan Kumar B',
     role: 'Student Coordinator',
-    org: '@ MIT Mysore',
+    org: '99455 07099 · @ MIT Mysore',
     photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80',
     linkedin: '#'
   },

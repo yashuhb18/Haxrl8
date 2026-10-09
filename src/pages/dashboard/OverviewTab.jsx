@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import EventTimeline from '../../components/EventTimeline';
 import { motion, AnimatePresence } from 'framer-motion';
-import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
-import ProblemStatementPDF from '../../assets/PS_example/Hackathon Problem Statement 2026.pdf';
+
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 const TIMELINE_STEPS = [
@@ -131,6 +130,40 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
 
       {/* Cosmic Event Timeline */}
       <EventTimeline steps={TIMELINE_STEPS} currentStepIndex={currentStepIndex} />
+
+      {/* ── PROBLEM STATEMENTS RELEASE & FLIGHT PASS NOTICE ── */}
+      <div style={{
+        background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+        border: '1.5px solid #fde68a',
+        borderRadius: 18,
+        padding: '16px 22px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+        boxShadow: '0 4px 14px rgba(217, 119, 6, 0.08)'
+      }}>
+        <div style={{
+          width: 44,
+          height: 44,
+          borderRadius: 12,
+          background: '#fef08a',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 22,
+          flexShrink: 0
+        }}>
+          🔒
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 800, color: '#92400e', marginBottom: 2 }}>
+            Problem Statement Block Unlocks November 2nd
+          </div>
+          <div style={{ fontSize: 13, color: '#b45309', fontWeight: 600, lineHeight: 1.5 }}>
+            The Problem Statement section will open by <strong>November 2nd</strong>. The official flight pass will be sent to all registered participants prior to the grand hackathon at MIT Mysore.
+          </div>
+        </div>
+      </div>
 
       {/* Stats Grid */}
       <div className="dash-overview-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
@@ -292,7 +325,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
               📦 Official Mission Artifacts &amp; Resources
             </h3>
             <p style={{ fontSize: 13, color: '#64748b', margin: 0, fontWeight: 500 }}>
-              Official guides, sample problem statements, and campus logistics for your squad.
+              Official guides, event rulebooks, and campus logistics for your squad.
             </p>
           </div>
         </div>
@@ -322,30 +355,24 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
             </div>
           </div>
 
-          {/* Problem Statement PDF */}
-          <a
-            href={ProblemStatementPDF}
-            download="HAXLR8-Problem-Statements-2026.pdf"
+          {/* Problem Statement Notice Card */}
+          <div
             style={{
-              textDecoration: 'none',
-              background: '#eff6ff',
-              border: '1.5px solid #bfdbfe',
+              background: '#fffbeb',
+              border: '1.5px solid #fde68a',
               borderRadius: 16,
               padding: '16px',
               display: 'flex',
               alignItems: 'center',
               gap: 12,
-              transition: 'transform 0.2s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
           >
-            <span style={{ fontSize: 28 }}>📑</span>
+            <span style={{ fontSize: 28 }}>🔒</span>
             <div>
-              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#1e40af' }}>Problem Statements</div>
-              <div style={{ fontSize: 11, color: '#2563eb', fontWeight: 600 }}>Download PDF Tracks</div>
+              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#92400e' }}>Problem Statements</div>
+              <div style={{ fontSize: 11, color: '#b45309', fontWeight: 600 }}>Unlocks Nov 2nd · Pass via Email</div>
             </div>
-          </a>
+          </div>
 
           {/* Leader vs Impostor Protocol */}
           <div

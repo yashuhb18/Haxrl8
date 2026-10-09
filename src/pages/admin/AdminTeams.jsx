@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
 import { Users, Flag, CheckSquare, Search, ChevronDown, Download, ChevronRight, MoreVertical, ChevronLeft, Trophy, Trash2, Eye, Receipt, X, ExternalLink, Image } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const S = {
   bg: '#F8FAFC', card: '#FFFFFF', border: '#E5E7EB', primary: '#6C4EFF',
@@ -212,24 +213,61 @@ export default function AdminTeams() {
     return pages;
   };
 
-  const exportCSV = async () => {
-    const query = buildQuery(true);
-    const { data } = await query;
-    if (!data) return;
+  const exportExcel = async () => {
+    try {
+      const query = buildQuery(true);
+      const { data } = await query;
+      if (!data || data.length === 0) {
+        alert("No squad records found to export.");
+        return;
+      }
 
-    let csv = "data:text/csv;charset=utf-8,S.No,Squad Name,Domain Track,Team Lead,Email,Phone,Members Count,Status,Has Receipt,Registered On\n";
-    data.forEach((t, i) => {
-      const sub = submissions.find(s => s.team_id === t.id);
-      const teamMems = members.filter(m => m.team_id === t.id);
-      const lead = teamMems.find(m => m.is_leader === true) || teamMems[0];
-      const track = sub?.category || 'General';
-      const hasReceipt = sub?.pdf_url ? 'Yes' : 'No';
-      csv += `${i + 1},"${t.team_name || ''}","${track}","${lead?.full_name || ''}","${lead?.email || ''}","${lead?.phone_number || ''}",${teamMems.length || 1},"Finale Ready","${hasReceipt}","${t.created_at || ''}"\n`;
-    });
-    const a = document.createElement("a");
-    a.href = encodeURI(csv);
-    a.download = "haxlr8_squads_manifest.csv";
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      const teamIds = data.map(t => t.id);
+      const [{ data: m }, { data: s }] = await Promise.all([
+        supabase.from('team_members').select('*').in('team_id', teamIds),
+        supabase.from('submissions').select('id, team_id, category, project_title, pdf_url, project_description, created_at').in('team_id', teamIds)
+      ]);
+
+      const excelRows = data.map((t, i) => {
+        const teamMems = (m || []).filter(mem => mem.team_id === t.id);
+        const lead = teamMems.find(mem => mem.is_leader === true) || teamMems[0];
+        const sub = (s || []).find(subItem => subItem.team_id === t.id);
+
+        const utrMatch = sub?.project_description?.match(/UTR:\s*([A-Za-z0-9_-]+)/i);
+        const utr = t.payment_utr || t.transaction_id || (utrMatch ? utrMatch[1] : (sub?.pdf_url ? 'Verified' : 'N/A'));
+
+        const memberNames = teamMems.map(mem => mem.full_name).filter(Boolean).join(', ');
+        const phone = lead?.phone_number || lead?.phone || t.phone || 'N/A';
+        const regDateTime = t.created_at ? new Date(t.created_at).toLocaleString('en-IN', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        }) : 'N/A';
+
+        return {
+          "Sl No": i + 1,
+          "Team Name": t.team_name || 'N/A',
+          "Team Lead": lead?.full_name || 'N/A',
+          "Team Members": memberNames || lead?.full_name || 'N/A',
+          "Members Count": teamMems.length || 1,
+          "Payment Transaction ID": utr,
+          "Phone": phone,
+          "Date and Time of Registration": regDateTime
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(excelRows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Teams Roster");
+      XLSX.writeFile(workbook, "haxlr8_teams_registered.xlsx");
+    } catch (err) {
+      console.error('Export error:', err);
+      alert('Failed to export Excel sheet: ' + err.message);
+    }
   };
 
   return (
@@ -263,8 +301,8 @@ export default function AdminTeams() {
                 <p style={{ fontSize:13, color:S.t2, margin:'4px 0 0' }}>All registered 3–4 member squads with direct entry to the 24H Grand Finale. Manage squads, inspect payment QR proofs, and edit rosters directly.</p>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <button onClick={exportCSV} style={{ display:'flex', alignItems:'center', gap:6, background:S.card, color:S.t1, border:'1px solid '+S.border, padding:'10px 16px', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', boxShadow:'0 1px 2px rgba(0,0,0,.04)' }}>
-                  <Download size={16}/> Export Squads CSV
+                <button onClick={exportExcel} style={{ display:'flex', alignItems:'center', gap:6, background:S.card, color:S.t1, border:'1px solid '+S.border, padding:'10px 16px', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', boxShadow:'0 1px 2px rgba(0,0,0,.04)' }}>
+                  <Download size={16}/> Export Excel
                 </button>
               </div>
             </div>

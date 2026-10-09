@@ -39,7 +39,10 @@ function renderEmailFooter() {
         Department of Electronics &amp; Communication Engineering<br>
         Maharaja Institute of Technology Mysore, Belagola, Srirangapatna Taluk, Mandya - 571438
       </div>
-      <div style="margin-top: 10px; font-size: 11px; color: #64748b;">
+      <div style="margin-top: 10px; padding: 10px 14px; background: #1e293b; border-radius: 8px; color: #e2e8f0; font-size: 11.5px; display: inline-block;">
+        <strong>Student Coordinators:</strong> Yashwanth H B: 8050614849 &bull; Chethan Kumar B: 99455 07099
+      </div>
+      <div style="margin-top: 12px; font-size: 11px; color: #64748b;">
         Official Mailbox: <a href="mailto:${HAXLR8_HOST_EMAIL}" style="color: #ff3b69; text-decoration: none; font-weight: 700;">${HAXLR8_HOST_EMAIL}</a> • Portal: <a href="${HAXLR8_PORTAL_URL}" style="color: #38bdf8; text-decoration: none; font-weight: 700;">${HAXLR8_PORTAL_URL}</a>
       </div>
       <div style="margin-top: 10px; font-size: 10.5px; color: #475569;">
@@ -50,9 +53,32 @@ function renderEmailFooter() {
 }
 
 /**
- * Generate rich, warm-themed HTML welcome email for newly registered squad leaders & crewmates
+ * Generate rich HTML welcome email for newly registered squad leaders & crewmates
  */
-export function generateWelcomeEmailHtml({ leaderName, teamName, teamId, crewCount }) {
+export function generateWelcomeEmailHtml({ 
+  leaderName, 
+  leaderPhone,
+  teamName, 
+  domain, 
+  feeStatus, 
+  members = [], 
+  crewCount, 
+  teamId 
+}) {
+  const memberRows = members && members.length > 0
+    ? members.map((m, idx) => `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 7px 0; color: #334155; font-weight: 700;">${m.name || `Crewmate ${idx + 1}`} <span style="color: #64748b; font-size: 11px; font-weight: 600;">(${m.role || 'Member'})</span></td>
+          <td style="padding: 7px 0; color: #0f172a; font-weight: 800; text-align: right;">${m.phone || 'Provided'}</td>
+        </tr>
+      `).join('')
+    : `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 7px 0; color: #334155; font-weight: 700;">${leaderName || 'Team Lead'} <span style="color: #64748b; font-size: 11px;">(Lead)</span></td>
+          <td style="padding: 7px 0; color: #0f172a; font-weight: 800; text-align: right;">${leaderPhone || 'Registered'}</td>
+        </tr>
+      `;
+
   return `
 <!DOCTYPE html>
 <html>
@@ -63,76 +89,99 @@ export function generateWelcomeEmailHtml({ leaderName, teamName, teamId, crewCou
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 24px 10px; color: #0f172a;">
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid #1e293b;">
-    ${renderEmailHeader('🚀 FLIGHT MANIFEST CONFIRMED • MIT MYSORE • NOV 06–07')}
+    ${renderEmailHeader('🚀 REGISTRATION CONFIRMED • MIT MYSORE • NOV 06–07')}
 
     <div style="padding: 32px 30px; line-height: 1.6;">
       <div style="display: inline-block; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;">
-        <span style="color: #059669; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">● Squad Clearance Confirmed</span>
+        <span style="color: #059669; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">● Squad Registration Confirmed</span>
       </div>
 
       <h2 style="font-size: 22px; color: #0f172a; margin: 0 0 10px; font-weight: 800;">
-        Welcome Aboard, Commander ${leaderName || 'Squad Captain'}!
+        Welcome Aboard, ${leaderName || 'Team Captain'}!
       </h2>
       <p style="margin: 0 0 20px; color: #334155; font-size: 14.5px;">
-        Your squad registration for <strong>HAXLR8 3.0</strong> is officially confirmed! You and your crew have secured entry into the 24-hour offline hackathon grand finale at <strong>Maharaja Institute of Technology, Mysore</strong>.
+        Your squad registration for <strong>HAXLR8 3.0</strong> is officially confirmed! You and your crew have secured entry into the 24-hour offline hackathon grand finale at <strong>Maharaja Institute of Technology Mysore</strong> on November 6–7, 2026.
       </p>
 
       <!-- Manifest Summary Card -->
       <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
         <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;">
-          ⭐ OFFICIAL SQUAD MANIFEST
+          📋 OFFICIAL SQUAD &amp; REGISTRATION DETAILS
         </div>
         <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Squad Name</td>
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Team Name</td>
             <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${teamName || 'Confirmed Squad'}</td>
           </tr>
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Commander / Lead</td>
-            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${leaderName || 'Squad Leader'}</td>
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Domain</td>
+            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${domain || 'Agriculture'}</td>
           </tr>
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Squad Strength</td>
-            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${crewCount || '3–4'} Members</td>
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Team Lead</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${leaderName || 'Leader'}${leaderPhone ? ' (' + leaderPhone + ')' : ''}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Members Count</td>
+            <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${crewCount || (members ? members.length : '3–4')} Members</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Flight Registry ID</td>
-            <td style="padding: 8px 0 0; color: #ff3b69; font-weight: 800; font-family: monospace; text-align: right;">${teamId ? teamId.substring(0, 16) + '...' : 'HAXLR8-2026'}</td>
+            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Registration Fee Status</td>
+            <td style="padding: 8px 0 0; color: #16a34a; font-weight: 800; text-align: right;">${feeStatus || '₹1,200 (Verified / Paid)'}</td>
           </tr>
         </table>
       </div>
 
-      <!-- Action Directives -->
-      <div style="margin: 22px 0;">
-        <div style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Immediate Mission Directives:</div>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #334155;">
+      <!-- Team Members Roster -->
+      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;">
+          👥 TEAM MEMBERS &amp; CONTACT NUMBERS
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 2px solid #e2e8f0; font-size: 11.5px; color: #64748b;">
+              <th style="padding: 6px 0; text-align: left; font-weight: 800;">Member Name</th>
+              <th style="padding: 6px 0; text-align: right; font-weight: 800;">Contact Phone</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${memberRows}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Student Coordinators Contact Card -->
+      <div style="background-color: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 14px; padding: 18px 20px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">
+          📞 STUDENT COORDINATORS SUPPORT
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #0f172a;">
           <tr>
-            <td style="vertical-align: top; width: 24px; padding-bottom: 8px; color: #ff3b69; font-weight: 900;">1.</td>
-            <td style="padding-bottom: 8px;">Verify that all <strong>3 to 4 crewmates</strong> are listed in your dashboard roster.</td>
+            <td style="padding: 5px 0; font-weight: 700;">Yashwanth H B</td>
+            <td style="padding: 5px 0; font-weight: 800; text-align: right; color: #0369a1;">
+              <a href="tel:8050614849" style="color: #0369a1; text-decoration: none;">8050614849</a>
+            </td>
           </tr>
           <tr>
-            <td style="vertical-align: top; width: 24px; padding-bottom: 8px; color: #ff3b69; font-weight: 900;">2.</td>
-            <td style="padding-bottom: 8px;">Complete the <strong>₹1,200 team registration fee</strong> in the Payment Tab to unlock your entry pass.</td>
-          </tr>
-          <tr>
-            <td style="vertical-align: top; width: 24px; color: #ff3b69; font-weight: 900;">3.</td>
-            <td>Download and save your official <strong>Entry QR Flight Pass</strong> for registration on <strong>November 06, 2026</strong>.</td>
+            <td style="padding: 5px 0; font-weight: 700;">Chethan Kumar B</td>
+            <td style="padding: 5px 0; font-weight: 800; text-align: right; color: #0369a1;">
+              <a href="tel:9945507099" style="color: #0369a1; text-decoration: none;">99455 07099</a>
+            </td>
           </tr>
         </table>
       </div>
 
       <!-- Milestones Box -->
       <div style="background-color: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 14px 18px; margin: 20px 0; font-size: 12.5px; color: #7c2d12; line-height: 1.55;">
-        <strong>🗓️ Mission Flight Milestones:</strong><br>
-        • <strong>Oct 09:</strong> Squad Registrations Open<br>
-        • <strong>Oct 28:</strong> Roster &amp; Payment Lock<br>
-        • <strong>Nov 06–07:</strong> 24-Hour Offline Hackathon Grand Finale at MIT Mysore Campus (₹30,000+ Prize Bounty)
+        <strong>🗓️ Mission Milestones:</strong><br>
+        • <strong>Nov 02:</strong> Problem Statements Released &amp; Flight Passes Dispatched<br>
+        • <strong>Nov 06–07:</strong> 24-Hour Offline Hackathon at MIT Mysore Campus (₹33,333+ Cash Bounty)
       </div>
 
       <!-- CTA Button -->
       <div style="text-align: center; margin-top: 26px;">
         <a href="${HAXLR8_PORTAL_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #ff3b69 0%, #ea580c 100%); color: #ffffff !important; padding: 14px 34px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; box-shadow: 0 4px 16px rgba(234, 88, 12, 0.35);">
-          Launch Flight Deck Dashboard →
+          Open Dashboard →
         </a>
       </div>
     </div>
@@ -213,15 +262,34 @@ export function generateSubmissionEmailHtml({ leaderName, teamName, trackName, p
 /**
  * Send automated email notification upon user or squad creation
  */
-export async function sendParticipantWelcomeEmail({ recipientEmail, leaderName, teamName, teamId, crewCount }) {
+export async function sendParticipantWelcomeEmail({ 
+  recipientEmail, 
+  leaderName, 
+  leaderPhone,
+  teamName, 
+  domain,
+  feeStatus,
+  members,
+  teamId, 
+  crewCount 
+}) {
   if (!recipientEmail) return { success: false, error: 'Recipient email is required' };
 
   console.log(`[HAXLR8 Email Automation] Dispatching welcome email from ${HAXLR8_HOST_EMAIL} to ${recipientEmail}...`);
 
   const emailPayload = {
     to: recipientEmail,
-    subject: `🚀 Welcome to HAXLR8 3.0! Flight Manifest Confirmed for ${teamName || 'Your Squad'}`,
-    html: generateWelcomeEmailHtml({ leaderName, teamName, teamId, crewCount }),
+    subject: `🚀 Registration Confirmed: ${teamName || 'Your Squad'} - HAXLR8 3.0`,
+    html: generateWelcomeEmailHtml({ 
+      leaderName, 
+      leaderPhone,
+      teamName, 
+      domain, 
+      feeStatus, 
+      members, 
+      crewCount, 
+      teamId 
+    }),
     leaderName,
     teamName,
     teamId
@@ -597,18 +665,39 @@ export function getEmailDispatchLogs() {
 /**
  * Generate rich HTML email for team registration fee verification
  */
-export function generatePaymentEmailHtml({ leaderName, teamName, teamId, transactionId }) {
+export function generatePaymentEmailHtml({ 
+  leaderName, 
+  leaderPhone,
+  teamName, 
+  domain, 
+  transactionId, 
+  members = [] 
+}) {
+  const memberRows = members && members.length > 0
+    ? members.map((m, idx) => `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 7px 0; color: #334155; font-weight: 700;">${m.name || `Crewmate ${idx + 1}`}</td>
+          <td style="padding: 7px 0; color: #0f172a; font-weight: 800; text-align: right;">${m.phone || 'Provided'}</td>
+        </tr>
+      `).join('')
+    : `
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 7px 0; color: #334155; font-weight: 700;">${leaderName || 'Team Lead'}</td>
+          <td style="padding: 7px 0; color: #0f172a; font-weight: 800; text-align: right;">${leaderPhone || 'Registered'}</td>
+        </tr>
+      `;
+
   return `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Verified & Flight Pass Active</title>
+  <title>Payment Verified & Confirmation</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f19; margin: 0; padding: 24px 10px; color: #0f172a;">
   <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35); border: 1px solid #1e293b;">
-    ${renderEmailHeader('🎫 FLIGHT PASS UNLOCKED • ₹1,200 FEE VERIFIED')}
+    ${renderEmailHeader('🎫 FEE VERIFIED • HAXLR8 3.0 MIT MYSORE')}
 
     <div style="padding: 32px 30px; line-height: 1.6;">
       <div style="display: inline-block; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;">
@@ -616,10 +705,10 @@ export function generatePaymentEmailHtml({ leaderName, teamName, teamId, transac
       </div>
 
       <h2 style="font-size: 22px; color: #0f172a; margin: 0 0 10px; font-weight: 800;">
-        Grand Finale Pass Unlocked, Captain ${leaderName || 'Leader'}!
+        Registration Fee Verified, ${leaderName || 'Captain'}!
       </h2>
       <p style="margin: 0 0 20px; color: #334155; font-size: 14.5px;">
-        Your squad registration fee of <strong>₹1,200</strong> for <strong>${teamName || 'Your Squad'}</strong> has been verified. Your squad has full clearance for the 24-hour offline hackathon grand finale!
+        Your squad registration fee of <strong>₹1,200</strong> for <strong>${teamName || 'Your Squad'}</strong> has been verified. Your squad has full clearance for the 24-hour offline hackathon grand finale at <strong>Maharaja Institute of Technology Mysore</strong>!
       </p>
 
       <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
@@ -628,27 +717,66 @@ export function generatePaymentEmailHtml({ leaderName, teamName, teamId, transac
         </div>
         <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
           <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Squad Name</td>
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Team Name</td>
             <td style="padding: 8px 0; color: #0f172a; font-weight: 800; text-align: right;">${teamName || 'Registered Squad'}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Domain</td>
+            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${domain || 'Agriculture'}</td>
           </tr>
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Transaction UTR</td>
             <td style="padding: 8px 0; color: #0284c7; font-weight: 800; font-family: monospace; text-align: right;">${transactionId || 'VERIFIED'}</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Amount Paid</td>
-            <td style="padding: 8px 0 0; color: #16a34a; font-weight: 800; text-align: right;">₹1,200 (Complete Squad Fee)</td>
+            <td style="padding: 8px 0 0; color: #64748b; font-weight: 600;">Fee Paid Status</td>
+            <td style="padding: 8px 0 0; color: #16a34a; font-weight: 800; text-align: right;">₹1,200 (Paid / Verified)</td>
           </tr>
         </table>
       </div>
 
-      <p style="font-size: 13.5px; color: #475569;">
-        Your official <strong>Hackathon Entry Pass</strong> with your squad QR badge is now generated and ready to download in your dashboard. Present this pass at the MIT Mysore registration desk on <strong>November 06, 2026</strong>.
-      </p>
+      <!-- Team Members Roster -->
+      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;">
+          👥 TEAM MEMBERS &amp; CONTACT NUMBERS
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 2px solid #e2e8f0; font-size: 11.5px; color: #64748b;">
+              <th style="padding: 6px 0; text-align: left; font-weight: 800;">Member Name</th>
+              <th style="padding: 6px 0; text-align: right; font-weight: 800;">Contact Phone</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${memberRows}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Student Coordinators Contact Card -->
+      <div style="background-color: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 14px; padding: 18px 20px; margin: 22px 0;">
+        <div style="font-size: 11px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">
+          📞 STUDENT COORDINATORS SUPPORT
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #0f172a;">
+          <tr>
+            <td style="padding: 5px 0; font-weight: 700;">Yashwanth H B</td>
+            <td style="padding: 5px 0; font-weight: 800; text-align: right; color: #0369a1;">
+              <a href="tel:8050614849" style="color: #0369a1; text-decoration: none;">8050614849</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 5px 0; font-weight: 700;">Chethan Kumar B</td>
+            <td style="padding: 5px 0; font-weight: 800; text-align: right; color: #0369a1;">
+              <a href="tel:9945507099" style="color: #0369a1; text-decoration: none;">99455 07099</a>
+            </td>
+          </tr>
+        </table>
+      </div>
 
       <div style="text-align: center; margin-top: 26px;">
         <a href="${HAXLR8_PORTAL_URL}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: #ffffff !important; padding: 14px 34px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 14px; box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35);">
-          Download Official Entry Pass →
+          View Dashboard →
         </a>
       </div>
     </div>
@@ -663,13 +791,29 @@ export function generatePaymentEmailHtml({ leaderName, teamName, teamId, transac
 /**
  * Dispatch payment confirmation email
  */
-export async function sendPaymentConfirmationEmail({ recipientEmail, leaderName, teamName, teamId, transactionId }) {
+export async function sendPaymentConfirmationEmail({ 
+  recipientEmail, 
+  leaderName, 
+  leaderPhone,
+  teamName, 
+  domain,
+  teamId, 
+  transactionId,
+  members 
+}) {
   if (!recipientEmail) return { success: false, message: 'Missing recipient' };
 
   const emailPayload = {
     recipientEmail,
-    subject: `🎫 Payment Verified & Flight Pass Active: ${teamName || 'HAXLR8 Squad'}`,
-    html: generatePaymentEmailHtml({ leaderName, teamName, teamId, transactionId }),
+    subject: `🎫 Payment Verified: ${teamName || 'HAXLR8 Squad'} - ₹1,200 Confirmed`,
+    html: generatePaymentEmailHtml({ 
+      leaderName, 
+      leaderPhone,
+      teamName, 
+      domain, 
+      transactionId, 
+      members 
+    }),
     teamName,
     leaderName
   };

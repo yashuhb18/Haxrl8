@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
-import ProblemStatementPDF from '../../assets/PS_example/Hackathon Problem Statement 2026.pdf';
 
 const RESOURCES = [
   { icon: '💳', label: 'Payment Google Form', desc: 'Official Google Form link for ₹1,200 fee & UTR submission', tag: 'G-FORM', href: 'https://forms.gle/pw945ievXT9bH1wV7', target: '_blank', color: '#ff3b69', bg: '#fef2f2', border: '#fecaca' },
-  { icon: '📄', label: 'Hackathon Rulebook', desc: 'Official rules and judging criteria', tag: 'PDF', href: '#', color: '#ea580c', bg: '#fff7ed', border: '#fed7aa' },
-  { icon: '🧩', label: 'Sample Problem Statements', desc: 'Download sample problem statements for 2026', tag: 'PDF', href: ProblemStatementPDF, download: 'HAXLR8-Problem-Statements-2026.pdf', color: '#0284c7', bg: '#eff6ff', border: '#bfdbfe' },
+  { icon: '📄', label: 'Hackathon Rulebook', desc: 'Official guidelines and event format', tag: 'PDF', href: '#', color: '#ea580c', bg: '#fff7ed', border: '#fed7aa' },
+  { icon: '🔒', label: 'Problem Statements', desc: 'Section unlocks by November 2nd • Flight passes will be sent to all participants', tag: 'OPENS NOV 2', href: '#', color: '#b45309', bg: '#fffbeb', border: '#fde68a' },
   { icon: '👑', label: 'Leader vs. Impostor Protocol', desc: 'Official flight manifest rules & role guide', tag: 'GUIDE', href: '#leader-protocol', color: '#9333ea', bg: '#fdf4ff', border: '#f5d0fe' },
   { icon: '🏆', label: 'Prize Bounty Breakdown', desc: 'Learn about the ₹30,000 cash prizes & awards', tag: 'AWARDS', href: '/prizes', color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
 ];
@@ -48,18 +47,6 @@ const FAQS = [
     a: "Please bring your laptop, charger, required hardware/IoT sensors, student ID card, and enthusiasm. Refreshments, Wi-Fi, and workspace will be provided at Maharaja Institute of Technology Mysore.",
   },
   {
-    q: "Are we allowed to use AI tools or \"vibe code\" during the hackathon?",
-    a: "Yes! \"Vibe coding\" (using AI assistants to generate and shape your code) is officially allowed during the 24-hour hackathon. We encourage using modern tools to build faster, as long as the actual development and logic are implemented during the event.",
-  },
-  {
-    q: "We are building an IoT/Hardware project. Do we have to build hardware from scratch?",
-    a: "No. Hardware teams may procure and test components beforehand. However, software development and complete end-to-end integration must take place during the 24-hour offline hackathon.",
-  },
-  {
-    q: "How are the winners selected?",
-    a: "Projects will be evaluated by industry judges and academic experts based on innovation (25%), domain impact (25%), technical complexity (25%), and presentation & feasibility (25%).",
-  },
-  {
     q: "Will the hackathon be in person or online?",
     a: "HAXLR8 3.0 is a 100% in-person 24-hour Grand Hackathon hosted at Maharaja Institute of Technology Mysore on November 6–7, 2026. There are no screening or elimination rounds—all registered teams advance directly!",
   },
@@ -95,6 +82,40 @@ export default function ResourcesTab({ hasTeam, submissions }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      {/* ── PROBLEM STATEMENTS RELEASE & FLIGHT PASS NOTICE ── */}
+      <div style={{
+        background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+        border: '1.5px solid #fde68a',
+        borderRadius: 18,
+        padding: '16px 22px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+        boxShadow: '0 4px 14px rgba(217, 119, 6, 0.08)'
+      }}>
+        <div style={{
+          width: 44,
+          height: 44,
+          borderRadius: 12,
+          background: '#fef08a',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 22,
+          flexShrink: 0
+        }}>
+          🔒
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 800, color: '#92400e', marginBottom: 2 }}>
+            Problem Statement Block Unlocks November 2nd
+          </div>
+          <div style={{ fontSize: 13, color: '#b45309', fontWeight: 600, lineHeight: 1.5 }}>
+            The Problem Statement section will open by <strong>November 2nd</strong>. The official flight pass will be sent to all registered participants prior to the grand hackathon at MIT Mysore.
+          </div>
+        </div>
+      </div>
+
       {/* Resources grid */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
