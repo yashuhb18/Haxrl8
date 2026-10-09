@@ -72,6 +72,13 @@ export default function DashboardPage() {
       }
 
       setUser(activeUser);
+      try {
+        localStorage.setItem('haxlr8_leader_session', JSON.stringify({
+          user: activeUser,
+          email: activeUser.email,
+          role: 'team_leader'
+        }));
+      } catch (e) {}
 
       // Security: Clean up OAuth tokens from the URL if they are present after redirect
       if (window.location.hash.includes('access_token=')) {

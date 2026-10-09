@@ -38,13 +38,22 @@ export default function AuthPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Check if session already exists
+  // Check if session already exists or returning from OAuth
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data?.user) {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session?.user) {
+        try {
+          localStorage.setItem('haxlr8_leader_session', JSON.stringify({
+            user: data.session.user,
+            email: data.session.user.email,
+            role: 'team_leader'
+          }));
+        } catch (e) {}
         navigate('/dashboard');
       }
-    });
+    };
+    checkSession();
   }, [navigate]);
 
   // Keep route synced with tab switcher
