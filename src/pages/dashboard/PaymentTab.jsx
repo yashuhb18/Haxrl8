@@ -332,8 +332,8 @@ export default function PaymentTab({
 
       setPaymentRecord(paymentPayload);
       setIsEditing(false);
-      setSuccessMsg('🎉 Payment verification successfully submitted! Your official Flight Pass has been unlocked.');
-      setToastMsg('Flight Pass unlocked! Access your official ticket now.');
+      setSuccessMsg('🎉 Payment verification successfully submitted! Your verified payment receipt has been generated.');
+      setToastMsg('Payment verified! Access your official payment receipt.');
 
       if (onPaymentUpdated) {
         onPaymentUpdated(paymentPayload);
@@ -398,7 +398,7 @@ export default function PaymentTab({
               {teamData?.team_name ? (
                 <>Squad: <strong>{teamData.team_name}</strong> · Domain: <strong>{teamData.domain || 'Agriculture'}</strong> · Fee covers complete 3–4 member squad</>
               ) : (
-                <>Fee covers complete 3–4 member squad, 24-hr access, catering, Wi-Fi & official flight credentials</>
+                <>Fee covers complete 3–4 member squad, 24-hr access, catering, Wi-Fi & official registration verification</>
               )}
             </p>
           </div>
@@ -414,7 +414,7 @@ export default function PaymentTab({
             }}
           >
             <TicketIcon size={18} />
-            <span>View Official Flight Pass →</span>
+            <span>View Payment Receipt →</span>
           </button>
         )}
       </div>
@@ -518,7 +518,7 @@ export default function PaymentTab({
                   onClick={() => { if (setActiveTab) setActiveTab('ticket'); }}
                   style={{ flex: 1, ...styles.buttonPrimary, padding: '11px' }}
                 >
-                  View Flight Pass →
+                  View Payment Receipt →
                 </button>
               </div>
             </div>
@@ -532,16 +532,17 @@ export default function PaymentTab({
                 <h3 style={{ fontSize: 17, fontWeight: 900, color: '#0f172a', margin: 0 }}>Coordinator Verification Status</h3>
               </div>
               <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.6, marginBottom: 18 }}>
-                Your payment reference has been recorded in the central flight database. Event coordinators at the Department of ECE, MIT Mysore will cross-verify with bank records and your Google Form entry.
+                Your payment reference has been recorded in the central registration database. Event coordinators at the Department of ECE, MIT Mysore will cross-verify with bank records and your Google Form entry.
               </p>
 
               <div style={{ background: '#f0f9ff', border: '1.5px solid #bae6fd', borderRadius: 14, padding: 16, marginBottom: 18 }}>
                 <div style={{ fontSize: 12, fontWeight: 800, color: '#0369a1', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>
-                  Boarding Checkpoint Instructions:
+                  Registration Desk Instructions:
                 </div>
                 <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: '#0f172a', lineHeight: 1.6 }}>
-                  <li>Bring your downloaded or printed <strong>Flight Pass</strong> to registration desk.</li>
-                  <li>All 3–4 members must present valid College ID cards.</li>
+                  <li>Bring your downloaded or printed <strong>Payment Receipt</strong> to registration desk.</li>
+                  <li>Official Hackathon Flight Passes will be issued on <strong>November 2nd</strong> after problem statements are assigned.</li>
+                  <li>All 3–4 members must present valid College ID cards at venue.</li>
                   <li>Reporting begins 8:30 AM on <strong>November 6, 2026</strong> at MIT Mysore.</li>
                 </ul>
               </div>
@@ -552,7 +553,7 @@ export default function PaymentTab({
               style={{ ...styles.buttonPrimary, width: '100%' }}
             >
               <TicketIcon size={18} />
-              <span>Claim & Print Flight Pass</span>
+              <span>Claim &amp; Print Payment Receipt</span>
             </button>
           </div>
         </div>
@@ -716,7 +717,7 @@ export default function PaymentTab({
             </div>
 
             <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.5, marginBottom: 20 }}>
-              Enter your UPI Transaction ID and upload your receipt screenshot here so our flight deck instantly logs your team and prepares your official entry pass.
+              Enter your UPI Transaction ID and upload your receipt screenshot here so our desk instantly logs your squad and generates your verified registration receipt.
             </p>
 
             <form onSubmit={handleSubmitVerification} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>

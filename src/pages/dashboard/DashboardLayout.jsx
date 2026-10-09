@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { LayoutDashboard, Users, CreditCard, Ticket, BookOpen, Bell } from 'lucide-react';
+import { LayoutDashboard, Users, CreditCard, Receipt, BookOpen, Bell } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import DomainWheel from '../../components/ui/DomainWheel';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
@@ -14,7 +14,7 @@ const NAV = [
   { id:'overview',      icon: LayoutDashboard, label:'Overview',       shortLabel:'Overview' },
   { id:'team',          icon: Users,           label:'My Team',        shortLabel:'Team'     },
   { id:'payment',       icon: CreditCard,      label:'Payment & Verify', shortLabel:'Payment' },
-  { id:'ticket',        icon: Ticket,          label:'Flight Pass',    shortLabel:'Ticket'   },
+  { id:'ticket',        icon: Receipt,         label:'Payment Receipt',  shortLabel:'Receipt' },
   { id:'resources',     icon: BookOpen,        label:'Resources',      shortLabel:'Guides'   },
   { id:'announcements', icon: Bell,            label:'Announcements',  shortLabel:'Alerts'   },
 ];

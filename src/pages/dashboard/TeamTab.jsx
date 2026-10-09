@@ -980,7 +980,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
             {[
               { num: 1, title: 'Squad Manifest Locked In', desc: `Crew of ${teamMembers.length} confirmed in ${teamData?.domain || 'Agriculture'} domain.` },
               { num: 2, title: 'Pay Registration Fee (₹1,200)', desc: 'Pay ₹1,200 team fee & submit verification details.' },
-              { num: 3, title: 'Unlock Official Flight Pass', desc: 'Download your verified 24-hour hackathon entry flight pass.' }
+              { num: 3, title: 'Unlock Payment Receipt', desc: 'Download your verified hackathon registration and fee receipt.' }
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: 20, position: 'relative', zIndex: 1 }}>
                 <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#16a34a' : '#ffffff', border: `2px solid ${i === 0 ? '#16a34a' : '#0284c7'}`, color: i === 0 ? '#ffffff' : '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, flexShrink: 0, boxShadow: '0 2px 8px rgba(2, 132, 199, 0.2)' }}>
@@ -1019,7 +1019,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           </div>
           <div>
             <div style={{ fontSize: 16.5, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>Ready to complete squad verification?</div>
-            <div style={{ fontSize: 13, color: '#64748b' }}>Proceed to Payment &amp; Verification to pay the ₹1,200 team fee and generate your official Flight Pass.</div>
+            <div style={{ fontSize: 13, color: '#64748b' }}>Proceed to Payment &amp; Verification to pay the ₹1,200 team fee and generate your verified payment receipt.</div>
           </div>
         </div>
         <button

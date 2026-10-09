@@ -501,7 +501,7 @@ export default function DashboardPage() {
 
           <h2 style={{ fontSize: 21, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>Commander Login Required</h2>
           <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 20px', lineHeight: 1.5 }}>
-            To access your squad manifest, challenge domain, payment verification, and official Flight Pass, please verify your credentials.
+            To access your squad manifest, challenge domain, payment verification, and verified registration receipt, please verify your credentials.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

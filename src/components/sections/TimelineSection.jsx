@@ -57,8 +57,8 @@ const EVENTS = [
   },
   {
     index: 2, num: "03", day: "02", month: "NOV", year: "2026",
-    title: "Flight Passes Issued",
-    desc: "Verification concluded; official Flight Passes with entry QR codes issued to all registered squads.",
+    title: "Problem Statements & Flight Passes",
+    desc: "Problem Statements revealed; official Flight Passes issued to all registered squads with venue logistics briefing.",
     tag: "Pass Clearance", tagColor: "#facc15", tagBg: "rgba(250,204,21,0.1)", tagBorder: "rgba(250,204,21,0.3)",
     Icon: IconAnnounce,
   },

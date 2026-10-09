@@ -3,8 +3,22 @@ import { supabase } from './supabaseClient';
 const CLOUDINARY_LOCAL_STORAGE_KEY = 'haxlr8_cloudinary_config';
 const CLOUDINARY_TAG = 'CLOUDINARY_CONFIG';
 
+// Default credentials verified from Cloudinary account
+const DEFAULT_CLOUD_NAME = 'daxycknxl';
+const DEFAULT_API_KEY = '218385963343261';
+const DEFAULT_API_SECRET = 'OBN1ZlxGRnjyADierOqARDf_yQ4';
+
 /**
- * Retrieve active Cloudinary credentials from localStorage, environment, or Supabase
+ * Native Web Crypto SHA-1 digest for browser and node
+ */
+async function sha1Hex(str) {
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-1', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Retrieve active Cloudinary credentials from localStorage, environment, or default verified credentials
  */
 export function getCloudinaryConfig() {
   // 1. Check localStorage first (allows admin to configure dynamically in UI)
@@ -16,7 +30,8 @@ export function getCloudinaryConfig() {
         return {
           cloudName: parsed.cloudName.trim(),
           uploadPreset: (parsed.uploadPreset || '').trim(),
-          apiKey: (parsed.apiKey || '').trim(),
+          apiKey: (parsed.apiKey || '').trim() || DEFAULT_API_KEY,
+          apiSecret: (parsed.apiSecret || '').trim() || DEFAULT_API_SECRET,
           folder: parsed.folder || 'haxlr8',
           source: 'localStorage'
         };
@@ -26,17 +41,19 @@ export function getCloudinaryConfig() {
     console.warn('Error reading local Cloudinary config:', e);
   }
 
-  // 2. Fall back to environment variables
-  const envCloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
+  // 2. Check environment variables
+  const envCloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || DEFAULT_CLOUD_NAME;
   const envUploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '';
-  const envApiKey = import.meta.env.VITE_CLOUDINARY_API_KEY || '';
+  const envApiKey = import.meta.env.VITE_CLOUDINARY_API_KEY || DEFAULT_API_KEY;
+  const envApiSecret = import.meta.env.VITE_CLOUDINARY_API_SECRET || DEFAULT_API_SECRET;
 
   return {
     cloudName: envCloudName.trim(),
     uploadPreset: envUploadPreset.trim(),
     apiKey: envApiKey.trim(),
+    apiSecret: envApiSecret.trim(),
     folder: 'haxlr8',
-    source: envCloudName ? 'env' : 'none'
+    source: 'env_or_default'
   };
 }
 
@@ -45,7 +62,7 @@ export function getCloudinaryConfig() {
  */
 export function isCloudinaryConfigured() {
   const config = getCloudinaryConfig();
-  return Boolean(config.cloudName && config.uploadPreset);
+  return Boolean(config.cloudName && (config.uploadPreset || (config.apiKey && config.apiSecret)));
 }
 
 /**
@@ -53,9 +70,10 @@ export function isCloudinaryConfigured() {
  */
 export async function saveCloudinaryConfig(config) {
   const cleanConfig = {
-    cloudName: (config?.cloudName || '').trim(),
+    cloudName: (config?.cloudName || DEFAULT_CLOUD_NAME).trim(),
     uploadPreset: (config?.uploadPreset || '').trim(),
-    apiKey: (config?.apiKey || '').trim(),
+    apiKey: (config?.apiKey || DEFAULT_API_KEY).trim(),
+    apiSecret: (config?.apiSecret || DEFAULT_API_SECRET).trim(),
     folder: (config?.folder || 'haxlr8').trim(),
     updatedAt: new Date().toISOString()
   };
@@ -130,30 +148,42 @@ export async function syncCloudinaryFromSupabase() {
 
 /**
  * Upload an image (File or Blob or base64) to Cloudinary via REST API
+ * Supports both signed direct uploads (using API Key & Secret) and unsigned preset uploads.
  * @param {File|Blob|string} fileOrData 
  * @param {object} options
  * @returns {Promise<{ url: string, publicId: string, secureUrl: string, bytes: number }>}
  */
 export async function uploadToCloudinary(fileOrData, options = {}) {
   const config = getCloudinaryConfig();
-  if (!config.cloudName) {
-    throw new Error('Cloudinary Cloud Name is not configured. Please provide it in Admin Settings or .env');
-  }
-
-  const uploadPreset = options.uploadPreset || config.uploadPreset;
-  if (!uploadPreset) {
-    throw new Error('Cloudinary Upload Preset is required for direct client uploads. Please configure an unsigned upload preset in Cloudinary.');
-  }
-
+  const cloudName = config.cloudName || DEFAULT_CLOUD_NAME;
   const folder = options.folder || config.folder || 'haxlr8';
 
   const formData = new FormData();
   formData.append('file', fileOrData);
-  formData.append('upload_preset', uploadPreset);
-  if (folder) formData.append('folder', folder);
-  if (config.apiKey) formData.append('api_key', config.apiKey);
+  formData.append('folder', folder);
 
-  const endpoint = `https://api.cloudinary.com/v1_1/${config.cloudName}/image/upload`;
+  const uploadPreset = options.uploadPreset || config.uploadPreset;
+  const apiKey = config.apiKey || DEFAULT_API_KEY;
+  const apiSecret = config.apiSecret || DEFAULT_API_SECRET;
+
+  if (uploadPreset) {
+    // Unsigned upload via preset
+    formData.append('upload_preset', uploadPreset);
+    if (apiKey) formData.append('api_key', apiKey);
+  } else if (apiKey && apiSecret) {
+    // Direct signed upload
+    const timestamp = Math.floor(Date.now() / 1000);
+    const stringToSign = `folder=${folder}&timestamp=${timestamp}`;
+    const signature = await sha1Hex(stringToSign + apiSecret);
+
+    formData.append('api_key', apiKey);
+    formData.append('timestamp', String(timestamp));
+    formData.append('signature', signature);
+  } else {
+    throw new Error('Cloudinary credentials missing: Provide an Upload Preset or API Key & Secret.');
+  }
+
+  const endpoint = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
   const response = await fetch(endpoint, {
     method: 'POST',
@@ -180,24 +210,42 @@ export async function uploadToCloudinary(fileOrData, options = {}) {
 }
 
 /**
- * Test Cloudinary connection with a tiny 1x1 test pixel
+ * Test Cloudinary connection with a 1x1 test pixel
  */
-export async function testCloudinaryConnection(cloudName, uploadPreset) {
+export async function testCloudinaryConnection(cloudName = DEFAULT_CLOUD_NAME, uploadPreset = '') {
   try {
+    const config = getCloudinaryConfig();
+    const activeCloudName = cloudName || config.cloudName || DEFAULT_CLOUD_NAME;
+    const activePreset = uploadPreset || config.uploadPreset;
+    const apiKey = config.apiKey || DEFAULT_API_KEY;
+    const apiSecret = config.apiSecret || DEFAULT_API_SECRET;
+
     const testPixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAZb3BhbkFJQUlMb2dv';
+    const folder = 'haxlr8_test';
     const formData = new FormData();
     formData.append('file', testPixel);
-    formData.append('upload_preset', uploadPreset);
-    formData.append('folder', 'haxlr8_test');
+    formData.append('folder', folder);
 
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    if (activePreset) {
+      formData.append('upload_preset', activePreset);
+      if (apiKey) formData.append('api_key', apiKey);
+    } else if (apiKey && apiSecret) {
+      const timestamp = Math.floor(Date.now() / 1000);
+      const stringToSign = `folder=${folder}&timestamp=${timestamp}`;
+      const signature = await sha1Hex(stringToSign + apiSecret);
+      formData.append('api_key', apiKey);
+      formData.append('timestamp', String(timestamp));
+      formData.append('signature', signature);
+    }
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${activeCloudName}/image/upload`, {
       method: 'POST',
       body: formData
     });
 
     const data = await res.json();
     if (res.ok && data.secure_url) {
-      return { success: true, message: 'Cloudinary connection verified successfully!' };
+      return { success: true, message: 'Cloudinary CDN connected & verified successfully!' };
     }
     return { success: false, message: data.error?.message || 'Connection test failed.' };
   } catch (err) {

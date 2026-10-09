@@ -30,8 +30,8 @@ const guidelinesPart1 = [
   },
   {
     num: '03',
-    title: 'Team Fee & Pass',
-    description: 'Registration fee is ₹1,200 per team (3–4 members). Complete payment details in the dashboard to unlock your official flight pass.',
+    title: 'Team Fee & Receipt',
+    description: 'Registration fee is ₹1,200 per team (3–4 members). Complete payment details in the dashboard to unlock your verified registration receipt.',
     icon: FileText,
     badge: '₹1,200 / TEAM',
     bg: '#fdf4ff',
@@ -480,7 +480,7 @@ export default function PlayfulGuidelinesSection() {
               e.currentTarget.style.boxShadow = '0 8px 24px rgba(255, 59, 105, 0.35)';
             }}
           >
-            Claim Flight Pass →
+            Claim Registration Receipt →
           </a>
         </motion.div>
       </div>

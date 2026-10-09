@@ -278,12 +278,12 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
               <CheckItem label="Registration" status="done" />
               <CheckItem label="Crew Manifest (3–4 Members)" status={hasTeam ? 'done' : 'active'} />
               <CheckItem label="Payment Verification (₹1,200)" status={isPaid ? 'done' : (hasTeam ? 'active' : 'pending')} />
-              <CheckItem label="Official Flight Pass" status={isPaid ? 'done' : 'pending'} />
+              <CheckItem label="Payment Receipt" status={isPaid ? 'done' : 'pending'} />
               <CheckItem label="Grand Finale (Nov 6–7)" status="pending" />
             </div>
           </div>
           <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, fontWeight: 700, color: '#64748b' }}>
-            {isPaid ? 'All systems nominal! Your official Flight Pass is active.' : (hasTeam ? 'Roster locked! Proceed to Payment & Verification (₹1,200).' : 'Assemble 3–4 crew members in "My Team" to advance.')}
+            {isPaid ? 'All systems nominal! Your registration payment receipt is verified.' : (hasTeam ? 'Roster locked! Proceed to Payment & Verification (₹1,200).' : 'Assemble 3–4 crew members in "My Team" to advance.')}
           </div>
         </div>
 

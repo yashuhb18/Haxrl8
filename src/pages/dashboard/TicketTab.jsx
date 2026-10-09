@@ -75,7 +75,7 @@ export default function TicketTab({
             No Squad Manifest Registered
           </h2>
           <p style={{ fontSize: 13.5, color: '#64748b', maxWidth: 440, margin: '0 auto 24px', lineHeight: 1.5 }}>
-            You need to assemble your crew and select your challenge domain before generating your official Flight Ticket.
+            You need to assemble your crew and select your challenge domain before generating your official Payment &amp; Registration Receipt.
           </p>
           <button
             onClick={() => { if (setActiveTab) setActiveTab('team'); }}
@@ -109,10 +109,10 @@ export default function TicketTab({
             🔒
           </div>
           <h2 style={{ fontSize: 20, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>
-            Flight Pass Locked (Payment Verification Required)
+            Payment Receipt Locked (Payment Verification Required)
           </h2>
           <p style={{ fontSize: 13.5, color: '#64748b', maxWidth: 500, margin: '0 auto 20px', lineHeight: 1.5 }}>
-            Your squad <strong>"{teamData?.team_name}"</strong> is registered! To unlock your official Hackathon Entry Pass, please complete the ₹1,200 team fee in the Payment tab.
+            Your squad <strong>"{teamData?.team_name}"</strong> is registered! To unlock your verified Payment &amp; Registration Receipt, please complete the ₹1,200 team fee in the Payment tab.
           </p>
 
           <div style={{ display: 'inline-flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -158,10 +158,10 @@ export default function TicketTab({
               </div>
               <div>
                 <div style={{ fontSize: 15, fontWeight: 900, color: '#14532d' }}>
-                  Official Flight Pass Active &amp; Verified
+                  Official Payment &amp; Registration Receipt (Verified)
                 </div>
                 <div style={{ fontSize: 12, color: '#166534', fontWeight: 600 }}>
-                  Present this digital pass or physical printout at MIT Mysore registration desk.
+                  Present this verified payment receipt or printout at MIT Mysore registration desk. (Official Flight Passes will be issued on November 2nd).
                 </div>
               </div>
             </div>
@@ -184,11 +184,11 @@ export default function TicketTab({
               }}
             >
               <Printer size={16} />
-              <span>Print / Save Pass (PDF)</span>
+              <span>Print / Save Receipt (PDF)</span>
             </button>
           </div>
 
-          {/* ════ THE OFFICIAL BOARDING PASS TICKET CARD (SINGLE PAGE, NO SCANNERS) ════ */}
+          {/* ════ THE OFFICIAL PAYMENT RECEIPT CARD (SINGLE PAGE, NO SCANNERS) ════ */}
           <div ref={ticketRef} className="official-ticket-card" style={{
             background: '#ffffff',
             borderRadius: 24,
@@ -212,14 +212,14 @@ export default function TicketTab({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
                   <span style={{ fontSize: 10, fontWeight: 900, background: '#ea580c', color: '#ffffff', padding: '3px 8px', borderRadius: 6, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                    OFFICIAL BOARDING PASS
+                    PAYMENT &amp; REGISTRATION RECEIPT
                   </span>
                   <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 700 }}>
                     NATIONAL LEVEL 24-HOUR HACKATHON
                   </span>
                 </div>
                 <h1 style={{ fontSize: 24, fontWeight: 900, color: '#ffffff', margin: 0, letterSpacing: '-0.02em' }}>
-                  HAXLR8 3.0 · REGISTRATION &amp; ENTRY PASS
+                  HAXLR8 3.0 · VERIFIED REGISTRATION &amp; FEE RECEIPT
                 </h1>
                 <p style={{ fontSize: 12.5, color: '#cbd5e1', margin: '4px 0 0', fontWeight: 600 }}>
                   Department of Electronics &amp; Communication Engineering · Maharaja Institute of Technology Mysore
@@ -413,7 +413,7 @@ export default function TicketTab({
                     STUDENT COORDINATORS SUPPORT
                   </div>
                   <div style={{ fontSize: 12.5, color: '#334155', fontWeight: 600, marginTop: 2 }}>
-                    For flight deck assistance or campus arrival queries:
+                    For registration desk assistance or campus arrival queries:
                   </div>
                 </div>
 

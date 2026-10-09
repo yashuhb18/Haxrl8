@@ -104,8 +104,8 @@ const guidelinesPart1 = [
     icon: UserPlus
   },
   {
-    id: '03', title: 'Registration Fee & Pass',
-    description: 'Registration fee is ₹1,200 per team (3–4 members). Complete payment verification to receive your official Flight Pass.',
+    id: '03', title: 'Registration Fee & Verification',
+    description: 'Registration fee is ₹1,200 per team (3–4 members). Complete payment verification to receive your verified payment receipt.',
     icon: FileText
   },
   {

@@ -450,7 +450,7 @@ export default function HumansPage() {
                 {yashwanthData.name || 'Yashwanth H B'}
               </h3>
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 16px 0', maxWidth: 640, lineHeight: 1.6, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
-                Architected and engineered the end-to-end HAXLR8 3.0 digital platform, real-time registration sync, Supabase authentication & database infrastructure, automated flight pass generation, and digital jury evaluation systems.
+                Architected and engineered the end-to-end HAXLR8 3.0 digital platform, real-time registration sync, Supabase authentication & database infrastructure, automated registration verification systems, and digital jury evaluation infrastructure.
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
                 <a
