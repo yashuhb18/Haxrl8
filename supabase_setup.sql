@@ -172,3 +172,28 @@ FOR INSERT WITH CHECK (bucket_id = 'id-cards');
 
 CREATE POLICY "Allow Updates to ID Cards" ON storage.objects
 FOR UPDATE USING (bucket_id = 'id-cards');
+
+-- ------------------------------------------------------------------------------
+-- 11. MOMENTS / HIGHLIGHTS GALLERY TABLE (OPTIONAL DEDICATED TABLE)
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.moments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    subtitle TEXT,
+    category TEXT DEFAULT 'ceremony',
+    tag TEXT DEFAULT 'MOMENT',
+    src TEXT NOT NULL,
+    storage_path TEXT,
+    description TEXT,
+    rotate NUMERIC DEFAULT 0,
+    bg TEXT DEFAULT '#ffffff',
+    border TEXT DEFAULT '#fed7aa',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.moments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read moments" ON public.moments FOR SELECT USING (true);
+CREATE POLICY "Allow insert moments" ON public.moments FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update moments" ON public.moments FOR UPDATE USING (true);
+CREATE POLICY "Allow delete moments" ON public.moments FOR DELETE USING (true);
+

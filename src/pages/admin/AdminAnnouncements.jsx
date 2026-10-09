@@ -33,7 +33,9 @@ export default function AdminAnnouncements() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
-    if (data) setAnnouncements(data);
+    if (data) {
+      setAnnouncements(data.filter(a => a.tag !== 'MOMENT'));
+    }
     setLoading(false);
   }, []);
 

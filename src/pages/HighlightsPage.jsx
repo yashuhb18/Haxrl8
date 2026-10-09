@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Sparkles, Heart, Trophy, Users, X, ZoomIn, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Camera, Sparkles, Heart, Trophy, Users, X, ZoomIn, ArrowRight, Plus } from 'lucide-react';
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
+import { fetchMoments, getLocalMoments } from '../lib/momentsService';
 
 // Highlight photos (HAXLR8 Real Edition)
 import imgMentorship from '../assets/highlights/haxlr8_mentorship.png';
@@ -142,10 +144,30 @@ const GALLERY = [
 export default function HighlightsPage() {
   const [filter, setFilter] = useState('all');
   const [lightbox, setLightbox] = useState(null);
+  const [dynamicMoments, setDynamicMoments] = useState(getLocalMoments());
+
+  useEffect(() => {
+    fetchMoments().then(data => {
+      if (data && Array.isArray(data)) {
+        setDynamicMoments(data);
+      }
+    });
+
+    const handleUpdate = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setDynamicMoments(e.detail);
+      }
+    };
+    window.addEventListener('haxlr8_moments_updated', handleUpdate);
+    return () => window.removeEventListener('haxlr8_moments_updated', handleUpdate);
+  }, []);
+
+  // Dynamic user-uploaded moments appear at the top, followed by curated gallery
+  const allMoments = [...dynamicMoments, ...GALLERY];
 
   const filteredPhotos = filter === 'all' 
-    ? GALLERY 
-    : GALLERY.filter(p => p.category === filter);
+    ? allMoments 
+    : allMoments.filter(p => p.category === filter);
 
   const openLightbox = (photo) => {
     playCrewmatePopSound();
@@ -286,9 +308,10 @@ export default function HighlightsPage() {
             }}
           >
             {[
-              { id: 'all', label: `All Moments (${GALLERY.length})`, icon: Sparkles },
-              { id: 'sprint', label: `🔥 Hackathon Sprint (${GALLERY.filter(p => p.category === 'sprint').length})`, icon: Heart },
-              { id: 'ceremony', label: `🏆 Demos & Jury (${GALLERY.filter(p => p.category === 'ceremony').length})`, icon: Trophy },
+              { id: 'all', label: `All Moments (${allMoments.length})`, icon: Sparkles },
+              { id: 'sprint', label: `🔥 Hackathon Sprint (${allMoments.filter(p => p.category === 'sprint').length})`, icon: Heart },
+              { id: 'ceremony', label: `🏆 Demos & Jury (${allMoments.filter(p => p.category === 'ceremony').length})`, icon: Trophy },
+              { id: 'crowd', label: `✨ Squad Camaraderie (${allMoments.filter(p => p.category === 'crowd').length})`, icon: Users },
             ].map(tab => {
               const active = filter === tab.id;
               return (
@@ -324,6 +347,33 @@ export default function HighlightsPage() {
                 </button>
               );
             })}
+          </div>
+
+          {/* Organizer / Media Crew Direct Upload Button */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+            <Link
+              to="/upload-moments"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#ffffff',
+                color: '#0284c7',
+                border: '2px dashed #0284c7',
+                padding: '9px 24px',
+                borderRadius: '9999px',
+                fontSize: 13,
+                fontWeight: 800,
+                textDecoration: 'none',
+                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.08)',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f0f9ff'; e.currentTarget.style.borderColor = '#0369a1'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = '#0284c7'; }}
+            >
+              <Camera size={15} />
+              <span>+ Add / Upload Photos to Moments (Live Studio)</span>
+            </Link>
           </div>
         </div>
 

@@ -25,6 +25,7 @@ const AdminSubmissions = lazy(() => import('./pages/admin/AdminSubmissions'));
 const AdminAnnouncements = lazy(() => import('./pages/admin/AdminAnnouncements'));
 const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
 const AdminJury = lazy(() => import('./pages/admin/AdminJury'));
+const AdminMoments = lazy(() => import('./pages/admin/AdminMoments'));
 const LegalPage = lazy(() => import('./pages/LegalPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const ShortlistedPage = lazy(() => import('./pages/ShortlistedPage'));
@@ -120,6 +121,7 @@ function App() {
             <Route path="evaluations" element={<AdminEvaluations />} />
             <Route path="evaluations/:id" element={<AdminEvaluateSubmission />} />
             <Route path="jury" element={<AdminJury />} />
+            <Route path="moments" element={<AdminMoments />} />
             <Route path="submissions" element={<AdminSubmissions />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
@@ -132,10 +134,15 @@ function App() {
             <Route path="evaluations" element={<AdminEvaluations />} />
             <Route path="evaluations/:id" element={<AdminEvaluateSubmission />} />
             <Route path="jury" element={<AdminJury />} />
+            <Route path="moments" element={<AdminMoments />} />
             <Route path="submissions" element={<AdminSubmissions />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
           </Route>
+
+          {/* Standalone Direct Mobile Moments Upload Deck */}
+          <Route path="/upload-moments" element={<AdminMoments standalone={true} />} />
+          <Route path="/moments-upload" element={<AdminMoments standalone={true} />} />
 
           {/* All other pages — with Navbar/Footer */}
           <Route path="/*" element={
