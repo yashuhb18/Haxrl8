@@ -1,13 +1,45 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  FileText, Download, ExternalLink, Lock, Sparkles, BookOpen, 
+  Calendar, CheckCircle, AlertTriangle, ShieldCheck, Clock, 
+  Info, FileDown, Layers, ChevronRight, Eye, FileCheck
+} from 'lucide-react';
+import { fetchDocuments, getLocalDocuments, DEFAULT_DOCUMENTS } from '../../lib/documentsService';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 
-const RESOURCES = [
-  { icon: '💳', label: 'Payment Google Form', desc: 'Official Google Form link for ₹1,200 fee & UTR submission', tag: 'G-FORM', href: 'https://forms.gle/pw945ievXT9bH1wV7', target: '_blank', color: '#ff3b69', bg: '#fef2f2', border: '#fecaca' },
-  { icon: '📄', label: 'Hackathon Rulebook', desc: 'Official guidelines and event format', tag: 'PDF', href: '#', color: '#ea580c', bg: '#fff7ed', border: '#fed7aa' },
-  { icon: '🔒', label: 'Problem Statements', desc: 'Section unlocks by November 2nd • Flight passes will be sent to all participants', tag: 'OPENS NOV 2', href: '#', color: '#b45309', bg: '#fffbeb', border: '#fde68a' },
-  { icon: '👑', label: 'Leader vs. Impostor Protocol', desc: 'Official flight manifest rules & role guide', tag: 'GUIDE', href: '#leader-protocol', color: '#9333ea', bg: '#fdf4ff', border: '#f5d0fe' },
-  { icon: '🏆', label: 'Prize Bounty Breakdown', desc: 'Learn about the ₹30,000 cash prizes & awards', tag: 'AWARDS', href: '/prizes', color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+const QUICK_LINKS = [
+  { 
+    icon: '💳', 
+    label: 'Payment Google Form', 
+    desc: 'Official Google Form link for ₹1,200 fee & UTR submission', 
+    tag: 'G-FORM', 
+    href: 'https://forms.gle/pw945ievXT9bH1wV7', 
+    target: '_blank', 
+    color: '#ff3b69', 
+    bg: '#fef2f2', 
+    border: '#fecaca' 
+  },
+  { 
+    icon: '👑', 
+    label: 'Leader vs. Impostor Protocol', 
+    desc: 'Official team manifest rules & registration role guide', 
+    tag: 'GUIDE', 
+    href: '#leader-protocol', 
+    color: '#9333ea', 
+    bg: '#fdf4ff', 
+    border: '#f5d0fe' 
+  },
+  { 
+    icon: '🏆', 
+    label: 'Prize Bounty Breakdown', 
+    desc: 'Learn about the ₹30,000 cash prizes & track awards', 
+    tag: 'AWARDS', 
+    href: '/prizes', 
+    color: '#16a34a', 
+    bg: '#f0fdf4', 
+    border: '#bbf7d0' 
+  },
 ];
 
 const FAQS = [
@@ -59,26 +91,67 @@ const STATUS_STYLE = {
 };
 
 export default function ResourcesTab({ hasTeam, submissions }) {
+  const [documents, setDocuments] = useState(getLocalDocuments());
   const [openFaq, setOpenFaq] = useState(null);
   const [showRulebook, setShowRulebook] = useState(false);
   const [showProtocol, setShowProtocol] = useState(false);
-  const hasSubmitted = submissions?.length > 0;
+  const [lockedModalDoc, setLockedModalDoc] = useState(null);
+
+  // Sync documents from cloud and react to admin uploads in real-time
+  useEffect(() => {
+    const loadDocs = async () => {
+      try {
+        const cloudDocs = await fetchDocuments();
+        if (cloudDocs && cloudDocs.length > 0) {
+          setDocuments(cloudDocs);
+        }
+      } catch (e) {
+        console.warn('Doc fetch notice:', e);
+      }
+    };
+    loadDocs();
+
+    const handleUpdate = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setDocuments(e.detail);
+      }
+    };
+    window.addEventListener('haxlr8_documents_updated', handleUpdate);
+    return () => window.removeEventListener('haxlr8_documents_updated', handleUpdate);
+  }, []);
 
   useEffect(() => {
-    if (showRulebook || showProtocol) {
+    if (showRulebook || showProtocol || lockedModalDoc) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
-  }, [showRulebook, showProtocol]);
+  }, [showRulebook, showProtocol, lockedModalDoc]);
 
   const EVENTS = [
-    { date: 'Oct 09', event: 'Registration Opens', status: 'done', desc: 'Team registration opens for undergraduate students.', time: 'All day' },
+    { date: 'Oct 09', event: 'Registration Opens', status: 'done', desc: 'Team registration opens for undergraduate students across India.', time: 'All day' },
     { date: 'Oct 28', event: 'Squad & Fee Lock', status: hasTeam ? 'done' : 'active', desc: 'Assemble 3–4 members, pay ₹1,200 team fee, & submit verification.', time: '11:59 PM IST' },
-    { date: 'Nov 02', event: 'Flight Pass Clearance', status: hasTeam ? 'active' : 'upcoming', desc: 'Download your official 24-hour hackathon entry boarding pass.', time: '12:00 PM IST' },
-    { date: 'Nov 06–07', event: 'Grand Finale', status: 'upcoming', desc: '24-hour offline hackathon finale and prize ceremony at MIT Mysore.', time: '08:30 AM IST' },
+    { date: 'Nov 02', event: 'Problem Statements & Pass Clearance', status: hasTeam ? 'active' : 'upcoming', desc: 'Official problem statements reveal & hackathon flight pass clearance.', time: '12:00 PM IST' },
+    { date: 'Nov 06–07', event: 'Grand Finale at MIT Mysore', status: 'upcoming', desc: '24-hour offline hackathon sprint and prize ceremony at Maharaja Institute of Technology Mysore.', time: '08:30 AM IST' },
   ];
+
+  const handleDocumentClick = (doc) => {
+    if (doc.isLocked || doc.category === 'Problem Statements') {
+      setLockedModalDoc(doc);
+      return;
+    }
+
+    if (doc.fileUrl === '#rulebook-guide' || doc.category === 'Rulebook' && doc.fileUrl?.startsWith('#')) {
+      setShowRulebook(true);
+      return;
+    }
+
+    // Direct download or open URL
+    if (doc.fileUrl && doc.fileUrl !== '#') {
+      window.open(doc.fileUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -86,58 +159,282 @@ export default function ResourcesTab({ hasTeam, submissions }) {
       <div style={{
         background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
         border: '1.5px solid #fde68a',
-        borderRadius: 18,
-        padding: '16px 22px',
+        borderRadius: 20,
+        padding: '18px 24px',
         display: 'flex',
         alignItems: 'center',
         gap: 16,
         boxShadow: '0 4px 14px rgba(217, 119, 6, 0.08)'
       }}>
         <div style={{
-          width: 44,
-          height: 44,
-          borderRadius: 12,
+          width: 48,
+          height: 48,
+          borderRadius: 14,
           background: '#fef08a',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 22,
+          fontSize: 24,
           flexShrink: 0
         }}>
           🔒
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14.5, fontWeight: 800, color: '#92400e', marginBottom: 2 }}>
-            Problem Statement Block Unlocks November 2nd
+          <div style={{ fontSize: 15, fontWeight: 900, color: '#92400e', marginBottom: 3, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span>Problem Statements Section Unlocks November 2nd</span>
+            <span style={{ fontSize: 11, background: '#f59e0b', color: '#fff', padding: '2px 8px', borderRadius: 12, fontWeight: 800 }}>
+              COUNTDOWN ACTIVE
+            </span>
           </div>
           <div style={{ fontSize: 13, color: '#b45309', fontWeight: 600, lineHeight: 1.5 }}>
-            The Problem Statement section will open by <strong>November 2nd</strong>. The official flight pass will be sent to all registered participants prior to the grand hackathon at MIT Mysore.
+            The Problem Statement section will open by <strong>November 2nd, 2026</strong>. Hackathon flight passes will be issued to confirmed squads once problem statements are assigned.
           </div>
         </div>
       </div>
 
-      {/* Resources grid */}
+      {/* ── PARTICIPANTS DESK: OFFICIAL DOCUMENTS & DOWNLOADS ── */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0284c7' }} />
+            <div>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                Participants Desk — Official Documents &amp; Downloads
+              </h2>
+            </div>
+          </div>
+          <span style={{ fontSize: 11, fontWeight: 800, color: '#0369a1', background: '#e0f2fe', padding: '4px 12px', borderRadius: 20, border: '1px solid #bae6fd' }}>
+            {documents.length} OFFICIAL ARTIFACTS AVAILABLE
+          </span>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 18
+        }}>
+          {documents.map((doc) => {
+            const isLock = doc.isLocked || doc.category === 'Problem Statements';
+            const isPptx = doc.fileType === 'pptx' || doc.category === 'Template';
+
+            return (
+              <div
+                key={doc.id}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: 22,
+                  padding: '22px',
+                  border: `2px solid ${doc.border || '#fed7aa'}`,
+                  boxShadow: '0 4px 18px rgba(0,0,0,0.03)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 14,
+                  transition: 'all 0.2s',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0 12px 28px rgba(0,0,0,0.08)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 18px rgba(0,0,0,0.03)';
+                }}
+              >
+                {/* Header tags */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                  <span style={{
+                    fontSize: 11,
+                    fontWeight: 900,
+                    color: doc.color || '#ea580c',
+                    background: doc.bg || '#fff7ed',
+                    border: `1.5px solid ${doc.border || '#fed7aa'}`,
+                    padding: '3px 10px',
+                    borderRadius: 20,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase'
+                  }}>
+                    {doc.badge || doc.category}
+                  </span>
+
+                  <span style={{
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    color: isLock ? '#b45309' : '#0284c7',
+                    background: isLock ? '#fef3c7' : '#f0f9ff',
+                    border: `1px solid ${isLock ? '#fde68a' : '#bae6fd'}`,
+                    padding: '2px 8px',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4
+                  }}>
+                    {isLock ? <Lock size={11} /> : <FileText size={11} />}
+                    {doc.fileType?.toUpperCase() || 'PDF'}
+                  </span>
+                </div>
+
+                {/* Title & Desc */}
+                <div style={{ flex: 1 }}>
+                  <h3 style={{
+                    fontSize: 15.5,
+                    fontWeight: 900,
+                    color: '#0f172a',
+                    margin: '0 0 6px',
+                    lineHeight: 1.35
+                  }}>
+                    {doc.title}
+                  </h3>
+                  <p style={{
+                    fontSize: 12.5,
+                    color: '#64748b',
+                    margin: 0,
+                    lineHeight: 1.55
+                  }}>
+                    {doc.description}
+                  </p>
+                </div>
+
+                {/* Metadata row */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingTop: 10,
+                  borderTop: '1px dashed #f1e7db',
+                  fontSize: 11.5,
+                  color: '#94a3b8',
+                  fontWeight: 600
+                }}>
+                  <span>Size: <strong style={{ color: '#475569' }}>{doc.fileSize || 'Standard PDF'}</strong></span>
+                  <span>{isLock ? 'Release: Nov 2' : 'Verified CDN'}</span>
+                </div>
+
+                {/* Primary Action Button */}
+                {isLock ? (
+                  <button
+                    onClick={() => setLockedModalDoc(doc)}
+                    style={{
+                      width: '100%',
+                      padding: '11px 14px',
+                      borderRadius: 12,
+                      background: '#fffbeb',
+                      border: '1.5px solid #fde68a',
+                      color: '#b45309',
+                      fontWeight: 800,
+                      fontSize: 12.5,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      transition: 'all 0.15s'
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#fef3c7'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#fffbeb'}
+                  >
+                    <Lock size={14} /> Locked Until Nov 2nd (12:00 PM)
+                  </button>
+                ) : doc.fileUrl === '#rulebook-guide' || (doc.category === 'Rulebook' && doc.fileUrl?.startsWith('#')) ? (
+                  <button
+                    onClick={() => setShowRulebook(true)}
+                    style={{
+                      width: '100%',
+                      padding: '11px 14px',
+                      borderRadius: 12,
+                      background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
+                      border: 'none',
+                      color: '#ffffff',
+                      fontWeight: 800,
+                      fontSize: 12.5,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      boxShadow: '0 4px 12px rgba(234, 88, 12, 0.25)'
+                    }}
+                  >
+                    <Eye size={14} /> View Official Rulebook
+                  </button>
+                ) : isPptx ? (
+                  <a
+                    href={doc.fileUrl || OfficialPPT}
+                    download={doc.fileName || 'SRCAS-HACKATHON-3.0-Pitch-Template.pptx'}
+                    style={{
+                      width: '100%',
+                      padding: '11px 14px',
+                      borderRadius: 12,
+                      background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                      border: 'none',
+                      color: '#ffffff',
+                      fontWeight: 800,
+                      fontSize: 12.5,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    <Download size={14} /> Download Presentation Deck (.pptx)
+                  </a>
+                ) : (
+                  <a
+                    href={doc.fileUrl}
+                    download={doc.fileName}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      width: '100%',
+                      padding: '11px 14px',
+                      borderRadius: 12,
+                      background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                      border: 'none',
+                      color: '#ffffff',
+                      fontWeight: 800,
+                      fontSize: 12.5,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    <Download size={14} /> Download {doc.category} (PDF)
+                  </a>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── MISSION QUICK GUIDES ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ff3b69' }} />
           <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: 0 }}>
-            Official Mission Artifacts &amp; Resources
+            Essential Mission Artifacts &amp; Protocols
           </h2>
         </div>
 
-        <div className="dash-grid-resources" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 18 }}>
-          {RESOURCES.map((r, i) => (
+        <div className="dash-grid-resources" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 18 }}>
+          {QUICK_LINKS.map((r, i) => (
             <a
               key={i}
               href={r.href}
-              download={r.download}
               target={r.target || (r.href?.startsWith('http') ? '_blank' : undefined)}
               rel={r.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
               onClick={(e) => {
-                if (r.label === 'Hackathon Rulebook') {
-                  e.preventDefault();
-                  setShowRulebook(true);
-                } else if (r.label === 'Leader vs. Impostor Protocol') {
+                if (r.label === 'Leader vs. Impostor Protocol') {
                   e.preventDefault();
                   setShowProtocol(true);
                 }
@@ -177,7 +474,7 @@ export default function ResourcesTab({ hasTeam, submissions }) {
         </div>
       </div>
 
-      {/* Timeline */}
+      {/* ── TIMELINE ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ea580c' }} />
@@ -213,7 +510,7 @@ export default function ResourcesTab({ hasTeam, submissions }) {
         </div>
       </div>
 
-      {/* FAQ */}
+      {/* ── FAQ ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0284c7' }} />
@@ -242,21 +539,61 @@ export default function ResourcesTab({ hasTeam, submissions }) {
         </div>
       </div>
 
-      {/* Rulebook Modal */}
+      {/* ── LOCKED PROBLEM STATEMENTS MODAL ── */}
+      <AnimatePresence>
+        {lockedModalDoc && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+            <div style={{ background: '#ffffff', border: '2px solid #fed7aa', borderRadius: 24, width: '100%', maxWidth: 540, overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.18)' }}>
+              <div style={{ padding: '20px 24px', borderBottom: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fffbeb' }}>
+                <div style={{ fontSize: 17, fontWeight: 900, color: '#92400e', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span>🔒</span> Problem Statements Lock Protocol
+                </div>
+                <button onClick={() => setLockedModalDoc(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94a3b8' }}>&times;</button>
+              </div>
+              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 14, fontSize: 14, color: '#475569', lineHeight: 1.6 }}>
+                <div style={{ background: '#fef3c7', border: '1.5px solid #fde68a', borderRadius: 16, padding: '16px' }}>
+                  <div style={{ fontWeight: 800, color: '#92400e', marginBottom: 4 }}>
+                    Official Reveal Date: November 2nd, 2026 (12:00 PM IST)
+                  </div>
+                  <p style={{ margin: 0, fontSize: 13, color: '#b45309' }}>
+                    To ensure 100% fair play and prevent pre-built codebases, problem statements for all domains (Agriculture, Healthcare, and Smart City) are locked until November 2nd.
+                  </p>
+                </div>
+                <p style={{ margin: 0 }}>
+                  Once the problem statements unlock, your team will select and finalize its mission statement right here from the Participant Desk.
+                </p>
+                <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 14, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 20 }}>🎫</span>
+                  <div style={{ fontSize: 12.5, color: '#166534', fontWeight: 700 }}>
+                    Official Hackathon Flight Passes will be issued to confirmed squads along with problem assignment on November 2nd.
+                  </div>
+                </div>
+              </div>
+              <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'flex-end', background: '#fafafa' }}>
+                <button onClick={() => setLockedModalDoc(null)} style={{ padding: '10px 22px', borderRadius: 12, background: '#ea580c', color: '#fff', border: 'none', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
+                  Got It
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── RULEBOOK MODAL ── */}
       <AnimatePresence>
         {showRulebook && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
             <div style={{ background: '#ffffff', border: '2px solid #fed7aa', borderRadius: 24, width: '100%', maxWidth: 640, overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.18)' }}>
               <div style={{ padding: '20px 24px', borderBottom: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fffaf3' }}>
-                <div style={{ fontSize: 18, fontWeight: 900, color: '#0f172a' }}>📜 HAXLR8 3.0 Flight Rulebook</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: '#0f172a' }}>📜 HAXLR8 3.0 Official Rulebook</div>
                 <button onClick={() => setShowRulebook(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94a3b8' }}>&times;</button>
               </div>
               <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '70vh', overflowY: 'auto', fontSize: 14, color: '#475569', lineHeight: 1.6 }}>
                 <h4 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px' }}>1. Team Composition &amp; Eligibility</h4>
-                <p>Squads must consist of 3 to 4 undergraduate students. Inter-college and inter-branch teams are 100% permitted. All participants must carry official college identity cards.</p>
+                <p>Squads must consist of 3 to 4 undergraduate students. Inter-college and inter-branch teams are 100% permitted. All participants must carry official college identity cards to Maharaja Institute of Technology Mysore.</p>
 
                 <h4 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px' }}>2. 24-Hour Offline Hackathon</h4>
-                <p>The finale will be conducted live on campus at Maharaja Institute of Technology Mysore on November 06–07, 2026. High-speed Wi-Fi, power workstations, meals, and midnight snacks are provided.</p>
+                <p>The finale will be conducted live on campus at Maharaja Institute of Technology Mysore on November 06–07, 2026. High-speed Wi-Fi, power workstations, meals, and midnight refreshments are provided.</p>
 
                 <h4 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px' }}>3. Evaluation &amp; Judging (100 Points)</h4>
                 <ul style={{ paddingLeft: 20 }}>
@@ -276,7 +613,7 @@ export default function ResourcesTab({ hasTeam, submissions }) {
         )}
       </AnimatePresence>
 
-      {/* Leader vs Impostor Protocol Modal */}
+      {/* ── LEADER VS IMPOSTOR PROTOCOL MODAL ── */}
       <AnimatePresence>
         {showProtocol && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>

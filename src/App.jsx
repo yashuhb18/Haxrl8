@@ -27,6 +27,7 @@ const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
 const AdminJury = lazy(() => import('./pages/admin/AdminJury'));
 const AdminMoments = lazy(() => import('./pages/admin/AdminMoments'));
 const AdminCoordinators = lazy(() => import('./pages/admin/AdminCoordinators'));
+const AdminDocuments = lazy(() => import('./pages/admin/AdminDocuments'));
 const LegalPage = lazy(() => import('./pages/LegalPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const ShortlistedPage = lazy(() => import('./pages/ShortlistedPage'));
@@ -122,6 +123,7 @@ function App() {
             <Route path="evaluations" element={<AdminEvaluations />} />
             <Route path="evaluations/:id" element={<AdminEvaluateSubmission />} />
             <Route path="jury" element={<AdminJury />} />
+            <Route path="documents" element={<AdminDocuments />} />
             <Route path="moments" element={<AdminMoments />} />
             <Route path="coordinators" element={<AdminCoordinators />} />
             <Route path="submissions" element={<AdminSubmissions />} />
@@ -136,6 +138,7 @@ function App() {
             <Route path="evaluations" element={<AdminEvaluations />} />
             <Route path="evaluations/:id" element={<AdminEvaluateSubmission />} />
             <Route path="jury" element={<AdminJury />} />
+            <Route path="documents" element={<AdminDocuments />} />
             <Route path="moments" element={<AdminMoments />} />
             <Route path="coordinators" element={<AdminCoordinators />} />
             <Route path="submissions" element={<AdminSubmissions />} />

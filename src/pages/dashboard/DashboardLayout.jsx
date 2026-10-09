@@ -15,7 +15,7 @@ const NAV = [
   { id:'team',          icon: Users,           label:'My Team',        shortLabel:'Team'     },
   { id:'payment',       icon: CreditCard,      label:'Payment & Verify', shortLabel:'Payment' },
   { id:'ticket',        icon: Receipt,         label:'Payment Receipt',  shortLabel:'Receipt' },
-  { id:'resources',     icon: BookOpen,        label:'Resources',      shortLabel:'Guides'   },
+  { id:'resources',     icon: BookOpen,        label:'Participant Desk', shortLabel:'Desk'     },
   { id:'announcements', icon: Bell,            label:'Announcements',  shortLabel:'Alerts'   },
 ];
 
