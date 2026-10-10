@@ -7,17 +7,19 @@ import {
 } from 'lucide-react';
 import { 
   fetchCoordinators, saveCoordinators, uploadCoordinatorPhoto, 
-  resetCoordinatorsToDefault, getLocalCoordinators 
+  resetCoordinatorsToDefault, getLocalCoordinators, DEFAULT_LEAD_ARCHITECT 
 } from '../../lib/coordinatorsService';
+import yashwanthImg from '../../assets/humans/yashwanth.png';
 import { isCloudinaryConfigured } from '../../lib/cloudinaryService';
 import CloudinaryConfigModal from '../../components/admin/CloudinaryConfigModal';
 import { playCrewmatePopSound } from '../../components/amongus/AmongUsSound';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
 export default function AdminCoordinators() {
-  const [activeTab, setActiveTab] = useState('faculty'); // 'faculty' | 'student'
+  const [activeTab, setActiveTab] = useState('faculty'); // 'faculty' | 'student' | 'architect'
   const [facultyList, setFacultyList] = useState([]);
   const [studentList, setStudentList] = useState([]);
+  const [leadArchitect, setLeadArchitect] = useState(DEFAULT_LEAD_ARCHITECT);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingCoordId, setUploadingCoordId] = useState(null);
@@ -41,6 +43,7 @@ export default function AdminCoordinators() {
     if (data) {
       setFacultyList(data.faculty || []);
       setStudentList(data.students || []);
+      if (data.leadArchitect) setLeadArchitect(data.leadArchitect);
     }
     setLoading(false);
   };
@@ -52,6 +55,7 @@ export default function AdminCoordinators() {
       if (e.detail) {
         if (Array.isArray(e.detail.faculty)) setFacultyList(e.detail.faculty);
         if (Array.isArray(e.detail.students)) setStudentList(e.detail.students);
+        if (e.detail.leadArchitect) setLeadArchitect(e.detail.leadArchitect);
       }
     };
     window.addEventListener('haxlr8_coordinators_updated', handleUpdate);
@@ -65,9 +69,10 @@ export default function AdminCoordinators() {
       await saveCoordinators({
         faculty: facultyList,
         students: studentList,
+        leadArchitect: leadArchitect,
       });
       playCrewmatePopSound();
-      showToast('All coordinators & photos saved! Live changes applied to website 🚀', 'success');
+      showToast('All coordinators & Lead Architect photo saved! Live changes applied 🚀', 'success');
     } catch (err) {
       console.error('Failed to save coordinators:', err);
       showToast('Error saving coordinators. Check connection.', 'error');
@@ -120,9 +125,12 @@ export default function AdminCoordinators() {
     try {
       const publicUrl = await uploadCoordinatorPhoto(file, targetId);
       
-      // Update in faculty or student list
-      setFacultyList(prev => prev.map(c => c.id === targetId ? { ...c, photo: publicUrl } : c));
-      setStudentList(prev => prev.map(c => c.id === targetId ? { ...c, photo: publicUrl } : c));
+      if (targetId === 'lead_architect') {
+        setLeadArchitect(prev => ({ ...prev, photo: publicUrl }));
+      } else {
+        setFacultyList(prev => prev.map(c => c.id === targetId ? { ...c, photo: publicUrl } : c));
+        setStudentList(prev => prev.map(c => c.id === targetId ? { ...c, photo: publicUrl } : c));
+      }
 
       playCrewmatePopSound();
       showToast('Photo uploaded! Remember to click "Save All Changes" below.', 'success');
@@ -138,9 +146,13 @@ export default function AdminCoordinators() {
 
   // Remove photo from coordinator
   const handleRemovePhoto = (coordId) => {
-    setFacultyList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c));
-    setStudentList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c));
-    showToast('Photo removed. Avatar will be used.', 'info');
+    if (coordId === 'lead_architect') {
+      setLeadArchitect(prev => ({ ...prev, photo: null }));
+    } else {
+      setFacultyList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c));
+      setStudentList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c));
+    }
+    showToast('Photo removed. Default will be used.', 'info');
   };
 
   // Update specific field
@@ -452,9 +464,31 @@ export default function AdminCoordinators() {
             <Sparkles size={16} />
             <span>Student Coordinators ({studentList.length})</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('architect')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '10px 20px',
+              borderRadius: 14,
+              border: 'none',
+              background: activeTab === 'architect' ? '#0ea5e9' : '#f1f5f9',
+              color: activeTab === 'architect' ? '#ffffff' : '#64748b',
+              fontWeight: 900,
+              fontSize: 14,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <ShieldCheck size={16} />
+            <span>Lead Platform Architect</span>
+          </button>
         </div>
 
-        {/* Add button */}
+        {/* Action / Add button */}
         {activeTab === 'faculty' ? (
           <button
             type="button"
@@ -476,7 +510,7 @@ export default function AdminCoordinators() {
             <Plus size={15} />
             <span>Add Faculty Coordinator</span>
           </button>
-        ) : (
+        ) : activeTab === 'student' ? (
           <button
             type="button"
             onClick={handleAddStudent}
@@ -497,6 +531,21 @@ export default function AdminCoordinators() {
             <Plus size={15} />
             <span>Add Student Coordinator</span>
           </button>
+        ) : (
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            background: '#e0f2fe',
+            color: '#0284c7',
+            border: '1.5px solid #bae6fd',
+            padding: '8px 14px',
+            borderRadius: 12,
+            fontWeight: 800,
+            fontSize: 12.5,
+          }}>
+            <span>Separate Photo &amp; Social Profile</span>
+          </div>
         )}
       </div>
 
@@ -523,7 +572,7 @@ export default function AdminCoordinators() {
             />
           ))}
         </div>
-      ) : (
+      ) : activeTab === 'student' ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
           {studentList.map((coord, index) => (
             <CoordinatorCard
@@ -541,6 +590,15 @@ export default function AdminCoordinators() {
             />
           ))}
         </div>
+      ) : (
+        <LeadArchitectEditorCard
+          architect={leadArchitect}
+          onUpdate={(field, val) => setLeadArchitect(prev => ({ ...prev, [field]: val }))}
+          onUploadPhoto={(isCamera) => triggerPhotoUpload('lead_architect', isCamera)}
+          onRemovePhoto={() => handleRemovePhoto('lead_architect')}
+          isUploading={uploadingCoordId === 'lead_architect'}
+          onPreviewPhoto={(src) => setPreviewModalImg(src)}
+        />
       )}
 
       {/* Floating Save Bar on Bottom */}
@@ -995,3 +1053,385 @@ function CoordinatorCard({
     </div>
   );
 }
+
+/**
+ * Lead Platform Architect Dedicated Editor Card
+ */
+function LeadArchitectEditorCard({
+  architect,
+  onUpdate,
+  onUploadPhoto,
+  onRemovePhoto,
+  isUploading,
+  onPreviewPhoto,
+}) {
+  const photoSrc = architect.photo || architect.defaultPhoto || yashwanthImg;
+
+  return (
+    <div style={{
+      background: '#ffffff',
+      border: '2px solid #bae6fd',
+      borderRadius: 28,
+      padding: '32px 28px',
+      boxShadow: '0 10px 30px rgba(2, 132, 199, 0.06)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 24,
+      maxWidth: 820,
+      margin: '0 auto',
+    }}>
+      {/* Notice Banner */}
+      <div style={{
+        background: '#f0f9ff',
+        border: '1.5px solid #bae6fd',
+        borderRadius: 18,
+        padding: '14px 18px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+      }}>
+        <div style={{ fontSize: 24 }}>🚀</div>
+        <div>
+          <div style={{ fontSize: 13.5, fontWeight: 900, color: '#0369a1' }}>
+            Distinct Profile &amp; Photo for Lead Platform Architect
+          </div>
+          <div style={{ fontSize: 12, color: '#0284c7', marginTop: 2, lineHeight: 1.4 }}>
+            This section updates the dedicated Lead Platform Architect card displayed on <strong>/humans</strong>.
+            The photo uploaded here is stored <em>independently</em> from Yashwanth's Student Coordinator photo.
+          </div>
+        </div>
+      </div>
+
+      {/* Photo & Actions Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 24,
+        flexWrap: 'wrap',
+        paddingBottom: 20,
+        borderBottom: '1.5px solid #f1f5f9',
+      }}>
+        {/* Photo Container */}
+        <div style={{
+          width: 140,
+          height: 140,
+          borderRadius: 28,
+          border: '3.5px solid #0284c7',
+          overflow: 'hidden',
+          background: '#f0f9ff',
+          flexShrink: 0,
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 8px 24px rgba(2, 132, 199, 0.15)',
+        }}>
+          {isUploading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <RefreshCw size={24} className="animate-spin" color="#0284c7" />
+              <span style={{ fontSize: 11, fontWeight: 800, color: '#0284c7' }}>Uploading...</span>
+            </div>
+          ) : photoSrc ? (
+            <>
+              <img
+                src={photoSrc}
+                alt={architect.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
+              />
+              <button
+                type="button"
+                onClick={() => onPreviewPhoto(photoSrc)}
+                style={{
+                  position: 'absolute',
+                  bottom: 6,
+                  right: 6,
+                  background: 'rgba(0,0,0,0.65)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: 4,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                title="View Full Photo"
+              >
+                <Eye size={13} />
+              </button>
+            </>
+          ) : (
+            <AmongUsCrewmate color="cyan" hat="crown" size={96} />
+          )}
+        </div>
+
+        {/* Upload Buttons */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, minWidth: 260 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              fontSize: 11,
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              color: '#0284c7',
+              background: '#e0f2fe',
+              padding: '4px 10px',
+              borderRadius: 8,
+              letterSpacing: '0.04em',
+            }}>
+              Lead Architect Photo
+            </span>
+            {architect.photo ? (
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#16a34a' }}>● Custom Photo Active</span>
+            ) : (
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b' }}>● Default Photo</span>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => onUploadPhoto(false)}
+              disabled={isUploading}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: '#0284c7',
+                color: '#fff',
+                border: 'none',
+                padding: '9px 14px',
+                borderRadius: 12,
+                fontSize: 12.5,
+                fontWeight: 800,
+                cursor: isUploading ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <Upload size={14} />
+              <span>Upload Separate Photo</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onUploadPhoto(true)}
+              disabled={isUploading}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: '#f8fafc',
+                color: '#334155',
+                border: '1.5px solid #cbd5e1',
+                padding: '9px 14px',
+                borderRadius: 12,
+                fontSize: 12.5,
+                fontWeight: 800,
+                cursor: isUploading ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <Camera size={14} />
+              <span>Camera</span>
+            </button>
+
+            {architect.photo && (
+              <button
+                type="button"
+                onClick={onRemovePhoto}
+                disabled={isUploading}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: '#fef2f2',
+                  color: '#dc2626',
+                  border: '1.5px solid #fecaca',
+                  padding: '9px 14px',
+                  borderRadius: 12,
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  cursor: isUploading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                <Trash2 size={14} />
+                <span>Reset to Default</span>
+              </button>
+            )}
+          </div>
+          <span style={{ fontSize: 11.5, color: '#94a3b8' }}>
+            Supports JPG, PNG, WebP &amp; iPhone camera uploads (auto-converts via Cloudinary CDN).
+          </span>
+        </div>
+      </div>
+
+      {/* Input Fields */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Row 1: Name and Phone */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#475569', marginBottom: 4 }}>
+              Full Name
+            </label>
+            <input
+              type="text"
+              value={architect.name || ''}
+              onChange={e => onUpdate('name', e.target.value)}
+              placeholder="Yashwanth H B"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 12,
+                border: '1.5px solid #e2e8f0',
+                fontSize: 13,
+                fontWeight: 700,
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#475569', marginBottom: 4 }}>
+              Phone / WhatsApp
+            </label>
+            <input
+              type="text"
+              value={architect.phone || ''}
+              onChange={e => onUpdate('phone', e.target.value)}
+              placeholder="+91 80506 14849"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 12,
+                border: '1.5px solid #e2e8f0',
+                fontSize: 13,
+                fontWeight: 700,
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Row 2: Designation and Org */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#475569', marginBottom: 4 }}>
+              Designation / Role Title
+            </label>
+            <input
+              type="text"
+              value={architect.designation || ''}
+              onChange={e => onUpdate('designation', e.target.value)}
+              placeholder="Systems Engineer & Lead Platform Architect"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 12,
+                border: '1.5px solid #e2e8f0',
+                fontSize: 13,
+                fontWeight: 600,
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#475569', marginBottom: 4 }}>
+              Department / Institution
+            </label>
+            <input
+              type="text"
+              value={architect.org || ''}
+              onChange={e => onUpdate('org', e.target.value)}
+              placeholder="Dept. of ECE · Maharaja Institute of Technology Mysore"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 12,
+                border: '1.5px solid #e2e8f0',
+                fontSize: 13,
+                fontWeight: 600,
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Row 3: Social Profiles (GitHub & LinkedIn) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#475569', marginBottom: 4 }}>
+              GitHub Profile Link
+            </label>
+            <input
+              type="url"
+              value={architect.github || ''}
+              onChange={e => onUpdate('github', e.target.value)}
+              placeholder="https://github.com/yashuhb18"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 12,
+                border: '1.5px solid #e2e8f0',
+                fontSize: 13,
+                fontWeight: 600,
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#475569', marginBottom: 4 }}>
+              LinkedIn Profile Link
+            </label>
+            <input
+              type="url"
+              value={architect.linkedin || ''}
+              onChange={e => onUpdate('linkedin', e.target.value)}
+              placeholder="https://www.linkedin.com/in/yashwanthhb/"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 12,
+                border: '1.5px solid #e2e8f0',
+                fontSize: 13,
+                fontWeight: 600,
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Row 4: Bio / Platform Architecture Summary */}
+        <div>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#475569', marginBottom: 4 }}>
+            Platform Architecture &amp; Contribution Bio
+          </label>
+          <textarea
+            rows={4}
+            value={architect.bio || ''}
+            onChange={e => onUpdate('bio', e.target.value)}
+            placeholder="Architected and engineered the end-to-end HAXLR8 3.0 digital platform..."
+            style={{
+              width: '100%',
+              padding: '12px 14px',
+              borderRadius: 12,
+              border: '1.5px solid #e2e8f0',
+              fontSize: 13,
+              fontWeight: 500,
+              lineHeight: 1.5,
+              outline: 'none',
+              boxSizing: 'border-box',
+              fontFamily: 'inherit',
+              resize: 'vertical',
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+

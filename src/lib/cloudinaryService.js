@@ -9,12 +9,60 @@ const DEFAULT_API_KEY = '218385963343261';
 const DEFAULT_API_SECRET = 'OBN1ZlxGRnjyADierOqARDf_yQ4';
 
 /**
- * Native Web Crypto SHA-1 digest for browser and node
+ * Universal SHA-1 hex digest that works in both secure and non-secure contexts (HTTP, webviews, older mobile)
  */
-async function sha1Hex(str) {
-  const enc = new TextEncoder().encode(str);
-  const buf = await crypto.subtle.digest('SHA-1', enc);
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+function jsSha1(str) {
+  function utf8Encode(s) {
+    return unescape(encodeURIComponent(s));
+  }
+  const raw = utf8Encode(str);
+  const words = [];
+  for (let i = 0; i < raw.length * 8; i += 8) {
+    words[i >> 5] |= (raw.charCodeAt(i / 8) & 0xff) << (24 - (i % 32));
+  }
+  const len = raw.length * 8;
+  words[len >> 5] |= 0x80 << (24 - (len % 32));
+  words[(((len + 64) >> 9) << 4) + 15] = len;
+
+  const w = new Array(80);
+  let a = 1732584193, b = -271733879, c = -1732584194, d = 271733878, e = -1009589776;
+
+  for (let i = 0; i < words.length; i += 16) {
+    const olda = a, oldb = b, oldc = c, oldd = d, olde = e;
+    for (let j = 0; j < 80; j++) {
+      if (j < 16) w[j] = words[i + j] | 0;
+      else {
+        const t = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16];
+        w[j] = (t << 1) | (t >>> 31);
+      }
+      let f, k;
+      if (j < 20) { f = (b & c) | ((~b) & d); k = 1518500249; }
+      else if (j < 40) { f = b ^ c ^ d; k = 1859775393; }
+      else if (j < 60) { f = (b & c) | (b & d) | (c & d); k = -1894007588; }
+      else { f = b ^ c ^ d; k = -899497514; }
+
+      const t = (((a << 5) | (a >>> 27)) + f + e + k + w[j]) | 0;
+      e = d; d = c; c = ((b << 30) | (b >>> 2)) | 0; b = a; a = t;
+    }
+    a = (a + olda) | 0;
+    b = (b + oldb) | 0;
+    c = (c + oldc) | 0;
+    d = (d + oldd) | 0;
+    e = (e + olde) | 0;
+  }
+
+  return [a, b, c, d, e].map(v => (v >>> 0).toString(16).padStart(8, '0')).join('');
+}
+
+export async function sha1Hex(str) {
+  try {
+    if (typeof crypto !== 'undefined' && crypto.subtle && typeof crypto.subtle.digest === 'function') {
+      const enc = new TextEncoder().encode(str);
+      const buf = await crypto.subtle.digest('SHA-1', enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (_) {}
+  return jsSha1(str);
 }
 
 /**
@@ -198,13 +246,19 @@ export async function uploadToCloudinary(fileOrData, options = {}) {
     throw new Error(errMsg);
   }
 
+  // Ensure HEIC/HEIF images are delivered as universal JPG/WebP so all browsers render them
+  let secureUrl = data.secure_url || data.url || '';
+  if (data.format === 'heic' || data.format === 'heif' || secureUrl.match(/\.(heic|heif)$/i)) {
+    secureUrl = secureUrl.replace(/\.(heic|heif)$/i, '.jpg');
+  }
+
   return {
-    url: data.secure_url || data.url,
-    secureUrl: data.secure_url || data.url,
+    url: secureUrl,
+    secureUrl: secureUrl,
     publicId: data.public_id,
     width: data.width,
     height: data.height,
-    format: data.format,
+    format: data.format === 'heic' || data.format === 'heif' ? 'jpg' : data.format,
     bytes: data.bytes
   };
 }

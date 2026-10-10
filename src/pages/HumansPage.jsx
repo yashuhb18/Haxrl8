@@ -42,6 +42,16 @@ export default function HumansPage() {
   const staffCoordinators = coordinators.faculty || [];
   const studentOrganizers = coordinators.students || [];
   const yashwanthData = studentOrganizers.find(s => s.name?.toLowerCase().includes('yashwanth')) || { photo: yashwanthImg, phone: '+91 80506 14849' };
+  const leadArchitect = coordinators.leadArchitect || {
+    name: 'Yashwanth H B',
+    role: 'Lead Platform Architect',
+    designation: 'Systems Engineer & Lead Platform Architect',
+    photo: null,
+    defaultPhoto: yashwanthImg,
+    phone: '+91 80506 14849',
+    github: 'https://github.com/yashuhb18',
+    linkedin: 'https://www.linkedin.com/in/yashwanthhb/'
+  };
 
   return (
     <div
@@ -411,7 +421,7 @@ export default function HumansPage() {
               }}
             >
               <img
-                src={yashwanthData.photo || yashwanthData.defaultPhoto || yashwanthImg}
+                src={leadArchitect.photo || leadArchitect.defaultPhoto || yashwanthImg}
                 alt="Yashwanth H B - Lead Platform Architect"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
               />
@@ -447,14 +457,15 @@ export default function HumansPage() {
                 </span>
               </div>
               <h3 style={{ fontSize: '24px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px 0' }}>
-                {yashwanthData.name || 'Yashwanth H B'}
+                {leadArchitect.name || 'Yashwanth H B'}
               </h3>
               <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 16px 0', maxWidth: 640, lineHeight: 1.6, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
-                Architected and engineered the end-to-end HAXLR8 3.0 digital platform, real-time registration sync, Supabase authentication & database infrastructure, automated registration verification systems, and digital jury evaluation infrastructure.
+                {leadArchitect.bio || 'Architected and engineered the end-to-end HAXLR8 3.0 digital platform, real-time registration sync, Supabase authentication & database infrastructure, automated registration verification systems, and digital jury evaluation infrastructure.'}
               </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                {/* Phone */}
                 <a
-                  href={`tel:${(yashwanthData.phone || '8050614849').replace(/\s+/g, '')}`}
+                  href={`tel:${(leadArchitect.phone || '8050614849').replace(/\s+/g, '')}`}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -470,8 +481,66 @@ export default function HumansPage() {
                   }}
                 >
                   <Phone size={14} />
-                  <span>{yashwanthData.phone || '+91 80506 14849'}</span>
+                  <span>{leadArchitect.phone || '+91 80506 14849'}</span>
                 </a>
+
+                {/* GitHub Link */}
+                <a
+                  href={leadArchitect.github || 'https://github.com/yashuhb18'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: '13px',
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    background: '#f8fafc',
+                    border: '1px solid #cbd5e1',
+                    padding: '6px 14px',
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#0f172a'; e.currentTarget.style.color = '#ffffff'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.color = '#0f172a'; }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                  <span>GitHub</span>
+                </a>
+
+                {/* LinkedIn Link */}
+                <a
+                  href={leadArchitect.linkedin || 'https://www.linkedin.com/in/yashwanthhb/'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: '13px',
+                    fontWeight: 800,
+                    color: '#0284c7',
+                    background: '#e0f2fe',
+                    border: '1px solid #bae6fd',
+                    padding: '6px 14px',
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#0284c7'; e.currentTarget.style.color = '#ffffff'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#e0f2fe'; e.currentTarget.style.color = '#0284c7'; }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                    <rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" />
+                  </svg>
+                  <span>LinkedIn</span>
+                </a>
+
                 <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>
                   Dept. of ECE · Maharaja Institute of Technology Mysore
                 </span>

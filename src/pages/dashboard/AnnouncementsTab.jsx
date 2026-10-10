@@ -1,6 +1,8 @@
 import React from 'react';
+import { filterRealAnnouncements } from '../../lib/announcementsService';
 
 export default function AnnouncementsTab({ announcements = [] }) {
+  const displayAnnouncements = filterRealAnnouncements(announcements);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 860, margin: '0 auto', width: '100%', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div style={{ background: '#ffffff', borderRadius: 24, padding: '36px', boxShadow: '0 4px 24px rgba(0,0,0,0.03)', border: '2px solid #fed7aa' }}>
@@ -15,13 +17,13 @@ export default function AnnouncementsTab({ announcements = [] }) {
         </p>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {announcements.length === 0 ? (
+          {displayAnnouncements.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#64748b', padding: '48px 0', fontSize: 14, border: '1.5px dashed #fed7aa', borderRadius: 16, background: '#fffaf3' }}>
               <div style={{ fontSize: 36, marginBottom: 10 }}>🛰️</div>
               <div style={{ fontWeight: 800, color: '#0f172a' }}>No starship broadcasts in this frequency yet.</div>
               <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>Check back regularly as your squad approaches launch day!</p>
             </div>
-          ) : announcements.map(a => (
+          ) : displayAnnouncements.map(a => (
             <div key={a.id} style={{ padding: '22px', borderRadius: 18, border: '1.5px solid #fed7aa', background: '#f8fafc' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                 <div>

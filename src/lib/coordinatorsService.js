@@ -80,39 +80,35 @@ export const DEFAULT_STUDENT_COORDINATORS = [
   },
 ];
 
+export const DEFAULT_LEAD_ARCHITECT = {
+  id: 'lead_architect',
+  name: 'Yashwanth H B',
+  role: 'Lead Platform Architect',
+  designation: 'Systems Engineer & Lead Platform Architect',
+  bio: 'Architected and engineered the end-to-end HAXLR8 3.0 digital platform, real-time registration sync, Supabase authentication & database infrastructure, automated registration verification systems, and digital jury evaluation infrastructure.',
+  station: 'Platform Architecture & Core Systems',
+  org: 'Dept. of ECE · Maharaja Institute of Technology Mysore',
+  phone: '+91 80506 14849',
+  github: 'https://github.com/yashuhb18',
+  linkedin: 'https://www.linkedin.com/in/yashwanthhb/',
+  badge: 'LEAD PLATFORM ARCHITECT',
+  color: 'cyan',
+  hat: 'crown',
+  crewColor: '#0284c7',
+  bg: '#e0f2fe',
+  border: '#38bdf8',
+  defaultPhoto: yashwanthImg,
+  photo: null, // Separate photo specifically for Lead Architect section
+};
+
 const STORAGE_KEY = 'haxlr8_dynamic_coordinators';
 const ANNOUNCEMENT_TAG = 'COORDINATORS_CONFIG';
-
-/**
- * Returns merged coordinators synchronously from localStorage or defaults
- */
-export function getLocalCoordinators() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && (Array.isArray(parsed.faculty) || Array.isArray(parsed.students))) {
-        return {
-          faculty: (parsed.faculty || []).map(mergeFacultyDefaults),
-          students: (parsed.students || []).map(mergeStudentDefaults),
-        };
-      }
-    }
-  } catch (e) {
-    console.warn('Error reading local coordinators:', e);
-  }
-
-  return {
-    faculty: DEFAULT_FACULTY_COORDINATORS.map(c => ({ ...c })),
-    students: DEFAULT_STUDENT_COORDINATORS.map(c => ({ ...c })),
-  };
-}
 
 function resolvePhotoField(photo, defaultPhoto) {
   if (photo === null) return null;
   if (typeof photo === 'string') {
     if (photo.startsWith('http://') || photo.startsWith('https://') || photo.startsWith('data:')) {
-      return photo;
+      return photo.replace(/\.(heic|heif)$/i, '.jpg');
     }
     // Stale hashed build assets fallback to current active imported image
     if (photo.startsWith('/assets/')) {
@@ -140,6 +136,46 @@ function mergeStudentDefaults(item) {
   };
 }
 
+function mergeLeadArchitectDefaults(item) {
+  const def = DEFAULT_LEAD_ARCHITECT;
+  if (!item) return { ...def };
+  return {
+    ...def,
+    ...item,
+    github: item.github || def.github,
+    linkedin: item.linkedin || def.linkedin,
+    phone: item.phone || def.phone,
+    photo: resolvePhotoField(item.photo, def.defaultPhoto),
+  };
+}
+
+/**
+ * Returns merged coordinators synchronously from localStorage or defaults
+ */
+export function getLocalCoordinators() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && (Array.isArray(parsed.faculty) || Array.isArray(parsed.students))) {
+        return {
+          faculty: (parsed.faculty || []).map(mergeFacultyDefaults),
+          students: (parsed.students || []).map(mergeStudentDefaults),
+          leadArchitect: mergeLeadArchitectDefaults(parsed.leadArchitect),
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('Error reading local coordinators:', e);
+  }
+
+  return {
+    faculty: DEFAULT_FACULTY_COORDINATORS.map(c => ({ ...c })),
+    students: DEFAULT_STUDENT_COORDINATORS.map(c => ({ ...c })),
+    leadArchitect: { ...DEFAULT_LEAD_ARCHITECT },
+  };
+}
+
 /**
  * Fetch coordinators configuration from Supabase and sync with localStorage
  */
@@ -164,6 +200,7 @@ export async function fetchCoordinators() {
         const merged = {
           faculty: (config.faculty || []).map(mergeFacultyDefaults),
           students: (config.students || []).map(mergeStudentDefaults),
+          leadArchitect: mergeLeadArchitectDefaults(config.leadArchitect),
         };
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
@@ -179,10 +216,14 @@ export async function fetchCoordinators() {
 }
 
 /**
- * Save faculty and student coordinators to Supabase and localStorage
+ * Save faculty, student coordinators, and lead architect to Supabase and localStorage
  */
-export async function saveCoordinators({ faculty, students }) {
-  const payload = { faculty, students };
+export async function saveCoordinators({ faculty, students, leadArchitect }) {
+  const payload = { 
+    faculty: faculty || [], 
+    students: students || [],
+    leadArchitect: leadArchitect || DEFAULT_LEAD_ARCHITECT 
+  };
 
   // Save locally first
   try {
@@ -234,14 +275,14 @@ export async function saveCoordinators({ faculty, students }) {
       }
     }
   } catch (err) {
-    console.warn('Supabase cloud sync failed, but localStorage is saved:', err);
+    console.warn('Supabase cloud sync notice, localStorage is saved:', err);
   }
 
   return payload;
 }
 
 /**
- * Upload a coordinator's photo to Supabase Storage and get public URL
+ * Upload a coordinator's photo (or Lead Architect's photo) to Cloudinary / Supabase Storage
  */
 export async function uploadCoordinatorPhoto(file, coordinatorId) {
   if (!file) throw new Error('No file provided');
@@ -251,14 +292,23 @@ export async function uploadCoordinatorPhoto(file, coordinatorId) {
     try {
       const cloudRes = await uploadToCloudinary(file, { folder: 'haxlr8_coordinators' });
       if (cloudRes?.secureUrl) {
-        return cloudRes.secureUrl;
+        return cloudRes.secureUrl.replace(/\.(heic|heif)$/i, '.jpg');
       }
     } catch (cErr) {
       console.warn('Cloudinary coordinator photo upload notice, falling back to Supabase:', cErr);
     }
   }
 
-  // 2. Supabase Storage fallback
+  // 2. Client-side conversion to JPEG if it is an iPhone HEIC before storage upload
+  let uploadFile = file;
+  const isHeic = file.name.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic';
+  if (isHeic) {
+    try {
+      return await fileToBase64(file);
+    } catch (_) {}
+  }
+
+  // 3. Supabase Storage fallback
   const fileExt = file.name.split('.').pop() || 'jpg';
   const cleanId = String(coordinatorId || 'coord').replace(/[^a-zA-Z0-9_-]/g, '_');
   const fileName = `coord_${cleanId}_${Date.now()}.${fileExt}`;
@@ -267,7 +317,7 @@ export async function uploadCoordinatorPhoto(file, coordinatorId) {
   try {
     const { data, error } = await supabase.storage
       .from('id-cards')
-      .upload(filePath, file, {
+      .upload(filePath, uploadFile, {
         cacheControl: '3600',
         upsert: true,
       });
@@ -307,6 +357,7 @@ export async function resetCoordinatorsToDefault() {
   const def = {
     faculty: DEFAULT_FACULTY_COORDINATORS.map(c => ({ ...c })),
     students: DEFAULT_STUDENT_COORDINATORS.map(c => ({ ...c })),
+    leadArchitect: { ...DEFAULT_LEAD_ARCHITECT },
   };
   return await saveCoordinators(def);
 }

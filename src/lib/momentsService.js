@@ -77,11 +77,12 @@ export async function fileToBase64(file, maxWidth = 1200) {
  */
 export async function uploadMomentImage(file) {
   if (!file) throw new Error('No image file provided');
-  if (!file.type.startsWith('image/')) {
-    throw new Error('Please select an image file (JPG, PNG, WebP)');
+  const isImg = (file.type && file.type.startsWith('image/')) || /\.(jpg|jpeg|png|webp|gif|heic|heif|bmp)$/i.test(file.name);
+  if (!isImg) {
+    throw new Error('Please select an image file (JPG, PNG, WebP, HEIC)');
   }
 
-  // 1. Try Cloudinary first if configured (prevents Supabase from getting overwhelmed)
+  // 1. Try Cloudinary first (automatically converts HEIC to universal JPEG)
   if (isCloudinaryConfigured()) {
     try {
       const cloudRes = await uploadToCloudinary(file, { folder: 'haxlr8_moments' });
@@ -97,7 +98,21 @@ export async function uploadMomentImage(file) {
     }
   }
 
-  // 2. Supabase Storage fallback
+  // 2. Client-side conversion to JPEG if it is an iPhone HEIC before storage upload
+  let uploadFile = file;
+  const isHeic = file.name.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic';
+  if (isHeic) {
+    try {
+      const base64Jpeg = await fileToBase64(file);
+      return {
+        url: base64Jpeg,
+        path: `moments/${Date.now()}_converted.jpg`,
+        storageType: 'base64_jpeg'
+      };
+    } catch (_) {}
+  }
+
+  // 3. Supabase Storage fallback
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(2, 8);
   const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_').toLowerCase();
@@ -106,7 +121,7 @@ export async function uploadMomentImage(file) {
   try {
     const { data, error } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(path, file, { cacheControl: '3600', upsert: false });
+      .upload(path, uploadFile, { cacheControl: '3600', upsert: false });
 
     if (!error && data) {
       const { data: urlData } = supabase.storage
@@ -125,7 +140,7 @@ export async function uploadMomentImage(file) {
     console.warn('Storage upload error, falling back to compressed data URL:', storageErr);
   }
 
-  // 3. Fallback to compressed base64 if storage calls fail
+  // 4. Fallback to compressed base64 if storage calls fail
   const base64Url = await fileToBase64(file);
   return {
     url: base64Url,
@@ -180,7 +195,7 @@ export async function fetchMoments() {
             subtitle: detail.subtitle || item.message || 'Maharaja Institute of Technology Mysore',
             category: detail.category || 'ceremony',
             tag: detail.tag || 'MOMENT',
-            src: detail.src || '',
+            src: (detail.src || '').replace(/\.(heic|heif)$/i, '.jpg'),
             storagePath: detail.storagePath || '',
             description: item.message || detail.description || '',
             rotate: detail.rotate || 0,

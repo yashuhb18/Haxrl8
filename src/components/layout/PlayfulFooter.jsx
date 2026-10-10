@@ -211,9 +211,9 @@ export default function PlayfulFooter() {
                 maxWidth: '380px',
               }}
             >
-              {/* MIT Mysore */}
+              {/* MIT Mysore & Dept of ECE */}
               <a
-                href="https://mitmysore.in"
+                href="https://mitmysore.in/electronics-communication-engineering/"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -235,7 +235,7 @@ export default function PlayfulFooter() {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
                   e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
                 }}
-                title="Maharaja Institute of Technology Mysore"
+                title="Maharaja Institute of Technology Mysore - ECE Department"
               >
                 <img
                   src={mitMysoreLogo}
@@ -254,13 +254,16 @@ export default function PlayfulFooter() {
                     Maharaja Institute of Technology Mysore
                   </span>
                   <span style={{ fontSize: '10.5px', color: '#94a3b8', fontWeight: 600 }}>
-                    Autonomous Institution · Affiliated to VTU
+                    Dept. of Electronics &amp; Communication Engineering
                   </span>
                 </div>
               </a>
 
-              {/* Department of ECE */}
-              <div
+              {/* Department of ECE & EMITERS */}
+              <a
+                href="https://mitmysore.in/electronics-communication-engineering/"
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -269,7 +272,18 @@ export default function PlayfulFooter() {
                   border: '1px solid rgba(255, 255, 255, 0.12)',
                   borderRadius: '12px',
                   padding: '8px 14px',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
                 }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                }}
+                title="Department of ECE Website"
               >
                 <img
                   src={emitersSeal}
@@ -285,49 +299,47 @@ export default function PlayfulFooter() {
                 />
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#ffffff', lineHeight: 1.25 }}>
-                    Department of Electronics & Communication Engineering
+                    Visit Department Website ↗
                   </span>
                   <span style={{ fontSize: '10.5px', color: '#38bdf8', fontWeight: 700, letterSpacing: '0.02em' }}>
-                    EMITERS Technical Association
+                    mitmysore.in/electronics-communication-engineering
                   </span>
                 </div>
-              </div>
+              </a>
             </div>
 
-            {/* Social Icons */}
+            {/* Official Social Links (Instagram only) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <a
-                href="https://www.instagram.com/mitmysore_official/"
+                href="https://www.instagram.com/haxlr8_3.0/"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#cbd5e1', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#ff3b69')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#cbd5e1')}
-                aria-label="Instagram"
+                style={{ 
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(255, 59, 105, 0.12)',
+                  border: '1px solid rgba(255, 59, 105, 0.3)',
+                  padding: '8px 16px',
+                  borderRadius: '12px',
+                  color: '#ffffff',
+                  fontSize: '12.5px',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 59, 105, 0.25)';
+                  e.currentTarget.style.borderColor = '#ff3b69';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 59, 105, 0.12)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 59, 105, 0.3)';
+                }}
+                aria-label="Official HAXLR8 3.0 Instagram"
               >
-                <InstagramIcon size={20} />
-              </a>
-              <a
-                href="https://www.linkedin.com/school/maharaja-institute-of-technology-mysore/"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#cbd5e1', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#ff3b69')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#cbd5e1')}
-                aria-label="LinkedIn"
-              >
-                <LinkedinIcon size={20} />
-              </a>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#cbd5e1', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#ff3b69')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#cbd5e1')}
-                aria-label="GitHub"
-              >
-                <GithubIcon size={20} />
+                <InstagramIcon size={18} />
+                <span>@haxlr8_3.0</span>
               </a>
             </div>
           </div>

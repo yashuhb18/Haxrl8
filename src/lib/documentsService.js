@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { getCloudinaryConfig } from './cloudinaryService';
+import { getCloudinaryConfig, sha1Hex } from './cloudinaryService';
 import OfficialPPT from '../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 
 const DOCUMENTS_STORAGE_KEY = 'haxlr8_participant_documents';
@@ -12,7 +12,7 @@ export const DEFAULT_DOCUMENTS = [
     category: 'Rulebook',
     badge: 'OFFICIAL GUIDE',
     description: 'Comprehensive guidelines, 24-hour offline sprint regulations, code of conduct, and reporting instructions at MIT Mysore.',
-    fileUrl: '#rulebook-guide',
+    fileUrl: '/HAXLR8-3.0-Official-Rulebook.pdf',
     fileName: 'HAXLR8-3.0-Official-Rulebook.pdf',
     fileSize: '1.8 MB',
     fileType: 'pdf',
@@ -76,14 +76,6 @@ export const DEFAULT_DOCUMENTS = [
   }
 ];
 
-/**
- * Native Web Crypto SHA-1 digest
- */
-async function sha1Hex(str) {
-  const enc = new TextEncoder().encode(str);
-  const buf = await crypto.subtle.digest('SHA-1', enc);
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
 /**
  * Get locally cached documents

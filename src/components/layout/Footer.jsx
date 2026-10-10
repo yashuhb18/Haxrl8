@@ -135,40 +135,38 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* Right: Social Media Icons */}
+          {/* Right: Official Instagram Link */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <a
-              href="https://www.instagram.com/mitmysore_official/"
+              href="https://www.instagram.com/haxlr8_3.0/"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: '#cbd5e1', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#cbd5e1')}
+              style={{ 
+                color: '#cbd5e1', 
+                transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                textDecoration: 'none',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                padding: '6px 14px',
+                borderRadius: '10px',
+                fontSize: '12px',
+                fontWeight: 700
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#ef4444';
+                e.currentTarget.style.borderColor = '#ef4444';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#cbd5e1';
+                e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+              }}
               aria-label="Instagram"
             >
-              <InstagramIcon size={20} />
-            </a>
-            <a
-              href="https://www.linkedin.com/school/maharaja-institute-of-technology-mysore/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: '#cbd5e1', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#cbd5e1')}
-              aria-label="LinkedIn"
-            >
-              <LinkedinIcon size={20} />
-            </a>
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: '#cbd5e1', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#cbd5e1')}
-              aria-label="GitHub"
-            >
-              <GithubIcon size={20} />
+              <InstagramIcon size={18} />
+              <span>@haxlr8_3.0</span>
             </a>
           </div>
         </div>

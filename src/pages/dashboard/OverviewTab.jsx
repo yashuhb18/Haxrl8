@@ -4,6 +4,7 @@ import EventTimeline from '../../components/EventTimeline';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
+import { filterRealAnnouncements } from '../../lib/announcementsService';
 
 const TIMELINE_STEPS = [
   { title: 'Registration', date: 'Oct 09' },
@@ -83,6 +84,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
   }, [showRulebook]);
 
   const memberCount = teamMembers?.length || 1;
+  const realAnnouncements = filterRealAnnouncements(announcements);
   let isPaid = false;
   try {
     if (user?.id) {
@@ -179,7 +181,10 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
             background: 'linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%)',
             transition: 'transform 0.2s, box-shadow 0.2s',
           })}
-          onClick={() => setShowRulebook(true)}
+          onClick={() => {
+            window.open('/HAXLR8-3.0-Official-Rulebook.pdf', '_blank');
+            setShowRulebook(true);
+          }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 25px rgba(2, 132, 199, 0.15)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.04)'; }}
         >
@@ -233,11 +238,11 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-            {announcements.length === 0 ? (
+            {realAnnouncements.length === 0 ? (
               <div style={{ textAlign: 'center', color: '#64748b', padding: '24px 0', fontSize: 13.5, background: '#f8fafc', borderRadius: 14, border: '1px dashed #cbd5e1' }}>
                 No active broadcasts. All telemetry nominal.
               </div>
-            ) : announcements.slice(0, 3).map(a => (
+            ) : realAnnouncements.slice(0, 3).map(a => (
               <div key={a.id} style={{ display: 'flex', gap: 12, background: '#f8fafc', padding: '14px', borderRadius: 14, border: '1px solid #e2e8f0' }}>
                 <span style={{ fontSize: 18, color: '#0284c7', flexShrink: 0 }}>📢</span>
                 <div>
@@ -423,8 +428,29 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
                 <li>Live Pitch &amp; Working Demonstration (25%)</li>
               </ul>
             </div>
-            <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'flex-end', background: '#fafafa' }}>
-              <button onClick={() => setShowRulebook(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#0284c7', color: '#fff', border: 'none', fontWeight: 800, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)' }}>
+            <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafafa', gap: 12, flexWrap: 'wrap' }}>
+              <a
+                href="/HAXLR8-3.0-Official-Rulebook.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                download="HAXLR8-3.0-Official-Rulebook.pdf"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '10px 18px',
+                  borderRadius: 12,
+                  background: '#0284c7',
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  fontSize: 13,
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)',
+                }}
+              >
+                <span>📥 Download Rulebook PDF (147 KB)</span>
+              </a>
+              <button onClick={() => setShowRulebook(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
                 Close Protocol Window
               </button>
             </div>

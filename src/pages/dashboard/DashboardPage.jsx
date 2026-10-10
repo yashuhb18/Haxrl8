@@ -10,6 +10,7 @@ import ResourcesTab   from './ResourcesTab';
 import AnnouncementsTab from './AnnouncementsTab';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
+import { filterRealAnnouncements } from '../../lib/announcementsService';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -164,7 +165,7 @@ export default function DashboardPage() {
       // Fetch announcements with safe default fallback
       try {
         const { data: annData } = await withTimeout(supabase.from('announcements').select('*').order('created_at', { ascending: false }), 1500);
-        const filteredAnn = annData ? annData.filter(a => a.tag !== 'MOMENT' && a.tag !== 'COORDINATORS_CONFIG') : [];
+        const filteredAnn = annData ? filterRealAnnouncements(annData) : [];
         if (filteredAnn && filteredAnn.length > 0) {
           setAnnouncements(filteredAnn);
         } else {
