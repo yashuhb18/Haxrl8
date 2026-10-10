@@ -26,6 +26,8 @@ export default function AdminMoments({ standalone = false }) {
   const [copiedLink, setCopiedLink] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isProcessingHeic, setIsProcessingHeic] = useState(false);
+  const [heicFileName, setHeicFileName] = useState('');
   const [batchFiles, setBatchFiles] = useState([]);
   const [batchUploading, setBatchUploading] = useState(false);
   const [batchProgress, setBatchProgress] = useState(0);
@@ -71,8 +73,8 @@ export default function AdminMoments({ standalone = false }) {
     setTimeout(() => setNotification(null), 4000);
   };
 
-  // Handle single file pick
-  const handleFileSelect = (e) => {
+  // Handle single file pick with seamless iPhone HEIC support
+  const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -83,10 +85,6 @@ export default function AdminMoments({ standalone = false }) {
       return;
     }
 
-    setSelectedFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewUrl(objectUrl);
-
     // Auto-generate title if blank
     if (!formData.title) {
       const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
@@ -95,6 +93,51 @@ export default function AdminMoments({ standalone = false }) {
         title: cleanName.charAt(0).toUpperCase() + cleanName.slice(1)
       }));
     }
+
+    const isHeic = file.name?.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic';
+
+    if (isHeic) {
+      setHeicFileName(file.name);
+      setIsProcessingHeic(true);
+      setSelectedFile(file);
+
+      try {
+        const heic2anyModule = await import('heic2any');
+        const heic2any = heic2anyModule.default || heic2anyModule;
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 0.90,
+        });
+        const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        const baseName = (file.name || 'photo').replace(/\.[^/.]+$/, '');
+        const convertedJpegFile = new File([blob], `${baseName}.jpg`, { type: 'image/jpeg' });
+
+        setSelectedFile(convertedJpegFile);
+        const objUrl = URL.createObjectURL(blob);
+        setPreviewUrl(objUrl);
+        setIsProcessingHeic(false);
+        showToast('iPhone photo converted to crisp Web JPEG! Ready to upload.', 'success');
+        return;
+      } catch (err) {
+        console.warn('heic2any client conversion notice:', err);
+        setIsProcessingHeic(false);
+        const rawUrl = URL.createObjectURL(file);
+        const testImg = new Image();
+        testImg.onload = () => {
+          setPreviewUrl(rawUrl);
+        };
+        testImg.onerror = () => {
+          setPreviewUrl('HEIC_PENDING_CLOUD_TRANSCODE');
+        };
+        testImg.src = rawUrl;
+        return;
+      }
+    }
+
+    setSelectedFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
   };
 
   // Handle single upload submit
@@ -389,7 +432,94 @@ export default function AdminMoments({ standalone = false }) {
                   onChange={handleFileSelect}
                 />
 
-                {previewUrl ? (
+                {isProcessingHeic ? (
+                  <div style={{
+                    width: '100%',
+                    height: 260,
+                    borderRadius: 18,
+                    border: '2px solid #0284c7',
+                    background: '#f0f9ff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 20,
+                    textAlign: 'center',
+                  }}>
+                    <RefreshCw size={36} color="#0284c7" className="animate-spin" style={{ marginBottom: 14 }} />
+                    <div style={{ fontSize: 14, fontWeight: 900, color: '#0369a1', marginBottom: 4 }}>
+                      Optimizing iPhone Photo ({heicFileName || 'HEIC'})...
+                    </div>
+                    <div style={{ fontSize: 12, color: '#0284c7', fontWeight: 600 }}>
+                      Transcoding Apple HEIC to high-resolution Web JPEG
+                    </div>
+                  </div>
+                ) : previewUrl === 'HEIC_PENDING_CLOUD_TRANSCODE' ? (
+                  <div style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: 260,
+                    borderRadius: 18,
+                    border: '2px solid #0284c7',
+                    background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 20,
+                    textAlign: 'center',
+                  }}>
+                    <div style={{
+                      width: 54,
+                      height: 54,
+                      borderRadius: 16,
+                      background: '#ffffff',
+                      border: '1.5px solid #bae6fd',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: 12,
+                      boxShadow: '0 4px 12px rgba(2, 132, 199, 0.1)',
+                    }}>
+                      <Camera size={26} color="#0284c7" />
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: '#0369a1', marginBottom: 4 }}>
+                      iPhone Camera Capture Selected
+                    </div>
+                    <div style={{ fontSize: 12, color: '#475569', fontWeight: 700, marginBottom: 8 }}>
+                      {selectedFile?.name || 'IMG_5259.HEIC'} ({(selectedFile?.size ? (selectedFile.size / 1024 / 1024).toFixed(1) : 2)} MB)
+                    </div>
+                    <div style={{ fontSize: 11.5, color: '#0284c7', background: '#ffffff', padding: '4px 12px', borderRadius: 999, fontWeight: 800, border: '1px solid #bae6fd' }}>
+                      ⚡ Cloudinary will auto-transcode this photo into crystal-clear Web format upon upload
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setPreviewUrl(null);
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                        if (cameraInputRef.current) cameraInputRef.current.value = '';
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        background: 'rgba(0,0,0,0.6)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : previewUrl ? (
                   <div style={{
                     position: 'relative',
                     width: '100%',
@@ -402,6 +532,17 @@ export default function AdminMoments({ standalone = false }) {
                     <img
                       src={previewUrl}
                       alt="Preview"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const parent = e.currentTarget.parentElement;
+                        if (parent && !parent.querySelector('.img-preview-fallback')) {
+                          const fb = document.createElement('div');
+                          fb.className = 'img-preview-fallback';
+                          fb.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;background:#f0f9ff;color:#0369a1;';
+                          fb.innerHTML = '<div style="font-size:32px;margin-bottom:8px">📸</div><div style="font-weight:900;font-size:14px;color:#0f172a">' + (selectedFile?.name || 'Photo Ready') + '</div><div style="font-size:11.5px;color:#0284c7;font-weight:700;margin-top:4px">Ready to upload to Moments Gallery</div>';
+                          parent.appendChild(fb);
+                        }
+                      }}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                     <button
@@ -410,6 +551,7 @@ export default function AdminMoments({ standalone = false }) {
                         setSelectedFile(null);
                         setPreviewUrl(null);
                         if (fileInputRef.current) fileInputRef.current.value = '';
+                        if (cameraInputRef.current) cameraInputRef.current.value = '';
                       }}
                       style={{
                         position: 'absolute',
@@ -425,11 +567,12 @@ export default function AdminMoments({ standalone = false }) {
                         alignItems: 'center',
                         justifyContent: 'center',
                         cursor: 'pointer',
+                        zIndex: 10,
                       }}
                     >
                       ✕
                     </button>
-                    <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700 }}>
+                    <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, zIndex: 10 }}>
                       ✓ Image Ready for Upload
                     </div>
                   </div>
@@ -807,7 +950,23 @@ export default function AdminMoments({ standalone = false }) {
                       src={m.src}
                       alt={m.title}
                       onError={(e) => {
-                        e.currentTarget.style.opacity = '0.35';
+                        const current = e.currentTarget.src;
+                        if (current.includes('cloudinary.com') && (current.endsWith('.heic') || current.endsWith('.heif') || !current.includes('/f_auto'))) {
+                          const repaired = current.replace(/\.(heic|heif)($|\?)/i, '.jpg$2').replace('/upload/', '/upload/f_auto,q_auto/');
+                          if (repaired !== current) {
+                            e.currentTarget.src = repaired;
+                            return;
+                          }
+                        }
+                        e.currentTarget.style.display = 'none';
+                        const parent = e.currentTarget.parentElement;
+                        if (parent && !parent.querySelector('.img-card-fallback')) {
+                          const fb = document.createElement('div');
+                          fb.className = 'img-card-fallback';
+                          fb.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center;background:#fff7ed;color:#ea580c;';
+                          fb.innerHTML = '<div style="font-size:26px;margin-bottom:6px">📸</div><div style="font-weight:900;font-size:13px;color:#0f172a">' + (m.title || 'HAXLR8 Moment') + '</div><div style="font-size:11px;color:#ea580c;font-weight:700;margin-top:2px">Synced to Cloud CDN</div>';
+                          parent.appendChild(fb);
+                        }
                       }}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />

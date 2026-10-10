@@ -178,6 +178,14 @@ export async function fetchMoments() {
         try {
           const detail = item.content ? JSON.parse(item.content) : {};
           if (detail.isDeleted) return null;
+          const rawSrc = detail.src || '';
+          let itemSrc = rawSrc;
+          if (itemSrc.includes('cloudinary.com')) {
+            itemSrc = itemSrc.replace(/\.(heic|heif)($|\?)/i, '.jpg$2');
+            if (!itemSrc.includes('/f_auto') && itemSrc.includes('/upload/')) {
+              itemSrc = itemSrc.replace('/upload/', '/upload/f_auto,q_auto/');
+            }
+          }
           return {
             id: detail.id || `moment_${item.id}`,
             dbId: item.id,
@@ -185,9 +193,7 @@ export async function fetchMoments() {
             subtitle: detail.subtitle || item.message || 'Maharaja Institute of Technology Mysore',
             category: detail.category || 'ceremony',
             tag: detail.tag || 'MOMENT',
-            src: (detail.src || '').includes('cloudinary.com')
-              ? (detail.src || '').replace(/\.(heic|heif)($|\?)/i, '.jpg$2')
-              : (detail.src || ''),
+            src: itemSrc,
             storagePath: detail.storagePath || '',
             description: item.message || detail.description || '',
             rotate: detail.rotate || 0,

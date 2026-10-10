@@ -417,7 +417,23 @@ export default function HighlightsPage() {
                     src={photo.src}
                     alt={photo.title}
                     onError={(e) => {
-                      e.currentTarget.style.opacity = '0.35';
+                      const current = e.currentTarget.src;
+                      if (current.includes('cloudinary.com') && (current.endsWith('.heic') || current.endsWith('.heif') || !current.includes('/f_auto'))) {
+                        const repaired = current.replace(/\.(heic|heif)($|\?)/i, '.jpg$2').replace('/upload/', '/upload/f_auto,q_auto/');
+                        if (repaired !== current) {
+                          e.currentTarget.src = repaired;
+                          return;
+                        }
+                      }
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent && !parent.querySelector('.img-public-fallback')) {
+                        const fb = document.createElement('div');
+                        fb.className = 'img-public-fallback';
+                        fb.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;background:#fff7ed;color:#ea580c;';
+                        fb.innerHTML = '<div style="font-size:36px;margin-bottom:8px">📸</div><div style="font-weight:900;font-size:15px;color:#0f172a">' + (photo.title || 'HAXLR8 Moment') + '</div><div style="font-size:12px;color:#ea580c;font-weight:700;margin-top:4px">HAXLR8 Live Moment • MIT Mysore</div>';
+                        parent.appendChild(fb);
+                      }
                     }}
                     style={{
                       width: '100%',
@@ -602,10 +618,20 @@ export default function HighlightsPage() {
                 <X size={20} />
               </button>
 
-              <div style={{ borderRadius: '18px', overflow: 'hidden', maxHeight: '70vh' }}>
+              <div style={{ borderRadius: '18px', overflow: 'hidden', maxHeight: '70vh', position: 'relative' }}>
                 <img
                   src={lightbox.src}
                   alt={lightbox.title}
+                  onError={(e) => {
+                    const current = e.currentTarget.src;
+                    if (current.includes('cloudinary.com') && (current.endsWith('.heic') || current.endsWith('.heif') || !current.includes('/f_auto'))) {
+                      const repaired = current.replace(/\.(heic|heif)($|\?)/i, '.jpg$2').replace('/upload/', '/upload/f_auto,q_auto/');
+                      if (repaired !== current) {
+                        e.currentTarget.src = repaired;
+                        return;
+                      }
+                    }
+                  }}
                   style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 />
               </div>

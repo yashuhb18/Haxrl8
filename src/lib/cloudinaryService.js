@@ -246,13 +246,13 @@ export async function uploadToCloudinary(fileOrData, options = {}) {
     throw new Error(errMsg);
   }
 
-  // Ensure HEIC/HEIF images are delivered as universal JPG/WebP with auto-quality so all browsers render them
+  // Ensure all Cloudinary images are delivered with auto-format, auto-quality, and HEIC transcode to jpg
   let secureUrl = data.secure_url || data.url || '';
+  if (secureUrl.includes('/upload/') && !secureUrl.includes('/f_auto')) {
+    secureUrl = secureUrl.replace('/upload/', '/upload/f_auto,q_auto/');
+  }
   if (data.format === 'heic' || data.format === 'heif' || secureUrl.match(/\.(heic|heif)($|\?)/i)) {
     secureUrl = secureUrl.replace(/\.(heic|heif)($|\?)/i, '.jpg$2');
-    if (!secureUrl.includes('/f_auto') && secureUrl.includes('/upload/')) {
-      secureUrl = secureUrl.replace('/upload/', '/upload/f_auto,q_auto/');
-    }
   }
 
   return {
@@ -267,7 +267,7 @@ export async function uploadToCloudinary(fileOrData, options = {}) {
 }
 
 /**
- * Client-side Canvas Image Normalizer
+ * Client-side Canvas & HEIC Image Normalizer
  * Converts raw mobile/camera captures into standard JPEG Blobs locally if supported,
  * guaranteeing browser compatibility even before storage upload.
  */
@@ -276,6 +276,30 @@ export async function ensureUniversalImage(file, maxDimension = 1920) {
 
   const isWebStandard = (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp') && file.size < 2.5 * 1024 * 1024;
   const isHeic = file.name?.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic';
+
+  // 1. If it's an iPhone HEIC/HEIF photo, transcode using heic2any first
+  if (isHeic) {
+    try {
+      const heic2anyModule = await import('heic2any');
+      const heic2any = heic2anyModule.default || heic2anyModule;
+      const convertedBlob = await heic2any({
+        blob: file,
+        toType: 'image/jpeg',
+        quality: 0.90
+      });
+      const singleBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+      const baseName = (file.name || 'photo').replace(/\.[^/.]+$/, '');
+      const jpegFile = new File([singleBlob], `${baseName}.jpg`, { type: 'image/jpeg' });
+      file = jpegFile;
+    } catch (heicErr) {
+      console.warn('heic2any client transcoding notice, falling back to direct pipeline:', heicErr);
+    }
+  }
+
+  // If still HEIC because heic2any was unavailable or errored, return raw file for Cloudinary cloud transcode
+  if (file.name?.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic') {
+    return file;
+  }
 
   if (isWebStandard && !isHeic) return file;
 

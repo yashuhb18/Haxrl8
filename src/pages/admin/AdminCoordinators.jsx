@@ -123,6 +123,11 @@ export default function AdminCoordinators() {
       return;
     }
 
+    const isHeic = file.name?.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic';
+    if (isHeic) {
+      showToast('iPhone photo detected — auto-optimizing for web compatibility...', 'info');
+    }
+
     setUploadingCoordId(targetId);
     try {
       const publicUrl = await uploadCoordinatorPhoto(file, targetId);
