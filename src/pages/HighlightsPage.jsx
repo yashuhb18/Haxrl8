@@ -33,7 +33,7 @@ const GALLERY = [
   {
     id: 2,
     title: 'IoT & Hardware Prototyping Lab',
-    subtitle: 'Microsoft Innovation Lab bench engineering sprint',
+    subtitle: 'Department of ECE Innovation Lab bench engineering sprint',
     category: 'sprint',
     tag: 'HARDWARE SPRINT',
     src: imgHardwareLab,
@@ -69,7 +69,7 @@ const GALLERY = [
   {
     id: 5,
     title: 'Interactive Project Demonstration',
-    subtitle: 'Microsoft Innovation Lab smart screen display',
+    subtitle: 'ECE Innovation Lab smart screen display',
     category: 'ceremony',
     tag: 'LIVE PROTOTYPE',
     src: imgSmartDemo,

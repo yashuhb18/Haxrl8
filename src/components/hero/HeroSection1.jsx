@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import GlobeCanvas from '../ui/GlobeCanvas';
 import { theme } from '../../theme';
 import srcasLogo from '../../assets/logo/srcas-logo.png';
-import msLogo from '../../assets/logo/microsoft.png';
-import igeniusLogo from '../../assets/logo/igenius.png';
 
 // ── Icons ───────────────────────────────────────────────────────────────────────
 const StarIcon = ({ size = 20, color = "currentColor", fill = "none" }) => (
@@ -257,15 +255,20 @@ export default function HeroSection1() {
             <img src={srcasLogo} alt="SRCAS" style={{ height: "32px", objectFit: "contain" }} />
           </div>
           <div style={{ width: "1px", height: "30px", background: "#e5e7eb" }}></div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "0.9rem", color: "#6b7280", textTransform: "uppercase", fontWeight: 600, display: "flex", flexDirection: "column" }}>
-              Partner
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{
+              fontSize: "0.75rem",
+              background: "#fef3c7",
+              color: "#b45309",
+              border: "1px solid #fde68a",
+              padding: "4px 12px",
+              borderRadius: "100px",
+              fontWeight: 800,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase"
+            }}>
+              Sponsors Dropping Soon 🚀
             </span>
-            <img src={igeniusLogo} alt="igeniusAI" style={{ height: "24px", objectFit: "contain" }} />
-            <span style={{ fontSize: "0.9rem", color: "#6b7280", textTransform: "uppercase", fontWeight: 600, display: "flex", flexDirection: "column" }}>
-              Authorized Partner
-            </span>
-            <img src={msLogo} alt="Microsoft" style={{ height: "42px", objectFit: "contain" }} />
           </div>
         </div>
       </header>
