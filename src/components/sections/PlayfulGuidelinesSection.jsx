@@ -94,7 +94,7 @@ const guidelinesPart2 = [
   {
     num: '09',
     title: 'Campus Venue',
-    description: 'Maharaja Institute of Technology Mysore, Belavadi, Mandya/Mysuru. Easily accessible via train and highway bus routes.',
+    description: 'Maharaja Institute of Technology Mysore, Belawadi, Mandya/Mysuru. Easily accessible via train and highway bus routes.',
     icon: MapPin,
     badge: 'MIT MYSORE',
     bg: '#f8fafc',

@@ -37,7 +37,7 @@ function renderEmailFooter() {
       </div>
       <div style="color: #cbd5e1; font-weight: 600; font-size: 12px; margin-bottom: 8px;">
         Department of Electronics &amp; Communication Engineering<br>
-        Maharaja Institute of Technology Mysore, Belagola, Srirangapatna Taluk, Mandya - 571438
+        Maharaja Institute of Technology Mysore, Belawadi, Srirangapatna Taluk, Mandya - 571477
       </div>
       <div style="margin-top: 10px; padding: 10px 14px; background: #1e293b; border-radius: 8px; color: #e2e8f0; font-size: 11.5px; display: inline-block;">
         <strong>Student Coordinators:</strong> Yashwanth H B: 8050614849 &bull; Chethan Kumar B: 99455 07099

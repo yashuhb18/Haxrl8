@@ -478,7 +478,7 @@ export default function ContactSection() {
               <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: '0 0 16px', fontWeight: 500 }}>
                 <strong>Department of Electronics & Communication Engineering</strong><br />
                 Maharaja Institute of Technology Mysore (MITM)<br />
-                Belavadi, Srirangapatna Taluk, Mandya / Mysuru, Karnataka 571477
+                Belawadi, Srirangapatna Taluk, Mandya / Mysuru, Karnataka 571477
               </p>
 
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>

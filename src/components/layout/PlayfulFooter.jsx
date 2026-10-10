@@ -198,7 +198,7 @@ export default function PlayfulFooter() {
             >
               Department of Electronics & Communication Engineering<br />
               <strong>Maharaja Institute of Technology Mysore</strong><br />
-              Belagola, Mandya, Karnataka
+              Belawadi, Srirangapatna Taluk, Mandya, Karnataka
             </p>
 
             {/* Host Institution & Department (Both logos shortly with words) */}

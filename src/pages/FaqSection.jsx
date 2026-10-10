@@ -45,7 +45,7 @@ const FAQS = [
     id: 7,
     category: 'logistics',
     question: "Where and when will the Grand Hackathon take place?",
-    answer: "The 24-hour offline hackathon finale takes place on November 6–7, 2026, hosted at Maharaja Institute of Technology Mysore, Belavadi, Mandya/Mysuru.",
+    answer: "The 24-hour offline hackathon finale takes place on November 6–7, 2026, hosted at Maharaja Institute of Technology Mysore, Belawadi, Mandya/Mysuru.",
   },
   {
     id: 8,
