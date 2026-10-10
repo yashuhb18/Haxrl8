@@ -76,8 +76,10 @@ export default function AdminMoments({ standalone = false }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      showToast('Please select a valid image file (JPG, PNG, WebP)', 'error');
+    const isImg = (file.type && file.type.startsWith('image/')) || 
+      /\.(jpg|jpeg|png|webp|gif|heic|heif|bmp|avif)$/i.test(file.name);
+    if (!isImg) {
+      showToast('Please select a valid image file (JPG, PNG, WebP, HEIC)', 'error');
       return;
     }
 
@@ -143,7 +145,9 @@ export default function AdminMoments({ standalone = false }) {
 
   // Handle batch file pick
   const handleBatchSelect = async (e) => {
-    const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/'));
+    const files = Array.from(e.target.files || []).filter(f => 
+      (f.type && f.type.startsWith('image/')) || /\.(jpg|jpeg|png|webp|gif|heic|heif|bmp|avif)$/i.test(f.name)
+    );
     if (files.length === 0) return;
 
     setBatchFiles(files);
@@ -802,6 +806,9 @@ export default function AdminMoments({ standalone = false }) {
                     <img
                       src={m.src}
                       alt={m.title}
+                      onError={(e) => {
+                        e.currentTarget.style.opacity = '0.35';
+                      }}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                     

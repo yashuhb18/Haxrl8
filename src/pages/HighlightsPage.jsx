@@ -416,6 +416,9 @@ export default function HighlightsPage() {
                   <img
                     src={photo.src}
                     alt={photo.title}
+                    onError={(e) => {
+                      e.currentTarget.style.opacity = '0.35';
+                    }}
                     style={{
                       width: '100%',
                       height: '100%',

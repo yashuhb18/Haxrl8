@@ -116,8 +116,10 @@ export default function AdminCoordinators() {
     const targetId = currentUploadTargetRef.current;
     if (!file || !targetId) return;
 
-    if (!file.type.startsWith('image/')) {
-      showToast('Please select a valid image file (JPG, PNG, WebP)', 'error');
+    const isImg = (file.type && file.type.startsWith('image/')) || 
+      /\.(jpg|jpeg|png|webp|gif|heic|heif|bmp|avif)$/i.test(file.name);
+    if (!isImg) {
+      showToast('Please select a valid image file (JPG, PNG, WebP, HEIC)', 'error');
       return;
     }
 
@@ -125,15 +127,29 @@ export default function AdminCoordinators() {
     try {
       const publicUrl = await uploadCoordinatorPhoto(file, targetId);
       
+      let nextFaculty = facultyList;
+      let nextStudents = studentList;
+      let nextArchitect = leadArchitect;
+
       if (targetId === 'lead_architect') {
-        setLeadArchitect(prev => ({ ...prev, photo: publicUrl }));
+        nextArchitect = { ...leadArchitect, photo: publicUrl };
+        setLeadArchitect(nextArchitect);
       } else {
-        setFacultyList(prev => prev.map(c => c.id === targetId ? { ...c, photo: publicUrl } : c));
-        setStudentList(prev => prev.map(c => c.id === targetId ? { ...c, photo: publicUrl } : c));
+        nextFaculty = facultyList.map(c => c.id === targetId ? { ...c, photo: publicUrl } : c);
+        nextStudents = studentList.map(c => c.id === targetId ? { ...c, photo: publicUrl } : c);
+        setFacultyList(nextFaculty);
+        setStudentList(nextStudents);
       }
 
+      // Auto-save immediately to Supabase and localStorage so the photo is never lost!
+      await saveCoordinators({
+        faculty: nextFaculty,
+        students: nextStudents,
+        leadArchitect: nextArchitect,
+      });
+
       playCrewmatePopSound();
-      showToast('Photo uploaded! Remember to click "Save All Changes" below.', 'success');
+      showToast('Photo uploaded and published live to website! 🚀', 'success');
     } catch (err) {
       console.error('Photo upload failed:', err);
       showToast('Failed to upload photo', 'error');
@@ -145,14 +161,28 @@ export default function AdminCoordinators() {
   };
 
   // Remove photo from coordinator
-  const handleRemovePhoto = (coordId) => {
+  const handleRemovePhoto = async (coordId) => {
+    let nextFaculty = facultyList;
+    let nextStudents = studentList;
+    let nextArchitect = leadArchitect;
+
     if (coordId === 'lead_architect') {
-      setLeadArchitect(prev => ({ ...prev, photo: null }));
+      nextArchitect = { ...leadArchitect, photo: null };
+      setLeadArchitect(nextArchitect);
     } else {
-      setFacultyList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c));
-      setStudentList(prev => prev.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c));
+      nextFaculty = facultyList.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c);
+      nextStudents = studentList.map(c => c.id === coordId ? { ...c, photo: null, defaultPhoto: null } : c);
+      setFacultyList(nextFaculty);
+      setStudentList(nextStudents);
     }
-    showToast('Photo removed. Default will be used.', 'info');
+
+    // Auto-save removal immediately
+    await saveCoordinators({
+      faculty: nextFaculty,
+      students: nextStudents,
+      leadArchitect: nextArchitect,
+    });
+    showToast('Photo removed. Live changes applied.', 'info');
   };
 
   // Update specific field
@@ -716,7 +746,7 @@ function CoordinatorCard({
   isUploading,
   onPreviewPhoto,
 }) {
-  const photoSrc = coordinator.photo !== undefined ? coordinator.photo : (coordinator.defaultPhoto || null);
+  const photoSrc = coordinator.photo || coordinator.defaultPhoto || null;
 
   return (
     <div style={{
@@ -757,6 +787,11 @@ function CoordinatorCard({
               <img
                 src={photoSrc}
                 alt={coordinator.name}
+                onError={(e) => {
+                  if (coordinator.defaultPhoto && e.currentTarget.src !== coordinator.defaultPhoto) {
+                    e.currentTarget.src = coordinator.defaultPhoto;
+                  }
+                }}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
               />
               <button
@@ -1136,6 +1171,11 @@ function LeadArchitectEditorCard({
               <img
                 src={photoSrc}
                 alt={architect.name}
+                onError={(e) => {
+                  if (e.currentTarget.src !== yashwanthImg) {
+                    e.currentTarget.src = yashwanthImg;
+                  }
+                }}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
               />
               <button

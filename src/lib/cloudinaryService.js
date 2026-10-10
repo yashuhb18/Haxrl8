@@ -214,12 +214,8 @@ export async function uploadToCloudinary(fileOrData, options = {}) {
   const apiKey = config.apiKey || DEFAULT_API_KEY;
   const apiSecret = config.apiSecret || DEFAULT_API_SECRET;
 
-  if (uploadPreset) {
-    // Unsigned upload via preset
-    formData.append('upload_preset', uploadPreset);
-    if (apiKey) formData.append('api_key', apiKey);
-  } else if (apiKey && apiSecret) {
-    // Direct signed upload
+  // Prioritize verified signed upload so unconfigured or typo presets never break the upload
+  if (apiKey && apiSecret) {
     const timestamp = Math.floor(Date.now() / 1000);
     const stringToSign = `folder=${folder}&timestamp=${timestamp}`;
     const signature = await sha1Hex(stringToSign + apiSecret);
@@ -227,6 +223,10 @@ export async function uploadToCloudinary(fileOrData, options = {}) {
     formData.append('api_key', apiKey);
     formData.append('timestamp', String(timestamp));
     formData.append('signature', signature);
+  } else if (uploadPreset) {
+    // Fallback: unsigned upload via preset
+    formData.append('upload_preset', uploadPreset);
+    if (apiKey) formData.append('api_key', apiKey);
   } else {
     throw new Error('Cloudinary credentials missing: Provide an Upload Preset or API Key & Secret.');
   }
@@ -246,10 +246,13 @@ export async function uploadToCloudinary(fileOrData, options = {}) {
     throw new Error(errMsg);
   }
 
-  // Ensure HEIC/HEIF images are delivered as universal JPG/WebP so all browsers render them
+  // Ensure HEIC/HEIF images are delivered as universal JPG/WebP with auto-quality so all browsers render them
   let secureUrl = data.secure_url || data.url || '';
-  if (data.format === 'heic' || data.format === 'heif' || secureUrl.match(/\.(heic|heif)$/i)) {
-    secureUrl = secureUrl.replace(/\.(heic|heif)$/i, '.jpg');
+  if (data.format === 'heic' || data.format === 'heif' || secureUrl.match(/\.(heic|heif)($|\?)/i)) {
+    secureUrl = secureUrl.replace(/\.(heic|heif)($|\?)/i, '.jpg$2');
+    if (!secureUrl.includes('/f_auto') && secureUrl.includes('/upload/')) {
+      secureUrl = secureUrl.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
   }
 
   return {
@@ -261,6 +264,61 @@ export async function uploadToCloudinary(fileOrData, options = {}) {
     format: data.format === 'heic' || data.format === 'heif' ? 'jpg' : data.format,
     bytes: data.bytes
   };
+}
+
+/**
+ * Client-side Canvas Image Normalizer
+ * Converts raw mobile/camera captures into standard JPEG Blobs locally if supported,
+ * guaranteeing browser compatibility even before storage upload.
+ */
+export async function ensureUniversalImage(file, maxDimension = 1920) {
+  if (!file || typeof window === 'undefined') return file;
+
+  const isWebStandard = (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp') && file.size < 2.5 * 1024 * 1024;
+  const isHeic = file.name?.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic';
+
+  if (isWebStandard && !isHeic) return file;
+
+  try {
+    const converted = await new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((b) => {
+          if (b) {
+            const baseName = (file.name || 'photo').replace(/\.[^/.]+$/, '');
+            resolve(new File([b], `${baseName}.jpg`, { type: 'image/jpeg' }));
+          } else {
+            resolve(file);
+          }
+        }, 'image/jpeg', 0.88);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      };
+      img.src = url;
+    });
+    return converted || file;
+  } catch (_) {
+    return file;
+  }
 }
 
 /**

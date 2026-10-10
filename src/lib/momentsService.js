@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService';
+import { isCloudinaryConfigured, uploadToCloudinary, ensureUniversalImage } from './cloudinaryService';
 
 const LOCAL_MOMENTS_KEY = 'haxlr8_dynamic_moments';
 const STORAGE_BUCKET = 'id-cards';
@@ -77,15 +77,18 @@ export async function fileToBase64(file, maxWidth = 1200) {
  */
 export async function uploadMomentImage(file) {
   if (!file) throw new Error('No image file provided');
-  const isImg = (file.type && file.type.startsWith('image/')) || /\.(jpg|jpeg|png|webp|gif|heic|heif|bmp)$/i.test(file.name);
+  const isImg = (file.type && file.type.startsWith('image/')) || /\.(jpg|jpeg|png|webp|gif|heic|heif|bmp|avif)$/i.test(file.name);
   if (!isImg) {
     throw new Error('Please select an image file (JPG, PNG, WebP, HEIC)');
   }
 
-  // 1. Try Cloudinary first (automatically converts HEIC to universal JPEG)
+  // Pre-normalize using client-side canvas so mobile camera uploads become browser-native JPEG Blobs
+  const uploadFile = await ensureUniversalImage(file);
+
+  // 1. Try Cloudinary first (automatically converts and delivers via high-speed CDN)
   if (isCloudinaryConfigured()) {
     try {
-      const cloudRes = await uploadToCloudinary(file, { folder: 'haxlr8_moments' });
+      const cloudRes = await uploadToCloudinary(uploadFile, { folder: 'haxlr8_moments' });
       if (cloudRes?.secureUrl) {
         return {
           url: cloudRes.secureUrl,
@@ -98,24 +101,11 @@ export async function uploadMomentImage(file) {
     }
   }
 
-  // 2. Client-side conversion to JPEG if it is an iPhone HEIC before storage upload
-  let uploadFile = file;
-  const isHeic = file.name.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic';
-  if (isHeic) {
-    try {
-      const base64Jpeg = await fileToBase64(file);
-      return {
-        url: base64Jpeg,
-        path: `moments/${Date.now()}_converted.jpg`,
-        storageType: 'base64_jpeg'
-      };
-    } catch (_) {}
-  }
-
-  // 3. Supabase Storage fallback
+  // 2. Supabase Storage fallback (uploadFile is guaranteed universal JPEG)
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(2, 8);
-  const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_').toLowerCase();
+  const rawName = uploadFile.name || file.name || 'moment.jpg';
+  const cleanName = rawName.replace(/[^a-zA-Z0-9.]/g, '_').toLowerCase();
   const path = `moments/${timestamp}_${randomStr}_${cleanName}`;
 
   try {
@@ -140,8 +130,8 @@ export async function uploadMomentImage(file) {
     console.warn('Storage upload error, falling back to compressed data URL:', storageErr);
   }
 
-  // 4. Fallback to compressed base64 if storage calls fail
-  const base64Url = await fileToBase64(file);
+  // 3. Fallback to compressed base64 if storage calls fail
+  const base64Url = await fileToBase64(uploadFile);
   return {
     url: base64Url,
     path,
@@ -195,7 +185,9 @@ export async function fetchMoments() {
             subtitle: detail.subtitle || item.message || 'Maharaja Institute of Technology Mysore',
             category: detail.category || 'ceremony',
             tag: detail.tag || 'MOMENT',
-            src: (detail.src || '').replace(/\.(heic|heif)$/i, '.jpg'),
+            src: (detail.src || '').includes('cloudinary.com')
+              ? (detail.src || '').replace(/\.(heic|heif)($|\?)/i, '.jpg$2')
+              : (detail.src || ''),
             storagePath: detail.storagePath || '',
             description: item.message || detail.description || '',
             rotate: detail.rotate || 0,

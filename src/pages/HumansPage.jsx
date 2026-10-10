@@ -10,14 +10,14 @@ import mitMysoreBanner from '../assets/logo/mit-mysore-banner.png';
 import { fetchCoordinators, getLocalCoordinators } from '../lib/coordinatorsService';
 
 const resolveHumanPhoto = (c) => {
-  if (c.photo === null) return null;
-  if (c.photo && (c.photo.startsWith('http://') || c.photo.startsWith('https://') || c.photo.startsWith('data:'))) {
+  if (!c) return null;
+  if (c.photo && typeof c.photo === 'string' && (c.photo.startsWith('http://') || c.photo.startsWith('https://') || c.photo.startsWith('data:'))) {
     return c.photo;
   }
   const name = c.name?.toLowerCase() || '';
-  if (name.includes('balakrishna')) return balakrishnaImg;
-  if (name.includes('sandesh') && (c.type === 'faculty' || c.role?.toLowerCase().includes('faculty'))) return sandeshImg;
-  if (name.includes('yashwanth')) return c.photo || yashwanthImg;
+  if (name.includes('balakrishna')) return c.photo || c.defaultPhoto || balakrishnaImg;
+  if (name.includes('sandesh') && (c.type === 'faculty' || c.role?.toLowerCase().includes('faculty'))) return c.photo || c.defaultPhoto || sandeshImg;
+  if (name.includes('yashwanth')) return c.photo || c.defaultPhoto || yashwanthImg;
   if (c.photo && !c.photo.startsWith('/assets/')) return c.photo;
   return c.defaultPhoto || null;
 };
@@ -205,6 +205,12 @@ export default function HumansPage() {
                     <img
                       src={photo}
                       alt={c.name}
+                      onError={(e) => {
+                        const fallback = c.defaultPhoto || (c.name?.toLowerCase().includes('balakrishna') ? balakrishnaImg : (c.name?.toLowerCase().includes('sandesh') ? sandeshImg : null));
+                        if (fallback && e.currentTarget.src !== fallback) {
+                          e.currentTarget.src = fallback;
+                        }
+                      }}
                       style={{
                         width: '100%',
                         height: '100%',
@@ -319,6 +325,12 @@ export default function HumansPage() {
                     <img
                       src={photo}
                       alt={c.name}
+                      onError={(e) => {
+                        const fallback = c.defaultPhoto || (c.name?.toLowerCase().includes('yashwanth') ? yashwanthImg : null);
+                        if (fallback && e.currentTarget.src !== fallback) {
+                          e.currentTarget.src = fallback;
+                        }
+                      }}
                       style={{
                         width: '100%',
                         height: '100%',
@@ -423,6 +435,11 @@ export default function HumansPage() {
               <img
                 src={leadArchitect.photo || leadArchitect.defaultPhoto || yashwanthImg}
                 alt="Yashwanth H B - Lead Platform Architect"
+                onError={(e) => {
+                  if (e.currentTarget.src !== yashwanthImg) {
+                    e.currentTarget.src = yashwanthImg;
+                  }
+                }}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
               />
             </div>

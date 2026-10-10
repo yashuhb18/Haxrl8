@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { isCloudinaryConfigured, uploadToCloudinary } from './cloudinaryService';
+import { isCloudinaryConfigured, uploadToCloudinary, ensureUniversalImage } from './cloudinaryService';
 import balakrishnaImg from '../assets/humans/balakrishna.png';
 import sandeshImg from '../assets/humans/sandesh.jpg';
 import yashwanthImg from '../assets/humans/yashwanth.png';
@@ -105,17 +105,20 @@ const STORAGE_KEY = 'haxlr8_dynamic_coordinators';
 const ANNOUNCEMENT_TAG = 'COORDINATORS_CONFIG';
 
 function resolvePhotoField(photo, defaultPhoto) {
-  if (photo === null) return null;
-  if (typeof photo === 'string') {
+  if (photo && typeof photo === 'string' && photo.trim()) {
     if (photo.startsWith('http://') || photo.startsWith('https://') || photo.startsWith('data:')) {
-      return photo.replace(/\.(heic|heif)$/i, '.jpg');
+      if (photo.includes('cloudinary.com') && photo.match(/\.(heic|heif)($|\?)/i)) {
+        return photo.replace(/\.(heic|heif)($|\?)/i, '.jpg$2');
+      }
+      return photo;
     }
     // Stale hashed build assets fallback to current active imported image
     if (photo.startsWith('/assets/')) {
       return defaultPhoto || photo;
     }
+    return photo;
   }
-  return photo !== undefined ? photo : (defaultPhoto || null);
+  return defaultPhoto || null;
 }
 
 function mergeFacultyDefaults(item) {
@@ -287,31 +290,24 @@ export async function saveCoordinators({ faculty, students, leadArchitect }) {
 export async function uploadCoordinatorPhoto(file, coordinatorId) {
   if (!file) throw new Error('No file provided');
 
+  // Pre-normalize using client-side canvas so mobile camera uploads become browser-native JPEG Blobs
+  const uploadFile = await ensureUniversalImage(file);
+
   // 1. Prioritize Cloudinary if configured
   if (isCloudinaryConfigured()) {
     try {
-      const cloudRes = await uploadToCloudinary(file, { folder: 'haxlr8_coordinators' });
+      const cloudRes = await uploadToCloudinary(uploadFile, { folder: 'haxlr8_coordinators' });
       if (cloudRes?.secureUrl) {
-        return cloudRes.secureUrl.replace(/\.(heic|heif)$/i, '.jpg');
+        return cloudRes.secureUrl;
       }
     } catch (cErr) {
       console.warn('Cloudinary coordinator photo upload notice, falling back to Supabase:', cErr);
     }
   }
 
-  // 2. Client-side conversion to JPEG if it is an iPhone HEIC before storage upload
-  let uploadFile = file;
-  const isHeic = file.name.match(/\.(heic|heif)$/i) || file.type === 'image/heif' || file.type === 'image/heic';
-  if (isHeic) {
-    try {
-      return await fileToBase64(file);
-    } catch (_) {}
-  }
-
-  // 3. Supabase Storage fallback
-  const fileExt = file.name.split('.').pop() || 'jpg';
+  // 2. Supabase Storage fallback (uploadFile is guaranteed universal JPEG)
   const cleanId = String(coordinatorId || 'coord').replace(/[^a-zA-Z0-9_-]/g, '_');
-  const fileName = `coord_${cleanId}_${Date.now()}.${fileExt}`;
+  const fileName = `coord_${cleanId}_${Date.now()}.jpg`;
   const filePath = `coordinators/${fileName}`;
 
   try {
@@ -324,12 +320,12 @@ export async function uploadCoordinatorPhoto(file, coordinatorId) {
 
     if (error) {
       console.warn('Supabase storage upload error, falling back to base64:', error);
-      return await fileToBase64(file);
+      return await fileToBase64(uploadFile);
     }
 
     const { data: pubData } = supabase.storage
       .from('id-cards')
-      .getPublicUrl(data.path);
+      .getPublicUrl(filePath);
 
     if (pubData && pubData.publicUrl) {
       return pubData.publicUrl;
@@ -338,7 +334,7 @@ export async function uploadCoordinatorPhoto(file, coordinatorId) {
     console.warn('Storage upload exception, falling back to base64:', err);
   }
 
-  return await fileToBase64(file);
+  return await fileToBase64(uploadFile);
 }
 
 function fileToBase64(file) {

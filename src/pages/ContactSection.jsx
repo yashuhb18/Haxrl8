@@ -9,14 +9,14 @@ import sandeshImg from '../assets/humans/sandesh.jpg';
 import yashwanthImg from '../assets/humans/yashwanth.png';
 
 const resolveContactPhoto = (c) => {
-  if (c.photo === null) return null;
-  if (c.photo && (c.photo.startsWith('http://') || c.photo.startsWith('https://') || c.photo.startsWith('data:'))) {
+  if (!c) return null;
+  if (c.photo && typeof c.photo === 'string' && (c.photo.startsWith('http://') || c.photo.startsWith('https://') || c.photo.startsWith('data:'))) {
     return c.photo;
   }
   const name = c.name?.toLowerCase() || '';
-  if (name.includes('balakrishna')) return balakrishnaImg;
-  if (name.includes('sandesh') && (c.type === 'faculty' || c.role?.toLowerCase().includes('faculty'))) return sandeshImg;
-  if (name.includes('yashwanth')) return c.photo || yashwanthImg;
+  if (name.includes('balakrishna')) return c.photo || c.defaultPhoto || balakrishnaImg;
+  if (name.includes('sandesh') && (c.type === 'faculty' || c.role?.toLowerCase().includes('faculty'))) return c.photo || c.defaultPhoto || sandeshImg;
+  if (name.includes('yashwanth')) return c.photo || c.defaultPhoto || yashwanthImg;
   if (c.photo && !c.photo.startsWith('/assets/')) return c.photo;
   return c.defaultPhoto || null;
 };
@@ -222,6 +222,12 @@ export default function ContactSection() {
                             <img
                               src={facPhoto}
                               alt={fac.name}
+                              onError={(e) => {
+                                const fallback = fac.defaultPhoto || (fac.name?.toLowerCase().includes('balakrishna') ? balakrishnaImg : (fac.name?.toLowerCase().includes('sandesh') ? sandeshImg : null));
+                                if (fallback && e.currentTarget.src !== fallback) {
+                                  e.currentTarget.src = fallback;
+                                }
+                              }}
                               style={{
                                 width: '100%',
                                 height: '100%',
@@ -354,6 +360,12 @@ export default function ContactSection() {
                             <img
                               src={stuPhoto}
                               alt={stu.name}
+                              onError={(e) => {
+                                const fallback = stu.defaultPhoto || (stu.name?.toLowerCase().includes('yashwanth') ? yashwanthImg : null);
+                                if (fallback && e.currentTarget.src !== fallback) {
+                                  e.currentTarget.src = fallback;
+                                }
+                              }}
                               style={{
                                 width: '100%',
                                 height: '100%',
