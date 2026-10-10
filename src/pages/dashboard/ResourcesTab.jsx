@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { fetchDocuments, getLocalDocuments, getOfficialRulebook, DEFAULT_DOCUMENTS } from '../../lib/documentsService';
 import { AmongUsKingCharacter } from '../../components/amongus/AmongUsCrewmate';
-import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
+import OfficialPPT from '../../assets/PPT/HAXLR8 3.0 Pitch Deck Template.pptx';
 
 const QUICK_LINKS = [
   { 
@@ -363,7 +363,7 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                 ) : isPptx ? (
                   <a
                     href={doc.fileUrl || OfficialPPT}
-                    download={doc.fileName || 'SRCAS-HACKATHON-3.0-Pitch-Template.pptx'}
+                    download={doc.fileName || 'HAXLR8-3.0-Pitch-Template.pptx'}
                     style={{
                       width: '100%',
                       padding: '11px 14px',

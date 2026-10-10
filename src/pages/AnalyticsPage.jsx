@@ -431,11 +431,11 @@ export default function AnalyticsPage() {
 
         {/* ── FOOTER ── */}
         <div style={{ display:'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent:'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap:8, background:'#fff', border:'1px solid #e5e7eb', borderRadius:12, padding:'14px 20px', fontSize:12, color:'#6b7280', fontWeight:600 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:7, color:'#4f46e5' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:7, color:'#ff3b69' }}>
             <Info size={14} />
-            <span>Final analytics from SRCAS Hackathon 3.0</span>
+            <span>Official live analytics for HAXLR8 3.0</span>
           </div>
-          <span>Event concluded: July 26, 2026 • 6:00 PM IST</span>
+          <span>Grand Finale: Nov 6 – 7, 2026 • MIT Mysore Campus</span>
         </div>
 
       </div>

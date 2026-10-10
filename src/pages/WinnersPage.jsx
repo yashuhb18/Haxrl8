@@ -967,7 +967,7 @@ export default function WinnersPage() {
                 {/* Section Title */}
                 <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: 50, position: 'relative', zIndex: 2 }}>
                     <h2 style={{ fontSize: 44, fontWeight: 900, color: '#111827', margin: 0, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                        Winner's of <span style={{ color: '#16a34a' }}>SRCAS Hackathon 3.0</span>
+                        Winners of <span style={{ color: '#ff3b69' }}>HAXLR8 3.0</span>
                     </h2>
                     <p style={{ color: '#6b7280', fontSize: 16, fontWeight: 500, marginTop: 8 }}>
                         These innovators have delivered the best solutions to real-world challenges!

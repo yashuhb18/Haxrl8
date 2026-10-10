@@ -17,7 +17,7 @@
       { "name": "Sri Eshwar College Of Engineering", "count": 433 },
       { "name": "Rathinam Technical Campus",         "count": 282 },
       { "name": "Chennai Institute Of Technology",   "count": 228 },
-      { "name": "Srcas",                             "count": 210 },
+      { "name": "Maharaja Institute Of Technology Mysore", "count": 210 },
       { "name": "Kpr College Of Arts Science And Research", "count": 149 },
       { "name": "Sns College Of Technology",         "count": 135 },
       { "name": "Kprcas",                            "count": 126 },
@@ -31,7 +31,7 @@
       { "type": "Other / Unclassified", "participant_count": 348,  "unique_colleges": 150 },
       { "type": "University (Other)",   "participant_count": 325,  "unique_colleges": 76  }
     ],
-    "srcas_sri_ramakrishna_arts_science_count": 275,
+    "mit_mysore_count": 275,
     "year_of_study": [
       { "year": "3rd Year", "count": 2494 },
       { "year": "2nd Year", "count": 2310 },

@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient';
 import { getCloudinaryConfig, sha1Hex } from './cloudinaryService';
-import OfficialPPT from '../assets/PPT/SRCAS HACKATHON 3.0.pptx';
+import OfficialPPT from '../assets/PPT/HAXLR8 3.0 Pitch Deck Template.pptx';
 
 const DOCUMENTS_STORAGE_KEY = 'haxlr8_participant_documents';
 const ANNOUNCEMENT_TAG = 'DOCUMENTS_REGISTRY';
@@ -47,7 +47,7 @@ export const DEFAULT_DOCUMENTS = [
     badge: 'PITCH DECK PPTX',
     description: 'Mandatory presentation format for jury evaluations. Contains slide layouts for problem, architecture, prototype demo, and roadmap.',
     fileUrl: OfficialPPT,
-    fileName: 'SRCAS-HACKATHON-3.0-Pitch-Template.pptx',
+    fileName: 'HAXLR8-3.0-Pitch-Template.pptx',
     fileSize: '2.9 MB',
     fileType: 'pptx',
     unlockDate: null,

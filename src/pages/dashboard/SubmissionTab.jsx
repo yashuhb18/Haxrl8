@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
-import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
+import OfficialPPT from '../../assets/PPT/HAXLR8 3.0 Pitch Deck Template.pptx';
 import { sendSubmissionConfirmationEmail } from '../../lib/emailService';
 import { ensureUUID, isUUID } from '../../lib/syncService';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
