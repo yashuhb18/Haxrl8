@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import { 
   fetchDocuments, saveDocument, deleteDocument, 
-  uploadDocumentFile, DEFAULT_DOCUMENTS, getLocalDocuments 
+  uploadDocumentFile, DEFAULT_DOCUMENTS, getLocalDocuments,
+  getOfficialRulebook
 } from '../../lib/documentsService';
 import { playCrewmatePopSound } from '../../components/amongus/AmongUsSound';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
@@ -24,11 +25,14 @@ export default function AdminDocuments() {
   const [documents, setDocuments] = useState(getLocalDocuments());
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingRulebook, setUploadingRulebook] = useState(false);
   const [notification, setNotification] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
   const fileInputRef = useRef(null);
+  const rulebookInputRef = useRef(null);
+  const officialRulebook = getOfficialRulebook(documents);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -104,11 +108,12 @@ export default function AdminDocuments() {
       const catObj = CATEGORIES.find(c => c.id === formData.category) || CATEGORIES[0];
 
       // 3. Construct record
+      const isRulebook = formData.category === 'Rulebook';
       const docRecord = {
-        id: `doc_${Date.now()}`,
+        id: isRulebook ? 'doc_rulebook' : `doc_${Date.now()}`,
         title: formData.title.trim(),
         category: formData.category,
-        badge: formData.isLocked ? 'OPENS NOV 2' : formData.category.toUpperCase(),
+        badge: formData.isLocked ? 'OPENS NOV 2' : (isRulebook ? 'MANDATORY PROTOCOLS' : formData.category.toUpperCase()),
         description: formData.description.trim() || `Official ${formData.category} for HAXLR8 3.0 participants.`,
         fileUrl: uploadRes.url,
         fileName: uploadRes.fileName,
@@ -141,6 +146,51 @@ export default function AdminDocuments() {
       showToast(err.message || 'Upload failed', 'error');
     } finally {
       setUploading(false);
+    }
+  };
+
+  // Dedicated one-click Rulebook / Mandatory Protocols PDF uploader
+  const handleRulebookUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingRulebook(true);
+      playCrewmatePopSound();
+
+      const uploadRes = await uploadDocumentFile(file, 'haxlr8_rulebook');
+      const current = getLocalDocuments();
+      const existing = current.find(d => d.id === 'doc_rulebook') || DEFAULT_DOCUMENTS[0];
+
+      const updatedDoc = {
+        ...existing,
+        id: 'doc_rulebook',
+        title: 'HAXLR8 3.0 Official Hackathon Rulebook & Protocols',
+        category: 'Rulebook',
+        badge: 'MANDATORY PROTOCOLS',
+        description: 'Comprehensive guidelines, 24-hour offline sprint regulations, code of conduct, and reporting instructions at MIT Mysore.',
+        fileUrl: uploadRes.url,
+        fileName: uploadRes.fileName,
+        fileSize: uploadRes.fileSize,
+        fileType: uploadRes.fileType,
+        isLocked: false,
+        unlockDate: null,
+        color: '#0284c7',
+        bg: '#f0f9ff',
+        border: '#bae6fd',
+        updatedAt: new Date().toISOString(),
+      };
+
+      await saveDocument(updatedDoc);
+      playCrewmatePopSound();
+      showToast('Official Flight Rulebook PDF published! Active in Participant Dashboard 🚀', 'success');
+      loadDocumentsList();
+    } catch (err) {
+      console.error('Rulebook upload error:', err);
+      showToast('Failed to upload Rulebook PDF: ' + (err.message || ''), 'error');
+    } finally {
+      setUploadingRulebook(false);
+      if (rulebookInputRef.current) rulebookInputRef.current.value = '';
     }
   };
 
@@ -268,6 +318,178 @@ export default function AdminDocuments() {
             <span>View Participant Desk</span>
             <ExternalLink size={14} />
           </a>
+        </div>
+      </div>
+
+      {/* ── EXCLUSIVE SPOTLIGHT: FLIGHT RULEBOOK & MANDATORY PROTOCOLS PDF ── */}
+      <div style={{
+        background: '#ffffff',
+        border: '2.5px solid #7dd3fc',
+        borderRadius: 24,
+        padding: '24px 28px',
+        marginBottom: 28,
+        boxShadow: '0 8px 30px rgba(2, 132, 199, 0.08)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Top Tag & Title */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#e0f2fe', color: '#0369a1', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', marginBottom: 8 }}>
+              <span>📜 PARTICIPANT DASHBOARD SECTION</span>
+              <span>•</span>
+              <span>MANDATORY PROTOCOLS</span>
+            </div>
+            <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#0f172a', margin: '0 0 6px' }}>
+              Flight Rulebook &amp; Mandatory Protocols PDF
+            </h2>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: 0, maxWidth: 720, lineHeight: 1.5 }}>
+              This PDF is directly connected to the <strong>"Flight Rulebook (Mandatory Protocols)"</strong> card at the top of the participant dashboard. Upload your official PDF here so all participants get instant access.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {officialRulebook?.fileUrl ? (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#dcfce7', color: '#15803d', border: '1.5px solid #86efac', padding: '6px 14px', borderRadius: 999, fontSize: 12, fontWeight: 900 }}>
+                <CheckCircle2 size={15} />
+                <span>ACTIVE OFFICIAL PDF</span>
+              </span>
+            ) : (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fef3c7', color: '#b45309', border: '1.5px solid #fde68a', padding: '6px 14px', borderRadius: 999, fontSize: 12, fontWeight: 900 }}>
+                <AlertCircle size={15} />
+                <span>PENDING OFFICIAL PDF</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Current File Box & Actions */}
+        <div style={{
+          background: '#f8fafc',
+          border: '1.5px solid #e2e8f0',
+          borderRadius: 18,
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 16,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 14, background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
+              📄
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 900, color: '#0f172a' }}>
+                {officialRulebook?.fileName || 'No custom PDF uploaded yet'}
+              </div>
+              <div style={{ fontSize: 12, color: '#64748b', marginTop: 2, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>{officialRulebook?.fileSize || 'Select your verified rulebook PDF'}</span>
+                {officialRulebook?.updatedAt && (
+                  <>
+                    <span>•</span>
+                    <span>Updated {new Date(officialRulebook.updatedAt).toLocaleDateString()}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {/* Hidden Input */}
+            <input
+              ref={rulebookInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx"
+              style={{ display: 'none' }}
+              onChange={handleRulebookUpload}
+            />
+
+            {officialRulebook?.fileUrl && (
+              <>
+                <a
+                  href={officialRulebook.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    border: '1.5px solid #cbd5e1',
+                    padding: '8px 14px',
+                    borderRadius: 12,
+                    fontSize: 12.5,
+                    fontWeight: 800,
+                    textDecoration: 'none',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                  }}
+                >
+                  <Eye size={14} />
+                  <span>View PDF</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => copyFileLink(officialRulebook.fileUrl, 'rulebook_top')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    border: '1.5px solid #cbd5e1',
+                    padding: '8px 14px',
+                    borderRadius: 12,
+                    fontSize: 12.5,
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {copiedId === 'rulebook_top' ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
+                  <span>{copiedId === 'rulebook_top' ? 'Copied!' : 'Copy Link'}</span>
+                </button>
+              </>
+            )}
+
+            <button
+              type="button"
+              disabled={uploadingRulebook}
+              onClick={() => rulebookInputRef.current?.click()}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#0284c7',
+                color: '#ffffff',
+                border: 'none',
+                padding: '9px 18px',
+                borderRadius: 12,
+                fontSize: 13,
+                fontWeight: 900,
+                cursor: uploadingRulebook ? 'not-allowed' : 'pointer',
+                opacity: uploadingRulebook ? 0.75 : 1,
+                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.25)',
+                transition: 'all 0.2s',
+              }}
+            >
+              {uploadingRulebook ? (
+                <>
+                  <RefreshCw size={14} className="animate-spin" />
+                  <span>Uploading PDF...</span>
+                </>
+              ) : (
+                <>
+                  <Upload size={14} />
+                  <span>{officialRulebook?.fileUrl ? 'Replace Official Rulebook PDF' : 'Upload Official Rulebook PDF'}</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

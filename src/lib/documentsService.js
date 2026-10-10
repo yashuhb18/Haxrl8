@@ -8,20 +8,20 @@ const ANNOUNCEMENT_TAG = 'DOCUMENTS_REGISTRY';
 export const DEFAULT_DOCUMENTS = [
   {
     id: 'doc_rulebook',
-    title: 'HAXLR8 3.0 Official Hackathon Rulebook',
+    title: 'HAXLR8 3.0 Official Hackathon Rulebook & Protocols',
     category: 'Rulebook',
-    badge: 'OFFICIAL GUIDE',
+    badge: 'MANDATORY PROTOCOLS',
     description: 'Comprehensive guidelines, 24-hour offline sprint regulations, code of conduct, and reporting instructions at MIT Mysore.',
-    fileUrl: '/HAXLR8-3.0-Official-Rulebook.pdf',
-    fileName: 'HAXLR8-3.0-Official-Rulebook.pdf',
-    fileSize: '1.8 MB',
+    fileUrl: null, // Set by Admin upload
+    fileName: 'Pending Admin Upload',
+    fileSize: 'Official PDF',
     fileType: 'pdf',
     unlockDate: null, // immediately available
     isLocked: false,
     uploadedAt: '2026-10-09T10:00:00.000Z',
-    color: '#ea580c',
-    bg: '#fff7ed',
-    border: '#fed7aa'
+    color: '#0284c7',
+    bg: '#f0f9ff',
+    border: '#bae6fd'
   },
   {
     id: 'doc_brochure',
@@ -76,6 +76,21 @@ export const DEFAULT_DOCUMENTS = [
   }
 ];
 
+function sanitizeDocumentsList(docs) {
+  if (!Array.isArray(docs)) return DEFAULT_DOCUMENTS;
+  return docs.map(d => {
+    // Strip dummy generated rulebook PDF so admin can upload the real one
+    if (d.id === 'doc_rulebook' && d.fileUrl === '/HAXLR8-3.0-Official-Rulebook.pdf') {
+      return {
+        ...d,
+        fileUrl: null,
+        fileName: 'Pending Admin Upload',
+        fileSize: 'Official PDF',
+      };
+    }
+    return d;
+  });
+}
 
 /**
  * Get locally cached documents
@@ -86,13 +101,23 @@ export function getLocalDocuments() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return sanitizeDocumentsList(parsed);
       }
     }
   } catch (e) {
     console.warn('Error reading local documents:', e);
   }
   return DEFAULT_DOCUMENTS;
+}
+
+/**
+ * Returns the official rulebook document record
+ */
+export function getOfficialRulebook(docs) {
+  const list = docs || getLocalDocuments();
+  return list.find(d => d.id === 'doc_rulebook') || 
+         list.find(d => d.category === 'Rulebook') || 
+         DEFAULT_DOCUMENTS[0];
 }
 
 /**
@@ -130,8 +155,9 @@ export async function fetchDocuments() {
     if (!error && data && data[0]?.content) {
       const parsed = JSON.parse(data[0].content);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        setLocalDocuments(parsed);
-        return parsed;
+        const sanitized = sanitizeDocumentsList(parsed);
+        setLocalDocuments(sanitized);
+        return sanitized;
       }
     }
   } catch (err) {

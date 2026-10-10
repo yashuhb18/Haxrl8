@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import DomainWheel from '../../components/ui/DomainWheel';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 import emitersSeal from '../../assets/logo/emiters-seal.png';
-import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
+import AmongUsCrewmate, { AmongUsKingCharacter } from '../../components/amongus/AmongUsCrewmate';
 
 export { DomainWheel };
 export const SDGWheel = DomainWheel;
@@ -207,7 +207,7 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
               <div style={{ position:'absolute', top:2, right:2, width:8, height:8, borderRadius:'50%', background:'#0284c7', boxShadow:'0 0 8px #0284c7' }}/>
             </button>
 
-            {/* Profile Avatar with Leader Crown */}
+            {/* Profile Avatar with Leader Among Us King Character */}
             <div
               onClick={() => setShowProfile(true)}
               title="Commander Profile"
@@ -219,12 +219,12 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
                 background:'#f0fdf4',
                 border:'1.5px solid #bbf7d0',
                 borderRadius:'100px',
-                padding:'4px 12px 4px 6px',
+                padding:'3px 12px 3px 5px',
                 transition:'all 0.2s',
               }}
             >
-              <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg, #0284c7, #06b6d4)', display:'flex', alignItems:'center', justifyContent:'center', color:'#ffffff', fontSize:'13px', fontWeight:900, boxShadow:'0 2px 8px rgba(2, 132, 199, 0.3)' }}>
-                👑
+              <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg, #e0f2fe, #bae6fd)', border:'1.5px solid #7dd3fc', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 8px rgba(2, 132, 199, 0.25)', overflow:'visible' }}>
+                <AmongUsKingCharacter size={26} />
               </div>
               <span style={{ fontSize:12, fontWeight:800, color:'#15803d' }}>
                 {user?.user_metadata?.full_name?.split(' ')[0] || 'Leader'}
@@ -291,7 +291,10 @@ export default function DashboardLayout({ activeTab, setActiveTab, children, has
         <div style={{ position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(15, 23, 42, 0.4)', backdropFilter:'blur(8px)', zIndex:100, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
           <div style={{ background:'#ffffff', border:'2px solid #fed7aa', borderRadius:24, width:'100%', maxWidth:520, overflow:'hidden', boxShadow:'0 24px 60px rgba(0,0,0,0.15)', position:'relative' }}>
             <div style={{ padding:'20px 24px', borderBottom:'1.5px solid #f1e7db', display:'flex', justifyContent:'space-between', alignItems:'center', background:'#fffaf3' }}>
-              <div style={{ fontSize:18, fontWeight:900, color:'#0f172a' }}>👑 Squad Commander Profile</div>
+              <div style={{ display:'flex', alignItems:'center', gap:10, fontSize:18, fontWeight:900, color:'#0f172a' }}>
+                <AmongUsKingCharacter size={24} />
+                <span>Squad Commander Profile</span>
+              </div>
               <button onClick={() => setShowProfile(false)} style={{ background:'none', border:'none', fontSize:24, cursor:'pointer', color:'#94a3b8' }}>&times;</button>
             </div>
             <div style={{ padding:'24px', display:'flex', flexDirection:'column', gap:16, maxHeight:'75vh', overflowY:'auto' }}>

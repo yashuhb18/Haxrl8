@@ -277,6 +277,23 @@ export default function AmongUsCrewmate({
           </g>
         )}
 
+        {(hat === 'crown' || hat === 'king') && (
+          // King Crown Hat for Leaders 👑
+          <g id="hat-crown" transform="translate(42, -6)">
+            <path
+              d="M 2 16 L 6 3 L 14 11 L 22 3 L 26 16 Z"
+              fill="#facc15"
+              stroke="#0f172a"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
+            <circle cx="6" cy="3" r="2.2" fill="#ef4444" stroke="#0f172a" strokeWidth="1" />
+            <circle cx="14" cy="11" r="2.2" fill="#38bdf8" stroke="#0f172a" strokeWidth="1" />
+            <circle cx="22" cy="3" r="2.2" fill="#ef4444" stroke="#0f172a" strokeWidth="1" />
+            <line x1="3" y1="14" x2="25" y2="14" stroke="#ca8a04" strokeWidth="2" />
+          </g>
+        )}
+
         {hat === 'mini' && (
           // Mini Crewmate sitting on head
           <g id="hat-mini" transform="translate(44, -14) scale(0.35)">
@@ -287,5 +304,64 @@ export default function AmongUsCrewmate({
         )}
       </motion.svg>
     </div>
+  );
+}
+
+/**
+ * Authentic Compact Among Us King Character vector symbol
+ * Specifically crafted for leaders and commanders
+ */
+export function AmongUsKingCharacter({ size = 26, color = '#0284c7', className = '', style = {} }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 36 36" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={{ display: 'inline-block', overflow: 'visible', verticalAlign: 'middle', ...style }}
+    >
+      {/* Shiny Golden King Crown 👑 on top */}
+      <path
+        d="M 10 11 L 13 4.5 L 18 8.5 L 23 4.5 L 26 11 Z"
+        fill="#FACC15"
+        stroke="#854D0E"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      {/* Crown Jewels */}
+      <circle cx="13" cy="4.5" r="1.1" fill="#EF4444" />
+      <circle cx="18" cy="8.5" r="1.1" fill="#38BDF8" />
+      <circle cx="23" cy="4.5" r="1.1" fill="#EF4444" />
+      <line x1="11" y1="9.5" x2="25" y2="9.5" stroke="#CA8A04" strokeWidth="0.8" />
+
+      {/* Oxygen Backpack */}
+      <rect x="7" y="14" width="4.5" height="11" rx="2.2" fill="#0369A1" stroke="#0F172A" strokeWidth="1.5" />
+      <rect x="7" y="14" width="4.5" height="6.5" rx="2" fill="#0EA5E9" />
+
+      {/* Main Crewmate Body */}
+      <path
+        d="M 12 18 C 12 12.5 24 12.5 24 18 V 26.5 C 24 28.5 22.5 29.5 20.5 29.5 H 19 C 18 29.5 18 27 17 27 C 16 27 16 29.5 15 29.5 H 13.5 C 11.5 29.5 12 28.5 12 26.5 Z"
+        fill={color}
+        stroke="#0F172A"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      {/* Body Top Highlight */}
+      <path
+        d="M 13.5 17.5 C 14.5 14.5 21.5 14.5 22.5 17.5"
+        stroke="#7DD3FC"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+
+      {/* Visor */}
+      <rect x="16" y="16" width="9.5" height="6" rx="3" fill="#71E1FF" stroke="#0F172A" strokeWidth="1.3" />
+      {/* Visor Shadow */}
+      <path d="M 17 19.5 C 19 21.5 23 21.5 24.5 19.5" stroke="#2563EB" strokeWidth="0.9" strokeLinecap="round" />
+      {/* Visor Gloss Reflection */}
+      <ellipse cx="19.5" cy="17.5" rx="2" ry="0.9" fill="#FFFFFF" opacity="0.95" transform="rotate(-12 19.5 17.5)" />
+    </svg>
   );
 }

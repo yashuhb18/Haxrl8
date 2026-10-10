@@ -5,7 +5,8 @@ import {
   Calendar, CheckCircle, AlertTriangle, ShieldCheck, Clock, 
   Info, FileDown, Layers, ChevronRight, Eye, FileCheck
 } from 'lucide-react';
-import { fetchDocuments, getLocalDocuments, DEFAULT_DOCUMENTS } from '../../lib/documentsService';
+import { fetchDocuments, getLocalDocuments, getOfficialRulebook, DEFAULT_DOCUMENTS } from '../../lib/documentsService';
+import { AmongUsKingCharacter } from '../../components/amongus/AmongUsCrewmate';
 import OfficialPPT from '../../assets/PPT/SRCAS HACKATHON 3.0.pptx';
 
 const QUICK_LINKS = [
@@ -92,6 +93,7 @@ const STATUS_STYLE = {
 
 export default function ResourcesTab({ hasTeam, submissions }) {
   const [documents, setDocuments] = useState(getLocalDocuments());
+  const rulebookDoc = getOfficialRulebook(documents);
   const [openFaq, setOpenFaq] = useState(null);
   const [showRulebook, setShowRulebook] = useState(false);
   const [showProtocol, setShowProtocol] = useState(false);
@@ -603,7 +605,34 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                   <li>Live Pitch &amp; Working Demonstration (25%)</li>
                 </ul>
               </div>
-              <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'flex-end', background: '#fafafa' }}>
+              <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafafa', flexWrap: 'wrap', gap: 12 }}>
+                {rulebookDoc?.fileUrl && rulebookDoc.fileUrl !== '#' && !rulebookDoc.fileUrl.startsWith('#') ? (
+                  <a
+                    href={rulebookDoc.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download={rulebookDoc.fileName || "HAXLR8-3.0-Official-Rulebook.pdf"}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '10px 18px',
+                      borderRadius: 12,
+                      background: '#0284c7',
+                      color: '#ffffff',
+                      fontWeight: 800,
+                      fontSize: 13,
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)',
+                    }}
+                  >
+                    <span>📥 Download Official PDF {rulebookDoc.fileSize && rulebookDoc.fileSize !== 'Official PDF' ? `(${rulebookDoc.fileSize})` : ''}</span>
+                  </a>
+                ) : (
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b' }}>
+                    Official PDF will be published shortly by organizers.
+                  </div>
+                )}
                 <button onClick={() => setShowRulebook(false)} style={{ padding: '10px 20px', borderRadius: 12, background: '#ff3b69', color: '#fff', border: 'none', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
                   Close Window
                 </button>
@@ -619,12 +648,18 @@ export default function ResourcesTab({ hasTeam, submissions }) {
           <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
             <div style={{ background: '#ffffff', border: '2px solid #fed7aa', borderRadius: 24, width: '100%', maxWidth: 640, overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.18)' }}>
               <div style={{ padding: '20px 24px', borderBottom: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fffaf3' }}>
-                <div style={{ fontSize: 18, fontWeight: 900, color: '#0f172a' }}>👑 Leader vs. Impostor Protocol</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, fontWeight: 900, color: '#0f172a' }}>
+                  <AmongUsKingCharacter size={24} color="#9333ea" />
+                  <span>Leader vs. Impostor Protocol</span>
+                </div>
                 <button onClick={() => setShowProtocol(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#94a3b8' }}>&times;</button>
               </div>
               <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 14, maxHeight: '70vh', overflowY: 'auto', fontSize: 14, color: '#475569', lineHeight: 1.6 }}>
                 <div style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', borderRadius: 16, padding: '16px' }}>
-                  <h4 style={{ color: '#166534', fontWeight: 900, margin: '0 0 6px' }}>👑 Team Leader (Squad Commander)</h4>
+                  <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#166534', fontWeight: 900, margin: '0 0 6px' }}>
+                    <AmongUsKingCharacter size={18} color="#16a34a" />
+                    <span>Team Leader (Squad Commander)</span>
+                  </h4>
                   <p style={{ margin: 0, color: '#15803d' }}>Only the designated Team Leader creates an account. The leader selects the domain, registers 3–4 squad members, completes the ₹1,200 team payment, and receives official passes &amp; announcements.</p>
                 </div>
 
