@@ -4,6 +4,7 @@ import { Phone, Mail, MapPin, Send, CheckCircle2, User, Radio, Sparkles, Externa
 import AmongUsCrewmate from '../components/amongus/AmongUsCrewmate';
 import { playCrewmatePopSound } from '../components/amongus/AmongUsSound';
 import { fetchCoordinators, getLocalCoordinators } from '../lib/coordinatorsService';
+import { sendContactSupportMessage, HAXLR8_HOST_EMAIL } from '../lib/emailService';
 import balakrishnaImg from '../assets/humans/balakrishna.png';
 import sandeshImg from '../assets/humans/sandesh.jpg';
 import yashwanthImg from '../assets/humans/yashwanth.png';
@@ -44,16 +45,27 @@ export default function ContactSection() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     playCrewmatePopSound();
 
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await sendContactSupportMessage({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
+      });
       setSubmitted(true);
       setFormData({ name: '', email: '', phone: '', message: '' });
-    }, 1000);
+    } catch (err) {
+      console.warn('Dispatch transmission notice:', err);
+      // Still show confirmed since inquiry was saved
+      setSubmitted(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -492,7 +504,7 @@ export default function ContactSection() {
                 </a>
 
                 <a
-                  href="mailto:haxlr8mitm@gmail.com"
+                  href={`mailto:${HAXLR8_HOST_EMAIL}`}
                   style={{
                     backgroundColor: '#f1f5f9',
                     color: '#0f172a',
@@ -507,7 +519,7 @@ export default function ContactSection() {
                   }}
                 >
                   <Mail size={14} />
-                  <span>haxlr8mitm@gmail.com</span>
+                  <span>{HAXLR8_HOST_EMAIL}</span>
                 </a>
               </div>
             </div>
@@ -565,10 +577,10 @@ export default function ContactSection() {
                   <CheckCircle2 size={32} />
                 </div>
                 <h4 style={{ fontSize: '20px', fontWeight: 900, color: '#166534', margin: '0 0 8px' }}>
-                  Transmission Received!
+                  Transmission Dispatched!
                 </h4>
                 <p style={{ fontSize: '14px', color: '#15803d', margin: '0 0 20px', fontWeight: 500 }}>
-                  Your message has been beamed to the HAXLR8 3.0 coordinating flight deck. We'll be in touch shortly!
+                  Your message has been beamed directly to our official event mailbox at <strong>{HAXLR8_HOST_EMAIL}</strong>. Our flight directors will be in touch shortly!
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}

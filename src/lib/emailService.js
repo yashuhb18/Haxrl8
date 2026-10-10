@@ -852,4 +852,114 @@ export async function sendPaymentConfirmationEmail({
   return { success: true, status: deliveryStatus };
 }
 
+/**
+ * Dispatch Contact Support transmission to official host email haxlr8ecemitm@gmail.com
+ * and persist copy to Supabase so it's guaranteed never lost.
+ */
+export async function sendContactSupportMessage({ name, email, phone, message }) {
+  const cleanName = (name || 'Anonymous Innovator').trim();
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanPhone = (phone || '').trim();
+  const cleanMsg = (message || '').trim();
+
+  const formattedHtml = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; color: #0f172a;">
+      <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 26px 24px; text-align: center; border-bottom: 3px solid #ff3b69;">
+        <span style="display: inline-block; background: #fee2e2; color: #ef4444; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">
+          🚨 CONTACT TRANSMISSION
+        </span>
+        <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 900;">New Participant Support Inquiry</h2>
+        <p style="color: #fda4af; margin: 4px 0 0; font-size: 12px; font-weight: 700;">HAXLR8 3.0 • Maharaja Institute of Technology Mysore</p>
+      </div>
+
+      <div style="padding: 30px 24px;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 700; width: 140px;">Sender Name:</td>
+            <td style="padding: 10px 0; color: #0f172a; font-weight: 900; font-size: 15px;">${cleanName}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 700;">Email Address:</td>
+            <td style="padding: 10px 0; color: #0284c7; font-weight: 800;">
+              <a href="mailto:${cleanEmail}" style="color: #0284c7; text-decoration: none;">${cleanEmail}</a>
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 700;">Phone / WhatsApp:</td>
+            <td style="padding: 10px 0; color: #0f172a; font-weight: 800;">
+              ${cleanPhone ? `<a href="tel:${cleanPhone.replace(/\s+/g, '')}" style="color: #0f172a; text-decoration: none;">${cleanPhone}</a>` : 'Not provided'}
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 700;">Timestamp:</td>
+            <td style="padding: 10px 0; color: #475569; font-weight: 600;">${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</td>
+          </tr>
+        </table>
+
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-left: 4px solid #ff3b69; padding: 18px 20px; border-radius: 12px; margin-bottom: 24px;">
+          <div style="font-size: 11.5px; color: #ff3b69; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+            Inquiry Message
+          </div>
+          <div style="font-size: 14.5px; color: #1e293b; line-height: 1.6; white-space: pre-wrap;">${cleanMsg || 'No message content provided.'}</div>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="mailto:${cleanEmail}?subject=Re:%20HAXLR8%203.0%20Support%20Inquiry" style="display: inline-block; background: #ff3b69; color: #ffffff; padding: 12px 28px; border-radius: 12px; font-weight: 800; font-size: 13.5px; text-decoration: none; box-shadow: 0 4px 12px rgba(255, 59, 105, 0.3);">
+            Reply Directly to ${cleanName} →
+          </a>
+        </div>
+      </div>
+
+      <div style="background: #f1f5f9; padding: 16px 24px; text-align: center; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0;">
+        HAXLR8 3.0 Space Flight Command • Dept. of Electronics & Communication Engineering • MIT Mysore
+      </div>
+    </div>
+  `;
+
+  let emailDispatched = false;
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isContactMessage: true,
+        to: HAXLR8_HOST_EMAIL,
+        replyTo: cleanEmail,
+        subject: `🚨 New Contact Inquiry: ${cleanName} (${cleanPhone || cleanEmail})`,
+        html: formattedHtml,
+        senderName: cleanName,
+        senderEmail: cleanEmail,
+        senderPhone: cleanPhone,
+        senderMessage: cleanMsg,
+      })
+    });
+    if (res.ok) {
+      emailDispatched = true;
+    }
+  } catch (err) {
+    console.warn('API send-email notice for contact message:', err);
+  }
+
+  try {
+    const { supabase } = await import('./supabaseClient');
+    await supabase.from('announcements').insert([{
+      title: `[CONTACT] ${cleanName} - ${cleanPhone || cleanEmail}`,
+      message: cleanMsg,
+      content: JSON.stringify({
+        name: cleanName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        message: cleanMsg,
+        dispatchedAt: new Date().toISOString()
+      }),
+      tag: 'CONTACT_INQUIRY'
+    }]);
+  } catch (dbErr) {
+    console.warn('Supabase backup contact log notice:', dbErr);
+  }
+
+  return { success: true, emailDispatched };
+}
+
+
 

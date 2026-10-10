@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Soft subtle circular backdrop for tab contrast -->
+  <circle cx="32" cy="32" r="31" fill="#0f172a" />
+  
+  <!-- Shiny Golden King Crown -->
+  <g id="crown">
+    <path d="M 19 18 L 23 8 L 32 14 L 41 8 L 45 18 Z" fill="#FACC15" stroke="#78350F" stroke-width="1.8" stroke-linejoin="round" />
+    <circle cx="23" cy="8" r="1.8" fill="#EF4444" />
+    <circle cx="32" cy="14" r="1.8" fill="#38BDF8" />
+    <circle cx="41" cy="8" r="1.8" fill="#EF4444" />
+    <line x1="20.5" y1="16" x2="43.5" y2="16" stroke="#CA8A04" stroke-width="1.2" />
+  </g>
+
+  <!-- Backpack (Oxygen Tank) -->
+  <rect x="14" y="27" width="9" height="23" rx="4.5" fill="#881337" stroke="#000000" stroke-width="3" stroke-linejoin="round" />
+  <rect x="14" y="27" width="9" height="15" rx="4.5" fill="#FF1E56" />
+
+  <!-- Main Crewmate Body (Shadow Base) -->
+  <path d="M 23 23 C 23 15, 43 15, 43 23 L 43 51 C 43 56, 37 56, 37 51 L 37 45 L 29 45 L 29 51 C 29 56, 23 56, 23 51 Z" 
+        fill="#881337" stroke="#000000" stroke-width="3.5" stroke-linejoin="round" />
+
+  <!-- Body Illuminated Highlights -->
+  <path d="M 23 23 C 23 15, 43 15, 43 23 L 43 38 C 39 36, 27 37, 23 42 Z" fill="#FF1E56" />
+
+  <!-- Visor -->
+  <rect x="31" y="25" width="20" height="14" rx="7" fill="#000000" stroke="#000000" stroke-width="3.5" stroke-linejoin="round" />
+  <rect x="32" y="26" width="18" height="12" rx="6" fill="#38BDF8" />
+  <!-- Visor Lower Shadow -->
+  <path d="M 32 32 C 37 36, 45 36, 50 32 L 50 32 C 50 36, 45 38, 41 38 C 36 38, 32 36, 32 32 Z" fill="#0284C7" />
+  <!-- Visor Specular Reflection -->
+  <ellipse cx="38" cy="29" rx="5" ry="2.2" transform="rotate(-15 38 29)" fill="#FFFFFF" opacity="0.95" />
+</svg>
