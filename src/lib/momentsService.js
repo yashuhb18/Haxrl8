@@ -261,7 +261,7 @@ export async function addMoment({ title, subtitle, category, tag, description, i
     tag: (tag || 'HAXLR8 MOMENT').toUpperCase().trim(),
     src: finalSrc,
     storagePath,
-    description: (description || 'Special memory captured during HAXLR8 3.0 at MIT Mysore.').trim(),
+    description: (description || 'Captured in the events by Dept. of ECE · MIT Mysore').trim(),
     rotate: randomRotate,
     bg: chosenColor.bg,
     border: chosenColor.border,
@@ -312,6 +312,84 @@ export async function addMoment({ title, subtitle, category, tag, description, i
   }
 
   return momentRecord;
+}
+
+/**
+ * Update moment details (title, subtitle, category, tag, description/caption)
+ */
+export async function updateMoment(momentId, updatedFields) {
+  if (!momentId) return null;
+
+  const current = getLocalMoments();
+  let updatedRecord = null;
+
+  const nextMoments = current.map(m => {
+    if (m.id === momentId || String(m.dbId) === String(momentId)) {
+      updatedRecord = {
+        ...m,
+        ...updatedFields,
+        title: (updatedFields.title !== undefined ? updatedFields.title : m.title).trim(),
+        subtitle: (updatedFields.subtitle !== undefined ? updatedFields.subtitle : m.subtitle).trim(),
+        category: updatedFields.category || m.category,
+        tag: (updatedFields.tag !== undefined ? updatedFields.tag : m.tag).toUpperCase().trim(),
+        description: (updatedFields.description !== undefined ? updatedFields.description : m.description).trim(),
+        updated_at: new Date().toISOString()
+      };
+      return updatedRecord;
+    }
+    return m;
+  });
+
+  if (updatedRecord) {
+    setLocalMoments(nextMoments);
+  }
+
+  // Update in Supabase
+  try {
+    const dbId = updatedRecord?.dbId;
+    if (dbId) {
+      await supabase
+        .from('announcements')
+        .update({
+          title: updatedRecord.title,
+          message: updatedRecord.description,
+          content: JSON.stringify(updatedRecord),
+        })
+        .eq('id', dbId);
+    } else {
+      const { data: rows } = await supabase
+        .from('announcements')
+        .select('id, content')
+        .eq('tag', 'MOMENT');
+
+      if (rows && rows.length > 0) {
+        for (const r of rows) {
+          if (r.content && r.content.includes(momentId)) {
+            const parsed = JSON.parse(r.content);
+            const merged = { 
+              ...parsed, 
+              ...updatedFields, 
+              title: updatedRecord?.title || parsed.title, 
+              description: updatedRecord?.description || parsed.description 
+            };
+            await supabase
+              .from('announcements')
+              .update({
+                title: merged.title,
+                message: merged.description,
+                content: JSON.stringify(merged),
+              })
+              .eq('id', r.id);
+            break;
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Error updating moment in database:', err);
+  }
+
+  return updatedRecord;
 }
 
 /**

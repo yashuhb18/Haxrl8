@@ -3,10 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Camera, Upload, Image as ImageIcon, Trash2, ExternalLink, 
   Sparkles, CheckCircle2, AlertCircle, RefreshCw, Copy, Check, 
-  Eye, Plus, Tag, ArrowRight, ShieldCheck, Clock, MapPin, Cloud
+  Eye, Plus, Tag, ArrowRight, ShieldCheck, Clock, MapPin, Cloud, Edit3
 } from 'lucide-react';
 import { 
-  fetchMoments, addMoment, deleteMoment, getLocalMoments 
+  fetchMoments, addMoment, updateMoment, deleteMoment, getLocalMoments 
 } from '../../lib/momentsService';
 import { isCloudinaryConfigured } from '../../lib/cloudinaryService';
 import CloudinaryConfigModal from '../../components/admin/CloudinaryConfigModal';
@@ -33,6 +33,15 @@ export default function AdminMoments({ standalone = false }) {
   const [batchProgress, setBatchProgress] = useState(0);
   const [notification, setNotification] = useState(null);
   const [viewingMoment, setViewingMoment] = useState(null);
+  const [editingMoment, setEditingMoment] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    subtitle: 'Maharaja Institute of Technology Mysore • ECE Department',
+    category: 'ceremony',
+    tag: 'LIVE MOMENT',
+    description: 'Captured in the events by Dept. of ECE · MIT Mysore',
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [showCloudinaryModal, setShowCloudinaryModal] = useState(false);
 
@@ -46,7 +55,7 @@ export default function AdminMoments({ standalone = false }) {
     subtitle: 'Maharaja Institute of Technology Mysore • ECE Department',
     category: 'ceremony',
     tag: 'LIVE MOMENT',
-    description: '',
+    description: 'Captured in the events by Dept. of ECE · MIT Mysore',
   });
 
   const loadMomentsList = async () => {
@@ -210,7 +219,7 @@ export default function AdminMoments({ standalone = false }) {
           subtitle: 'Maharaja Institute of Technology Mysore • ECE Department',
           category: 'ceremony',
           tag: 'BATCH UPLOAD',
-          description: 'Captured during HAXLR8 3.0 at MIT Mysore.',
+          description: 'Captured in the events by Dept. of ECE · MIT Mysore',
           imageFile: file,
         });
         successCount++;
@@ -226,6 +235,39 @@ export default function AdminMoments({ standalone = false }) {
     playCrewmatePopSound();
     loadMomentsList();
     if (batchInputRef.current) batchInputRef.current.value = '';
+  };
+
+  // Open Edit Moment Modal
+  const handleStartEditMoment = (moment) => {
+    setEditingMoment(moment);
+    setEditFormData({
+      title: moment.title || '',
+      subtitle: moment.subtitle || 'Maharaja Institute of Technology Mysore • ECE Department',
+      category: moment.category || 'ceremony',
+      tag: moment.tag || 'LIVE MOMENT',
+      description: moment.description || 'Captured in the events by Dept. of ECE · MIT Mysore',
+    });
+  };
+
+  // Save Edited Moment (caption, title, details)
+  const handleSaveEditMoment = async (e) => {
+    e.preventDefault();
+    if (!editingMoment) return;
+    setSavingEdit(true);
+    playCrewmatePopSound();
+
+    try {
+      await updateMoment(editingMoment.id, editFormData);
+      showToast('Photo caption & details updated successfully! 🚀', 'success');
+      playCrewmatePopSound();
+      setEditingMoment(null);
+      loadMomentsList();
+    } catch (err) {
+      console.error('Error updating moment:', err);
+      showToast('Failed to update photo details', 'error');
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
   // Handle Delete
@@ -1040,27 +1082,50 @@ export default function AdminMoments({ standalone = false }) {
                         {new Date(m.created_at).toLocaleDateString()}
                       </span>
 
-                      <button
-                        type="button"
-                        disabled={deletingId === m.id}
-                        onClick={() => handleDeleteMoment(m)}
-                        style={{
-                          background: '#fee2e2',
-                          color: '#ef4444',
-                          border: 'none',
-                          borderRadius: 8,
-                          padding: '6px 10px',
-                          fontSize: 11.5,
-                          fontWeight: 800,
-                          cursor: deletingId === m.id ? 'not-allowed' : 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
-                      >
-                        <Trash2 size={12} />
-                        <span>{deletingId === m.id ? 'Deleting...' : 'Delete'}</span>
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <button
+                          type="button"
+                          onClick={() => handleStartEditMoment(m)}
+                          style={{
+                            background: '#e0f2fe',
+                            color: '#0284c7',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '6px 10px',
+                            fontSize: 11.5,
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <Edit3 size={12} />
+                          <span>Edit Caption</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={deletingId === m.id}
+                          onClick={() => handleDeleteMoment(m)}
+                          style={{
+                            background: '#fee2e2',
+                            color: '#ef4444',
+                            border: 'none',
+                            borderRadius: 8,
+                            padding: '6px 10px',
+                            fontSize: 11.5,
+                            fontWeight: 800,
+                            cursor: deletingId === m.id ? 'not-allowed' : 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <Trash2 size={12} />
+                          <span>{deletingId === m.id ? 'Deleting...' : 'Delete'}</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -1147,6 +1212,274 @@ export default function AdminMoments({ standalone = false }) {
                   </p>
                 )}
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Caption & Details Modal */}
+      <AnimatePresence>
+        {editingMoment && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setEditingMoment(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 99999,
+              background: 'rgba(15, 23, 42, 0.82)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 20,
+              backdropFilter: 'blur(6px)',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{
+                background: '#ffffff',
+                borderRadius: 24,
+                padding: 24,
+                maxWidth: 580,
+                width: '100%',
+                maxHeight: '92vh',
+                overflowY: 'auto',
+                boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 10, background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Edit3 size={18} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: 0 }}>
+                      Edit Photo Caption & Details
+                    </h3>
+                    <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>
+                      Update title, caption, and display category across the public gallery.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingMoment(null)}
+                  style={{
+                    background: '#f1f5f9',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: 32,
+                    height: 32,
+                    cursor: 'pointer',
+                    fontSize: 16,
+                    color: '#64748b',
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Thumbnail Preview */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#f8fafc', padding: 12, borderRadius: 16, marginBottom: 18, border: '1px solid #e2e8f0' }}>
+                <div style={{ width: 64, height: 64, borderRadius: 12, overflow: 'hidden', background: '#e2e8f0', flexShrink: 0 }}>
+                  <img src={editingMoment.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#ff3b69', textTransform: 'uppercase' }}>
+                    {editingMoment.tag || 'MOMENT'}
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {editingMoment.title}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: '#64748b' }}>
+                    Live on public Highlights & Moments gallery
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveEditMoment} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {/* Title */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12.5, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+                    Photo Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editFormData.title}
+                    onChange={e => setEditFormData({ ...editFormData, title: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: 12,
+                      border: '1.5px solid #e2e8f0',
+                      fontSize: 13.5,
+                      fontWeight: 600,
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+
+                {/* Caption / Description */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12.5, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+                    Photo Caption / Memory Description *
+                  </label>
+                  <textarea
+                    required
+                    rows={3}
+                    value={editFormData.description}
+                    onChange={e => setEditFormData({ ...editFormData, description: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: 12,
+                      border: '1.5px solid #e2e8f0',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      fontFamily: 'inherit',
+                      resize: 'vertical',
+                    }}
+                  />
+                  <span style={{ fontSize: 11, color: '#64748b', display: 'block', marginTop: 4 }}>
+                    Shown directly in photo cards and interactive viewing modals.
+                  </span>
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12.5, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>
+                    Gallery Category
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                    {CATEGORIES.map(cat => {
+                      const isSelected = editFormData.category === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => setEditFormData({ ...editFormData, category: cat.id })}
+                          style={{
+                            padding: '8px 10px',
+                            borderRadius: 12,
+                            border: isSelected ? `2px solid ${cat.color}` : '1.5px solid #e2e8f0',
+                            background: isSelected ? cat.bg : '#ffffff',
+                            color: isSelected ? cat.color : '#64748b',
+                            fontSize: 11.5,
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {cat.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Tag & Subtitle */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12.5, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+                      Tag Badge
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.tag}
+                      onChange={e => setEditFormData({ ...editFormData, tag: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        borderRadius: 12,
+                        border: '1.5px solid #e2e8f0',
+                        fontSize: 12.5,
+                        fontWeight: 700,
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        textTransform: 'uppercase',
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12.5, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+                      Location / Subtitle
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.subtitle}
+                      onChange={e => setEditFormData({ ...editFormData, subtitle: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        borderRadius: 12,
+                        border: '1.5px solid #e2e8f0',
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingMoment(null)}
+                    style={{
+                      background: '#f1f5f9',
+                      color: '#475569',
+                      border: 'none',
+                      borderRadius: 12,
+                      padding: '10px 18px',
+                      fontSize: 13,
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingEdit}
+                    style={{
+                      background: '#0284c7',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: 12,
+                      padding: '10px 22px',
+                      fontSize: 13,
+                      fontWeight: 900,
+                      cursor: savingEdit ? 'not-allowed' : 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)',
+                    }}
+                  >
+                    {savingEdit ? (
+                      <>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <span>Save Changes 💾</span>
+                    )}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}
