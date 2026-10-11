@@ -12,11 +12,13 @@ import {
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 import emitersSeal from '../../assets/logo/emiters-seal.png';
 import mitLogo from '../../assets/logo/mit-mysore-logo.png';
+import { resolveDomain } from '../../lib/domainUtils';
 
 export default function TicketTab({ 
   hasTeam, 
   teamData, 
   teamMembers, 
+  submissions,
   user, 
   setActiveTab 
 }) {
@@ -49,7 +51,7 @@ export default function TicketTab({
                  { full_name: user?.user_metadata?.full_name || 'Team Leader', email: user?.email };
 
   const crew = teamMembers?.filter(m => m.id !== leader?.id && m.email !== leader?.email) || [];
-  const domain = teamData?.domain || 'Agriculture';
+  const domain = resolveDomain(teamData, submissions?.[0], user);
 
   const handlePrint = () => {
     window.print();
@@ -317,7 +319,7 @@ export default function TicketTab({
                   <div style={{ fontSize: 15, fontWeight: 900, color: '#0f172a', marginTop: 4 }}>
                     08:30 AM IST (Nov 6)
                   </div>
-                  <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>Badge Pick-up &amp; Breakfast</div>
+                  <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>Badge Pick-up &amp; Check-in</div>
                 </div>
 
                 <div style={{ padding: '14px', background: '#f8fafc', borderRadius: 14, border: '1px solid #e2e8f0', gridColumn: 'span 2' }}>

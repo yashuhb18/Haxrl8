@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
 import { ensureUUID } from '../../lib/syncService';
 import { sendPaymentConfirmationEmail } from '../../lib/emailService';
+import { resolveDomain, formatDomainWithBadge } from '../../lib/domainUtils';
 import { 
   CreditCard, 
   ExternalLink, 
@@ -86,10 +87,12 @@ export default function PaymentTab({
   hasTeam, 
   teamData, 
   teamMembers, 
+  submissions,
   user, 
   setActiveTab,
   onPaymentUpdated 
 }) {
+  const currentDomain = resolveDomain(teamData, submissions?.[0], user);
   const [loading, setLoading] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
@@ -281,19 +284,19 @@ export default function PaymentTab({
       // 2. Persist to Supabase submissions table with QR screenshot in pdf_url
       if (teamData?.id) {
         try {
-          const teamDomain = teamData.domain || 'Agriculture';
           const { data: existingSubs } = await supabase
             .from('submissions')
-            .select('id')
+            .select('*')
             .eq('team_id', teamData.id)
             .limit(1);
           const existingSub = existingSubs?.[0];
+          const teamDomain = resolveDomain(teamData, existingSub || submissions?.[0], user);
 
           const subPayload = {
             team_id: teamData.id,
             project_title: `${teamData.team_name} - ${teamDomain}`,
             sdg_goal: teamDomain,
-            category: 'Registration Verified',
+            category: teamDomain,
             project_description: `Registration fee ₹1200 verified. UTR: ${cleanUtr}. Payer: ${sanitizeInput(payerName)} (${sanitizeInput(payerPhone || 'N/A')}). Leader: ${user?.user_metadata?.full_name || 'Leader'} (${user?.email}).`,
             pdf_url: finalScreenshotUrl,
             status: 'Shortlisted'
@@ -317,12 +320,14 @@ export default function PaymentTab({
             phone: m.phone_number || m.phone || ''
           }));
 
+          const teamDomain = resolveDomain(teamData, submissions?.[0], user);
+
           sendPaymentConfirmationEmail?.({
             recipientEmail: user.email,
             leaderName: user?.user_metadata?.full_name || 'Leader',
             leaderPhone: payerPhone || '',
             teamName: teamData?.team_name || 'Your Squad',
-            domain: teamData?.domain || 'Agriculture',
+            domain: teamDomain,
             teamId: teamData?.id,
             transactionId: cleanUtr,
             members: emailMembersList
@@ -336,7 +341,10 @@ export default function PaymentTab({
       setToastMsg('Payment verified! Access your official payment receipt.');
 
       if (onPaymentUpdated) {
-        onPaymentUpdated(paymentPayload);
+        onPaymentUpdated({
+          ...paymentPayload,
+          domain: resolveDomain(teamData, submissions?.[0], user)
+        });
       }
     } catch (err) {
       console.error('Payment verification error:', err);
@@ -396,7 +404,7 @@ export default function PaymentTab({
             </div>
             <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>
               {teamData?.team_name ? (
-                <>Squad: <strong>{teamData.team_name}</strong> · Domain: <strong>{teamData.domain || 'Agriculture'}</strong> · Fee covers complete 3–4 member squad</>
+                <>Squad: <strong>{teamData.team_name}</strong> · Domain: <strong>{formatDomainWithBadge(currentDomain)}</strong> · Fee covers complete 3–4 member squad</>
               ) : (
                 <>Fee covers complete 3–4 member squad, 24-hr access, catering, Wi-Fi & official registration verification</>
               )}

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
+import { resolveDomain } from '../../lib/domainUtils';
 import { Search, ChevronRight, Download, Eye, X, CheckCircle, Clock, MapPin, Users, Building, Laptop } from 'lucide-react';
 
 const S = {
@@ -114,7 +115,7 @@ export default function AdminEvaluations() {
           return {
             id: team.id,
             teamName: team.team_name || 'Unnamed Squad',
-            domain: sub?.category || 'General Innovation',
+            domain: resolveDomain(team, sub, null, 'General Innovation'),
             leaderName: lead?.full_name || 'N/A',
             leaderEmail: lead?.email || 'N/A',
             leaderPhone: lead?.phone_number || 'N/A',
@@ -173,7 +174,7 @@ export default function AdminEvaluations() {
       csvRows.push([
         i + 1,
         `"${t.team_name || ''}"`,
-        `"${sub?.category || 'General'}"`,
+        `"${resolveDomain(t, sub, null, 'General Innovation')}"`,
         `"${lead?.full_name || ''}"`,
         `"${lead?.email || ''}"`,
         `"${lead?.phone_number || ''}"`,

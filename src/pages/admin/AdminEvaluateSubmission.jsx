@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
+import { resolveDomain } from '../../lib/domainUtils';
 import { ChevronRight, ChevronLeft, CheckCircle, Mail, Phone, User, MapPin, Building2, Laptop, ShieldCheck } from 'lucide-react';
 
 const S = {
@@ -38,7 +39,7 @@ export default function AdminEvaluateSubmission() {
             teamId = sub.team_id;
             const { data: t } = await supabase.from('teams').select('*').eq('id', sub.team_id).maybeSingle();
             if (t) setTeam(t);
-            if (sub.category) setDomainTrack(sub.category);
+            setDomainTrack(resolveDomain(t, sub, null, 'Healthcare'));
           }
         }
 
@@ -48,7 +49,7 @@ export default function AdminEvaluateSubmission() {
             supabase.from('submissions').select('*').eq('team_id', teamId).maybeSingle()
           ]);
           if (mbrs) setMembers(mbrs);
-          if (subRec?.category) setDomainTrack(subRec.category);
+          if (subRec) setDomainTrack(resolveDomain(team, subRec, null, 'Healthcare'));
 
           // Check check-in status
           try {

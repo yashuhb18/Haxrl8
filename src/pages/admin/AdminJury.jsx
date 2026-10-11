@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
+import { resolveDomain } from '../../lib/domainUtils';
 import { Search, Download, FileText, LayoutDashboard, LogOut } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -92,7 +93,7 @@ export default function AdminJury() {
     const tm1 = otherMembers[0] || null;
     const tm2 = otherMembers[1] || null;
     const tm3 = otherMembers[2] || null;
-    const track = sub?.category || 'General';
+    const track = resolveDomain(team, sub, null, 'General');
 
     return {
       sNo: index + 1,

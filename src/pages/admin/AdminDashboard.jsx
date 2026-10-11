@@ -5,6 +5,7 @@ import { isOrganizerAuthorized } from './adminAuth';
 import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight, Mail, Send, CheckCircle2, RefreshCw } from 'lucide-react';
 import { getEmailDispatchLogs, HAXLR8_HOST_EMAIL } from '../../lib/emailService';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
+import { resolveDomain } from '../../lib/domainUtils';
 
 // Style constants
 const S = {
@@ -397,7 +398,7 @@ export default function AdminDashboard() {
                                 <span style={{ fontWeight:700, color:S.t1 }}>{team.team_name}</span>
                               </div>
                             </td>
-                            <td style={{ padding:'14px 18px', color:S.t2 }}>{sub?.category || 'General'}</td>
+                            <td style={{ padding:'14px 18px', color:S.t2 }}>{resolveDomain(team, sub, null, 'General Innovation')}</td>
                             <td style={{ padding:'14px 18px', color:S.t2, fontWeight:700 }}>{teamMems.length ? `${teamMems.length} Members` : '1 Member'}</td>
                             <td style={{ padding:'14px 18px', color:S.t3 }}>{team.created_at ? new Date(team.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-'}</td>
                             <td style={{ padding:'14px 18px' }}>

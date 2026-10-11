@@ -115,7 +115,7 @@ export function generateWelcomeEmailHtml({
           </tr>
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Domain</td>
-            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${domain || 'Agriculture'}</td>
+            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${(domain && domain !== 'Registration Verified') ? domain : 'Healthcare'}</td>
           </tr>
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Team Lead</td>
@@ -722,7 +722,7 @@ export function generatePaymentEmailHtml({
           </tr>
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Domain</td>
-            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${domain || 'Agriculture'}</td>
+            <td style="padding: 8px 0; color: #0284c7; font-weight: 800; text-align: right;">${(domain && domain !== 'Registration Verified') ? domain : 'Healthcare'}</td>
           </tr>
           <tr style="border-bottom: 1px solid #f1f5f9;">
             <td style="padding: 8px 0; color: #64748b; font-weight: 600;">Transaction UTR</td>

@@ -11,6 +11,7 @@ import AnnouncementsTab from './AnnouncementsTab';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 import { filterRealAnnouncements } from '../../lib/announcementsService';
+import { resolveDomain } from '../../lib/domainUtils';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -276,9 +277,6 @@ export default function DashboardPage() {
         }
 
         if (resolvedTeam) {
-          setHasTeam(true);
-          setTeamData(resolvedTeam);
-
           try {
             const { data: members } = await withTimeout(
               supabase
@@ -333,9 +331,16 @@ export default function DashboardPage() {
             }
           } catch (sErr) {}
 
+          // Determine canonical domain
+          const finalDomain = resolveDomain(resolvedTeam, resolvedSubs?.[0], activeUser);
+          resolvedTeam.domain = finalDomain;
+
+          setHasTeam(true);
+          setTeamData({ ...resolvedTeam, domain: finalDomain });
+
           // Cache strictly scoped to this user (never overwrite with empty members)
           try {
-            localStorage.setItem(`haxlr8_team_${activeUser.id}`, JSON.stringify(resolvedTeam));
+            localStorage.setItem(`haxlr8_team_${activeUser.id}`, JSON.stringify({ ...resolvedTeam, domain: finalDomain }));
             if (resolvedMembers && resolvedMembers.length > 0) {
               localStorage.setItem(`haxlr8_members_${activeUser.id}`, JSON.stringify(resolvedMembers));
             }
@@ -358,8 +363,10 @@ export default function DashboardPage() {
           } catch (e) {}
 
           if (userScopedTeam) {
+            const finalDomain = resolveDomain(userScopedTeam, null, activeUser);
+            userScopedTeam.domain = finalDomain;
             setHasTeam(true);
-            setTeamData(userScopedTeam);
+            setTeamData({ ...userScopedTeam, domain: finalDomain });
             try {
               const scopedMems = localStorage.getItem(`haxlr8_members_${activeUser.id}`);
               if (scopedMems) setTeamMembers(JSON.parse(scopedMems));
@@ -602,8 +609,8 @@ export default function DashboardPage() {
     <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab} hasTeam={hasTeam} announcements={announcements} user={user}>
       {activeTab === 'overview'   && <OverviewTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} user={user} setActiveTab={setActiveTab} announcements={announcements} />}
       {activeTab === 'team'       && <TeamTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} user={user} setTeamMembers={setTeamMembers} setTeamData={setTeamData} setHasTeam={setHasTeam} setActiveTab={setActiveTab} />}
-      {activeTab === 'payment'    && <PaymentTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} user={user} setActiveTab={setActiveTab} onPaymentUpdated={(p) => { if (teamData) setTeamData({ ...teamData, payment_status: 'submitted', payment_utr: p.transaction_id }); }} />}
-      {activeTab === 'ticket'     && <TicketTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} user={user} setActiveTab={setActiveTab} />}
+      {activeTab === 'payment'    && <PaymentTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} user={user} setActiveTab={setActiveTab} onPaymentUpdated={(p) => { if (teamData) setTeamData({ ...teamData, payment_status: 'submitted', payment_utr: p.transaction_id }); }} />}
+      {activeTab === 'ticket'     && <TicketTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} user={user} setActiveTab={setActiveTab} />}
       {activeTab === 'resources'  && <ResourcesTab hasTeam={hasTeam} submissions={submissions} setActiveTab={setActiveTab} />}
       {activeTab === 'announcements' && <AnnouncementsTab announcements={announcements} />}
     </DashboardLayout>

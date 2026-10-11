@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
+import { resolveDomain } from '../../lib/domainUtils';
 import { Users, Flag, CheckSquare, Search, ChevronDown, Download, ChevronRight, MoreVertical, ChevronLeft, Trophy, Trash2, Eye, Receipt, X, ExternalLink, Image } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -84,7 +85,7 @@ export default function AdminTeams() {
         if (teamIds.length > 0) {
           const [{ data: m }, { data: s }] = await Promise.all([
             supabase.from('team_members').select('*').in('team_id', teamIds),
-            supabase.from('submissions').select('id, team_id, category, project_title, pdf_url, project_description, created_at').in('team_id', teamIds)
+            supabase.from('submissions').select('*').in('team_id', teamIds)
           ]);
           if (m) setMembers(m);
           if (s) setSubmissions(s);
@@ -225,7 +226,7 @@ export default function AdminTeams() {
       const teamIds = data.map(t => t.id);
       const [{ data: m }, { data: s }] = await Promise.all([
         supabase.from('team_members').select('*').in('team_id', teamIds),
-        supabase.from('submissions').select('id, team_id, category, project_title, pdf_url, project_description, created_at').in('team_id', teamIds)
+        supabase.from('submissions').select('*').in('team_id', teamIds)
       ]);
 
       const excelRows = data.map((t, i) => {
@@ -251,6 +252,7 @@ export default function AdminTeams() {
         return {
           "Sl No": i + 1,
           "Team Name": t.team_name || 'N/A',
+          "Domain": resolveDomain(t, sub, null, 'General Innovation'),
           "Team Lead": lead?.full_name || 'N/A',
           "Team Members": memberNames || lead?.full_name || 'N/A',
           "Members Count": teamMems.length || 1,
@@ -337,7 +339,7 @@ export default function AdminTeams() {
                   <tbody>
                     {currentTeams.map((t, index) => {
                       const sub = submissions.find(s => s.team_id === t.id);
-                      const track = sub?.category || 'General';
+                      const track = resolveDomain(t, sub, null, 'General Innovation');
                       const teamMembers = members.filter(m => m.team_id === t.id);
                       const lead = teamMembers.find(m => m.is_leader === true) || teamMembers[0];
                       const hasReceipt = Boolean(sub?.pdf_url);

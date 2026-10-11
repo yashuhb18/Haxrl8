@@ -5,6 +5,7 @@ import { sanitizeInput } from '../../lib/security';
 import { Rocket, Users, Flag, ClipboardList, MoreVertical, Info, Target, Calendar, Check, AlertCircle, Clock } from 'lucide-react';
 import { sendParticipantWelcomeEmail } from '../../lib/emailService';
 import { ensureUUID, isUUID } from '../../lib/syncService';
+import { resolveDomain } from '../../lib/domainUtils';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 // import IdCardUpload from '../../components/IdCardUpload';
 
@@ -160,7 +161,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
   const [formData, setFormData] = useState({
     teamName: '',
     teamSize: 3,
-    domain: teamData?.domain || 'Agriculture',
+    domain: resolveDomain(teamData, null, user, 'Healthcare'),
     leader: {
       ...defaultMember,
       full_name: user?.user_metadata?.full_name || '',
@@ -200,7 +201,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
     setFormData({
       teamName: teamData?.team_name || '',
       teamSize: teamMembers?.length || 3,
-      domain: teamData?.domain || 'Agriculture',
+      domain: resolveDomain(teamData, null, user, 'Healthcare'),
       leader: {
         ...defaultMember,
         ...leader,
@@ -404,10 +405,10 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           console.warn('Submissions track insert notice:', subErr);
         }
 
-        localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(team));
+        finalTeamData = { ...team, domain: cleanDomain };
+        localStorage.setItem(`haxlr8_team_${validLeaderId}`, JSON.stringify(finalTeamData));
         localStorage.removeItem('haxlr8_teams_db');
         currentTeamId = team.id;
-        finalTeamData = { ...team, domain: cleanDomain };
       }
 
       // --- Upload Files Helper ---
@@ -978,7 +979,7 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
             <div style={{ position: 'absolute', top: 16, bottom: 16, left: 15, width: 2, background: '#f1e7db', zIndex: 0 }}></div>
 
             {[
-              { num: 1, title: 'Squad Manifest Locked In', desc: `Crew of ${teamMembers.length} confirmed in ${teamData?.domain || 'Agriculture'} domain.` },
+              { num: 1, title: 'Squad Manifest Locked In', desc: `Crew of ${teamMembers.length} confirmed in ${resolveDomain(teamData, null, user, 'Healthcare')} domain.` },
               { num: 2, title: 'Pay Registration Fee (₹1,200)', desc: 'Pay ₹1,200 team fee & submit verification details.' },
               { num: 3, title: 'Unlock Payment Receipt', desc: 'Download your verified hackathon registration and fee receipt.' }
             ].map((step, i) => (
