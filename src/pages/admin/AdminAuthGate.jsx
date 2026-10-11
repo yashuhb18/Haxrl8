@@ -4,10 +4,9 @@ import haxlr8LogoDark from '../../assets/logo/haxlr8-logo-dark.png';
 import emitersSeal from '../../assets/logo/emiters-seal.png';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
 
-const MASTER_PASSCODE = 'HAXLR8_COMMAND_2026';
+const MASTER_PASSCODE = 'ecemit3.0';
 const ORGANIZER_SESSION_KEY = 'haxlr8_organizer_session';
 const ORGANIZER_TIMESTAMP_KEY = 'haxlr8_organizer_timestamp';
-const ADMIN_IDLE_TIMEOUT_MS = 8 * 60 * 60 * 1000; // 8-hour session window for mobile & desktop organizers
 
 export const AdminAuthContext = React.createContext({
   isAuthenticated: false,
@@ -43,38 +42,21 @@ export default function AdminAuthGate({ children }) {
   useEffect(() => {
     const checkSession = async () => {
       let savedSession = null;
-      let savedTimestamp = 0;
 
       try {
-        savedSession = sessionStorage.getItem(ORGANIZER_SESSION_KEY);
-        savedTimestamp = parseInt(sessionStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
+        savedSession = localStorage.getItem(ORGANIZER_SESSION_KEY);
       } catch (e) {}
 
-      // Fallback to localStorage for mobile browsers where sessionStorage resets on tab suspend
-      if (savedSession !== 'active' || !savedTimestamp) {
+      if (savedSession !== 'active') {
         try {
-          const lSession = localStorage.getItem(ORGANIZER_SESSION_KEY);
-          const lTime = parseInt(localStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
-          if (lSession === 'active' && lTime) {
-            savedSession = lSession;
-            savedTimestamp = lTime;
-          }
+          savedSession = sessionStorage.getItem(ORGANIZER_SESSION_KEY);
         } catch (e) {}
       }
 
-      const now = Date.now();
-
-      if (savedSession === 'active' && savedTimestamp && (now - savedTimestamp < ADMIN_IDLE_TIMEOUT_MS)) {
-        const nowStr = now.toString();
-        try { sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr); } catch (e) {}
-        try { localStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr); } catch (e) {}
+      if (savedSession === 'active') {
         setIsAuthenticated(true);
         setLoading(false);
         return;
-      }
-
-      if (savedSession === 'active' && savedTimestamp && (now - savedTimestamp >= ADMIN_IDLE_TIMEOUT_MS)) {
-        setErrorMsg('🔒 Admin session expired after 8 hours. Please re-enter master passcode.');
       }
 
       setIsAuthenticated(false);
@@ -91,46 +73,15 @@ export default function AdminAuthGate({ children }) {
     return () => window.removeEventListener('haxlr8_organizer_logout', onLogoutEvent);
   }, []);
 
-  // Inactivity detection & mobile visibility resume
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const updateActivity = () => {
-      const nowStr = Date.now().toString();
-      try { sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr); } catch (e) {}
-      try { localStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr); } catch (e) {}
-    };
-
-    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'touchmove', 'click', 'visibilitychange'];
-    activityEvents.forEach(evt => window.addEventListener(evt, updateActivity, { passive: true }));
-
-    const timer = setInterval(() => {
-      let lastActive = 0;
-      try {
-        lastActive = parseInt(sessionStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || localStorage.getItem(ORGANIZER_TIMESTAMP_KEY) || '0', 10);
-      } catch (e) {}
-
-      if (!lastActive || (Date.now() - lastActive >= ADMIN_IDLE_TIMEOUT_MS)) {
-        setErrorMsg('🔒 Admin session expired. Please re-enter master passcode.');
-        handleLogout();
-      }
-    }, 15000); // Check every 15s instead of 2.5s to preserve mobile battery and performance
-
-    return () => {
-      activityEvents.forEach(evt => window.removeEventListener(evt, updateActivity));
-      clearInterval(timer);
-    };
-  }, [isAuthenticated]);
-
   const setAuthStorage = () => {
     const nowStr = Date.now().toString();
     try {
-      sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
-      sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr);
-    } catch (e) {}
-    try {
       localStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
       localStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr);
+    } catch (e) {}
+    try {
+      sessionStorage.setItem(ORGANIZER_SESSION_KEY, 'active');
+      sessionStorage.setItem(ORGANIZER_TIMESTAMP_KEY, nowStr);
     } catch (e) {}
     setIsAuthenticated(true);
   };
@@ -138,11 +89,17 @@ export default function AdminAuthGate({ children }) {
   const handlePasscodeLogin = (e) => {
     e.preventDefault();
     setErrorMsg('');
-    const cleanKey = passcode.trim().toUpperCase();
-    if (cleanKey === MASTER_PASSCODE || cleanKey === 'HAXLR8_2026' || cleanKey === 'HAXLR82026' || cleanKey === 'HAXLR8' || cleanKey === 'ADMIN' || cleanKey === 'MITM') {
+    const cleanKey = passcode.trim();
+    if (
+      cleanKey.toLowerCase() === MASTER_PASSCODE.toLowerCase() ||
+      cleanKey.toLowerCase() === 'ecemit3.0' ||
+      cleanKey === 'HAXLR8_COMMAND_2026' ||
+      cleanKey.toUpperCase() === 'HAXLR8' ||
+      cleanKey.toUpperCase() === 'ADMIN'
+    ) {
       setAuthStorage();
     } else {
-      setErrorMsg('Incorrect Master Passcode. Access denied.');
+      setErrorMsg('Incorrect Master Command Code. Access denied.');
     }
   };
 
@@ -150,19 +107,34 @@ export default function AdminAuthGate({ children }) {
     e.preventDefault();
     setSubmitting(true);
     setErrorMsg('');
+    const inputEmail = email.trim().toLowerCase();
+
+    // Direct organizer credential check for official email with password ecemit3.0
+    if (
+      (inputEmail === 'haxlr8ecemitm@gmail.com' || inputEmail === 'yashuhb18@gmail.com') &&
+      (password.trim() === 'ecemit3.0' || password.trim() === 'HAXLR8_COMMAND_2026')
+    ) {
+      setAuthStorage();
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      const res = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-      if (res.error) throw res.error;
-      const user = res.data?.user;
-      if (user?.email === 'yashuhb18@gmail.com' || user?.email === 'haxlr8ecemitm@gmail.com') {
-        setAuthStorage();
-      } else {
-        const { data: adminList } = await supabase.from('admins').select('email').eq('email', user.email);
-        if (adminList && adminList.length > 0) {
+      const res = await supabase.auth.signInWithPassword({ email: inputEmail, password });
+      if (!res.error && res.data?.user) {
+        const user = res.data.user;
+        if (user.email === 'yashuhb18@gmail.com' || user.email === 'haxlr8ecemitm@gmail.com') {
           setAuthStorage();
         } else {
-          setErrorMsg('Account authenticated, but this email is not in the authorized Organizers roster.');
+          const { data: adminList } = await supabase.from('admins').select('email').eq('email', user.email);
+          if (adminList && adminList.length > 0) {
+            setAuthStorage();
+          } else {
+            setErrorMsg('Account authenticated, but this email is not in the authorized Organizers roster.');
+          }
         }
+      } else {
+        throw res.error || new Error('Invalid login credentials');
       }
     } catch (err) {
       setErrorMsg(err.message || 'Login failed. Please verify credentials.');
