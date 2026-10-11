@@ -8,7 +8,7 @@ import {
 import { 
   fetchDocuments, saveDocument, deleteDocument, 
   uploadDocumentFile, DEFAULT_DOCUMENTS, getLocalDocuments,
-  getOfficialRulebook
+  getOfficialRulebook, subscribeToDocuments
 } from '../../lib/documentsService';
 import { playCrewmatePopSound } from '../../components/amongus/AmongUsSound';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
@@ -71,7 +71,17 @@ export default function AdminDocuments() {
       }
     };
     window.addEventListener('haxlr8_documents_updated', handleUpdate);
-    return () => window.removeEventListener('haxlr8_documents_updated', handleUpdate);
+
+    const unsubscribe = subscribeToDocuments((newDocs) => {
+      if (newDocs && Array.isArray(newDocs)) {
+        setDocuments(newDocs);
+      }
+    });
+
+    return () => {
+      window.removeEventListener('haxlr8_documents_updated', handleUpdate);
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   const handleFileChange = (e) => {
@@ -617,34 +627,6 @@ export default function AdminDocuments() {
                   resize: 'vertical'
                 }}
               />
-            </div>
-
-            {/* Lock / Release Toggle */}
-            <div style={{
-              background: formData.isLocked ? '#faf5ff' : '#f8fafc',
-              border: `1.5px solid ${formData.isLocked ? '#e9d5ff' : '#e2e8f0'}`,
-              borderRadius: 14,
-              padding: 14,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 8
-            }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', margin: 0 }}>
-                <input
-                  type="checkbox"
-                  checked={formData.isLocked}
-                  onChange={e => setFormData({ ...formData, isLocked: e.target.checked })}
-                  style={{ width: 18, height: 18, accentColor: '#9333ea', cursor: 'pointer' }}
-                />
-                <span style={{ fontSize: 13, fontWeight: 800, color: '#0f172a' }}>
-                  🔒 Lock Document until November 2nd (Problem Statements release)
-                </span>
-              </label>
-              {formData.isLocked && (
-                <div style={{ fontSize: 12, color: '#7c3aed', paddingLeft: 28 }}>
-                  Participants will see a "Unlocks on Nov 2nd" badge until the official reveal date.
-                </div>
-              )}
             </div>
 
             {/* Submit Button */}

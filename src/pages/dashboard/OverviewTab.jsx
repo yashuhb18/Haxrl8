@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import AmongUsCrewmate, { AmongUsKingCharacter } from '../../components/amongus/AmongUsCrewmate';
 import { filterRealAnnouncements } from '../../lib/announcementsService';
-import { fetchDocuments, getLocalDocuments, getOfficialRulebook } from '../../lib/documentsService';
+import { fetchDocuments, getLocalDocuments, getOfficialRulebook, subscribeToDocuments } from '../../lib/documentsService';
 
 const TIMELINE_STEPS = [
   { title: 'Registration', date: 'Oct 09' },
@@ -56,15 +56,25 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
   const rulebookDoc = getOfficialRulebook(documents);
 
   useEffect(() => {
+    let isMounted = true;
     fetchDocuments().then(data => {
-      if (data && Array.isArray(data)) setDocuments(data);
+      if (isMounted && data && Array.isArray(data)) setDocuments(data);
     });
 
     const handleDocsUpdate = (e) => {
       if (e.detail && Array.isArray(e.detail)) setDocuments(e.detail);
     };
     window.addEventListener('haxlr8_documents_updated', handleDocsUpdate);
-    return () => window.removeEventListener('haxlr8_documents_updated', handleDocsUpdate);
+
+    const unsubscribe = subscribeToDocuments((newDocs) => {
+      if (isMounted && newDocs && Array.isArray(newDocs)) setDocuments(newDocs);
+    });
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('haxlr8_documents_updated', handleDocsUpdate);
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -147,40 +157,6 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
 
       {/* Cosmic Event Timeline */}
       <EventTimeline steps={TIMELINE_STEPS} currentStepIndex={currentStepIndex} />
-
-      {/* ── PROBLEM STATEMENTS RELEASE & FLIGHT PASS NOTICE ── */}
-      <div style={{
-        background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-        border: '1.5px solid #fde68a',
-        borderRadius: 18,
-        padding: '16px 22px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-        boxShadow: '0 4px 14px rgba(217, 119, 6, 0.08)'
-      }}>
-        <div style={{
-          width: 44,
-          height: 44,
-          borderRadius: 12,
-          background: '#fef08a',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 22,
-          flexShrink: 0
-        }}>
-          🔒
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14.5, fontWeight: 800, color: '#92400e', marginBottom: 2 }}>
-            Problem Statement Block Unlocks November 2nd
-          </div>
-          <div style={{ fontSize: 13, color: '#b45309', fontWeight: 600, lineHeight: 1.5 }}>
-            The Problem Statement section will open by <strong>November 2nd</strong>. The official flight pass will be sent to all registered participants prior to the grand hackathon at MIT Mysore.
-          </div>
-        </div>
-      </div>
 
       {/* Stats Grid */}
       <div className="dash-overview-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>

@@ -15,7 +15,7 @@ export const DEFAULT_DOCUMENTS = [
     fileName: 'Pending Admin Upload',
     fileSize: 'Official PDF',
     fileType: 'pdf',
-    unlockDate: null, // immediately available
+    unlockDate: null,
     isLocked: false,
     uploadedAt: '2026-10-09T10:00:00.000Z',
     color: '#0284c7',
@@ -38,30 +38,17 @@ export const DEFAULT_DOCUMENTS = [
     color: '#0284c7',
     bg: '#f0f9ff',
     border: '#bae6fd'
-  },
-  {
-    id: 'doc_problem_statements',
-    title: 'Official Domain Problem Statements & Challenge Dossier',
-    category: 'Problem Statements',
-    badge: 'OPENS NOV 2',
-    description: 'Official industry problem statements for Agriculture, Healthcare, and Smart City. Reveals to all confirmed squads on November 2nd, 2026.',
-    fileUrl: '#problem-statements-nov-2',
-    fileName: 'HAXLR8-3.0-Problem-Statements.pdf',
-    fileSize: 'Pending Release',
-    fileType: 'pdf',
-    unlockDate: '2026-11-02T12:00:00.000Z',
-    isLocked: true,
-    uploadedAt: '2026-10-09T14:00:00.000Z',
-    color: '#9333ea',
-    bg: '#faf5ff',
-    border: '#e9d5ff'
   }
 ];
 
 function sanitizeDocumentsList(docs) {
   if (!Array.isArray(docs)) return DEFAULT_DOCUMENTS;
-  // Filter out any PPT template documents
-  const filtered = docs.filter(d => d.id !== 'doc_pptx_template' && d.category !== 'Template');
+  // Filter out any PPT template documents and locked placeholder problem statements
+  const filtered = docs.filter(d => 
+    d.id !== 'doc_pptx_template' && 
+    d.category !== 'Template' && 
+    d.id !== 'doc_problem_statements'
+  );
   if (filtered.length === 0) return DEFAULT_DOCUMENTS;
   return filtered.map(d => {
     // Strip dummy generated rulebook PDF so admin can upload the real one
@@ -110,6 +97,7 @@ export function getLocalDocuments() {
 export function getOfficialRulebook(docs) {
   const list = docs || getLocalDocuments();
   return list.find(d => d.id === 'doc_rulebook') || 
+         list.find(d => d.category === 'Rulebook' && d.fileUrl && d.fileUrl.startsWith('http')) || 
          list.find(d => d.category === 'Rulebook') || 
          DEFAULT_DOCUMENTS[0];
 }
@@ -127,24 +115,17 @@ export function setLocalDocuments(docs) {
 }
 
 /**
- * Fetch documents from Supabase cloud registry with local fallback
+ * Fetch documents from Supabase cloud registry with local fallback.
+ * Uses exact existing column list (id, content, created_at) to avoid SQL column errors.
  */
 export async function fetchDocuments() {
-  const local = getLocalDocuments();
-
   try {
-    const fetchPromise = supabase
+    const { data, error } = await supabase
       .from('announcements')
-      .select('content, updated_at')
+      .select('id, content, created_at')
       .eq('tag', ANNOUNCEMENT_TAG)
       .order('created_at', { ascending: false })
       .limit(1);
-
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Documents fetch timeout')), 2500)
-    );
-
-    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
 
     if (!error && data && data[0]?.content) {
       const parsed = JSON.parse(data[0].content);
@@ -155,10 +136,51 @@ export async function fetchDocuments() {
       }
     }
   } catch (err) {
-    // Graceful fallback to local documents
+    console.warn('Supabase fetchDocuments error:', err);
   }
 
-  return local;
+  return getLocalDocuments();
+}
+
+/**
+ * Real-time Supabase subscription for instant cross-device updates across all participant and admin accounts
+ */
+export function subscribeToDocuments(onUpdate) {
+  try {
+    const channel = supabase
+      .channel('public:documents_registry_sync')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'announcements',
+          filter: `tag=eq.${ANNOUNCEMENT_TAG}`
+        },
+        (payload) => {
+          if (payload.new && payload.new.content) {
+            try {
+              const parsed = JSON.parse(payload.new.content);
+              if (Array.isArray(parsed)) {
+                const sanitized = sanitizeDocumentsList(parsed);
+                setLocalDocuments(sanitized);
+                if (typeof onUpdate === 'function') onUpdate(sanitized);
+              }
+            } catch (err) {
+              console.warn('Error parsing real-time document payload:', err);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  } catch (err) {
+    console.warn('Failed to subscribe to documents real-time:', err);
+    return () => {};
+  }
 }
 
 /**

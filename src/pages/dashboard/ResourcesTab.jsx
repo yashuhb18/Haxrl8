@@ -5,7 +5,7 @@ import {
   Calendar, CheckCircle, AlertTriangle, ShieldCheck, Clock, 
   Info, FileDown, Layers, ChevronRight, Eye, FileCheck
 } from 'lucide-react';
-import { fetchDocuments, getLocalDocuments, getOfficialRulebook, DEFAULT_DOCUMENTS } from '../../lib/documentsService';
+import { fetchDocuments, getLocalDocuments, getOfficialRulebook, subscribeToDocuments } from '../../lib/documentsService';
 import { AmongUsKingCharacter } from '../../components/amongus/AmongUsCrewmate';
 
 const QUICK_LINKS = [
@@ -100,10 +100,11 @@ export default function ResourcesTab({ hasTeam, submissions }) {
 
   // Sync documents from cloud and react to admin uploads in real-time
   useEffect(() => {
+    let isMounted = true;
     const loadDocs = async () => {
       try {
         const cloudDocs = await fetchDocuments();
-        if (cloudDocs && cloudDocs.length > 0) {
+        if (isMounted && cloudDocs && cloudDocs.length > 0) {
           setDocuments(cloudDocs);
         }
       } catch (e) {
@@ -118,7 +119,19 @@ export default function ResourcesTab({ hasTeam, submissions }) {
       }
     };
     window.addEventListener('haxlr8_documents_updated', handleUpdate);
-    return () => window.removeEventListener('haxlr8_documents_updated', handleUpdate);
+
+    // Supabase real-time cloud subscription
+    const unsubscribe = subscribeToDocuments((newDocs) => {
+      if (isMounted && newDocs && Array.isArray(newDocs)) {
+        setDocuments(newDocs);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('haxlr8_documents_updated', handleUpdate);
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -156,43 +169,6 @@ export default function ResourcesTab({ hasTeam, submissions }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* ── PROBLEM STATEMENTS RELEASE & FLIGHT PASS NOTICE ── */}
-      <div style={{
-        background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-        border: '1.5px solid #fde68a',
-        borderRadius: 20,
-        padding: '18px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-        boxShadow: '0 4px 14px rgba(217, 119, 6, 0.08)'
-      }}>
-        <div style={{
-          width: 48,
-          height: 48,
-          borderRadius: 14,
-          background: '#fef08a',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 24,
-          flexShrink: 0
-        }}>
-          🔒
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 900, color: '#92400e', marginBottom: 3, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span>Problem Statements Section Unlocks November 2nd</span>
-            <span style={{ fontSize: 11, background: '#f59e0b', color: '#fff', padding: '2px 8px', borderRadius: 12, fontWeight: 800 }}>
-              COUNTDOWN ACTIVE
-            </span>
-          </div>
-          <div style={{ fontSize: 13, color: '#b45309', fontWeight: 600, lineHeight: 1.5 }}>
-            The Problem Statement section will open by <strong>November 2nd, 2026</strong>. Hackathon flight passes will be issued to confirmed squads once problem statements are assigned.
-          </div>
-        </div>
-      </div>
-
       {/* ── PARTICIPANTS DESK: OFFICIAL DOCUMENTS & DOWNLOADS ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
