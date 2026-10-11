@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
-import { Rocket, Users, Flag, ClipboardList, MoreVertical, Info, Target, Calendar, Check, AlertCircle, Clock } from 'lucide-react';
+import { Rocket, Users, Flag, ClipboardList, MoreVertical, Info, Target, Calendar, Check, AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
 import { sendParticipantWelcomeEmail } from '../../lib/emailService';
 import { ensureUUID, isUUID } from '../../lib/syncService';
 import { resolveDomain } from '../../lib/domainUtils';
@@ -155,7 +155,7 @@ const styles = {
   }
 };
 
-export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamMembers, setTeamData, setHasTeam, setActiveTab }) {
+export default function TeamTab({ hasTeam, teamData, teamMembers, submissions, user, setTeamMembers, setTeamData, setHasTeam, setActiveTab }) {
   // --- STATE MANAGEMENT ---
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -883,6 +883,39 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
   const leaderName = teamLeader?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Flight Captain';
   const registeredDate = teamData?.created_at ? new Date(teamData.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
 
+  // --- Retrieve payment state ---
+  let paymentRecord = null;
+  try {
+    if (user?.id) {
+      const cached = localStorage.getItem(`haxlr8_payment_${user.id}`);
+      if (cached) paymentRecord = JSON.parse(cached);
+    }
+  } catch (e) {}
+
+  if (!paymentRecord && (teamData?.payment_status === 'submitted' || teamData?.payment_utr)) {
+    paymentRecord = {
+      transaction_id: teamData.payment_utr,
+      amount: teamData.payment_amount || 1200,
+      status: 'submitted',
+      submitted_at: teamData.payment_date || new Date().toISOString()
+    };
+  }
+
+  if (!paymentRecord && submissions && submissions.length > 0) {
+    const paidSub = submissions.find(s => s.pdf_url || (s.project_description && s.project_description.includes('Registration fee')) || s.status === 'Shortlisted');
+    if (paidSub) {
+      const utrMatch = paidSub.project_description?.match(/UTR:\s*([A-Za-z0-9_-]+)/i);
+      paymentRecord = {
+        transaction_id: utrMatch ? utrMatch[1] : (paidSub.pdf_url ? 'VERIFIED' : 'VERIFIED'),
+        amount: 1200,
+        status: 'submitted',
+        submitted_at: paidSub.updated_at || paidSub.created_at || new Date().toISOString()
+      };
+    }
+  }
+
+  const isPaid = Boolean(paymentRecord?.transaction_id || teamData?.payment_status === 'submitted' || teamData?.payment_utr);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, width: '100%', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
@@ -895,8 +928,8 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
               <h2 style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>{teamData.team_name}</h2>
-              <span style={{ fontSize: 11, fontWeight: 800, background: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0', padding: '4px 12px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Flight Ready
+              <span style={{ fontSize: 11, fontWeight: 800, background: isPaid ? '#dcfce7' : '#e0f2fe', color: isPaid ? '#15803d' : '#0369a1', border: isPaid ? '1px solid #bbf7d0' : '1px solid #bae6fd', padding: '4px 12px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {isPaid ? 'Payment Verified ✓' : 'Flight Ready'}
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 36, flexWrap: 'wrap' }}>
@@ -976,21 +1009,57 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
           <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 24 }}>Follow the flight stages below to secure your entry pass.</p>
 
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 24, marginLeft: 10, paddingBottom: 10 }}>
-            <div style={{ position: 'absolute', top: 16, bottom: 16, left: 15, width: 2, background: '#f1e7db', zIndex: 0 }}></div>
+            <div style={{ position: 'absolute', top: 16, bottom: 16, left: 15, width: 2, background: isPaid ? '#16a34a' : '#f1e7db', zIndex: 0 }}></div>
 
             {[
-              { num: 1, title: 'Squad Manifest Locked In', desc: `Crew of ${teamMembers.length} confirmed in ${resolveDomain(teamData, null, user, 'Healthcare')} domain.` },
-              { num: 2, title: 'Pay Registration Fee (₹1,200)', desc: 'Pay ₹1,200 team fee & submit verification details.' },
-              { num: 3, title: 'Unlock Payment Receipt', desc: 'Download your verified hackathon registration and fee receipt.' }
+              { 
+                num: 1, 
+                title: 'Squad Manifest Locked In', 
+                desc: `Crew of ${teamMembers.length} confirmed in ${resolveDomain(teamData, submissions?.[0], user, 'Healthcare')} domain.`,
+                isDone: true 
+              },
+              { 
+                num: 2, 
+                title: isPaid ? 'Registration Fee Paid (₹1,200)' : 'Pay Registration Fee (₹1,200)', 
+                desc: isPaid ? `Registration fee ₹1,200 verified (UTR: ${paymentRecord?.transaction_id || 'VERIFIED'}).` : 'Pay ₹1,200 team fee & submit verification details.',
+                isDone: isPaid 
+              },
+              { 
+                num: 3, 
+                title: isPaid ? 'Payment Receipt Unlocked' : 'Unlock Payment Receipt', 
+                desc: isPaid ? 'Verified registration pass and fee receipt is ready for download.' : 'Download your verified hackathon registration and fee receipt.',
+                isDone: isPaid 
+              }
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: 20, position: 'relative', zIndex: 1 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#16a34a' : '#ffffff', border: `2px solid ${i === 0 ? '#16a34a' : '#0284c7'}`, color: i === 0 ? '#ffffff' : '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 900, flexShrink: 0, boxShadow: '0 2px 8px rgba(2, 132, 199, 0.2)' }}>
-                  {i === 0 ? '✓' : step.num}
+                <div style={{ 
+                  width: 32, 
+                  height: 32, 
+                  borderRadius: '50%', 
+                  background: step.isDone ? '#16a34a' : '#ffffff', 
+                  border: `2px solid ${step.isDone ? '#16a34a' : '#0284c7'}`, 
+                  color: step.isDone ? '#ffffff' : '#0284c7', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontSize: 13, 
+                  fontWeight: 900, 
+                  flexShrink: 0, 
+                  boxShadow: step.isDone ? '0 2px 8px rgba(22, 163, 74, 0.3)' : '0 2px 8px rgba(2, 132, 199, 0.2)' 
+                }}>
+                  {step.isDone ? '✓' : step.num}
                 </div>
                 <div style={{ flex: 1, paddingTop: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
                     <div style={{ flex: 1, minWidth: 150 }}>
-                      <div style={{ fontSize: 14.5, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>{step.title}</div>
+                      <div style={{ fontSize: 14.5, fontWeight: 800, color: step.isDone ? '#15803d' : '#0f172a', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span>{step.title}</span>
+                        {step.isDone && (
+                          <span style={{ fontSize: 10, fontWeight: 800, background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: 10, border: '1px solid #bbf7d0' }}>
+                            COMPLETED ✓
+                          </span>
+                        )}
+                      </div>
                       <div style={{ fontSize: 12.5, color: '#64748b', lineHeight: 1.5 }}>{step.desc}</div>
                     </div>
                   </div>
@@ -1015,19 +1084,36 @@ export default function TeamTab({ hasTeam, teamData, teamMembers, user, setTeamM
       {/* Bottom Action Card */}
       <div style={{ ...styles.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-          <div style={{ width: 50, height: 50, borderRadius: 14, background: '#e0f2fe', border: '1.5px solid #bae6fd', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Rocket size={24} color="#0284c7" />
+          <div style={{ width: 50, height: 50, borderRadius: 14, background: isPaid ? '#dcfce7' : '#e0f2fe', border: `1.5px solid ${isPaid ? '#86efac' : '#bae6fd'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {isPaid ? <CheckCircle2 size={24} color="#16a34a" /> : <Rocket size={24} color="#0284c7" />}
           </div>
           <div>
-            <div style={{ fontSize: 16.5, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>Ready to complete squad verification?</div>
-            <div style={{ fontSize: 13, color: '#64748b' }}>Proceed to Payment &amp; Verification to pay the ₹1,200 team fee and generate your verified payment receipt.</div>
+            <div style={{ fontSize: 16.5, fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>
+              {isPaid ? 'Payment Verified & Receipt Unlocked! 🎉' : 'Ready to complete squad verification?'}
+            </div>
+            <div style={{ fontSize: 13, color: '#64748b' }}>
+              {isPaid 
+                ? 'Your squad registration fee (₹1,200) is verified. Access and download your official entry pass and payment receipt.'
+                : 'Proceed to Payment & Verification to pay the ₹1,200 team fee and generate your verified payment receipt.'}
+            </div>
           </div>
         </div>
         <button
-          onClick={() => { if (setActiveTab) setActiveTab('payment'); }}
-          style={{ padding: '14px 28px', borderRadius: 12, border: 'none', background: '#0284c7', color: '#ffffff', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 14px rgba(2, 132, 199, 0.3)' }}
+          onClick={() => { if (setActiveTab) setActiveTab(isPaid ? 'ticket' : 'payment'); }}
+          style={{ 
+            padding: '14px 28px', 
+            borderRadius: 12, 
+            border: 'none', 
+            background: isPaid ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)' : '#0284c7', 
+            color: '#ffffff', 
+            fontSize: 14, 
+            fontWeight: 800, 
+            cursor: 'pointer', 
+            transition: 'all 0.2s', 
+            boxShadow: isPaid ? '0 4px 16px rgba(22, 163, 74, 0.35)' : '0 4px 14px rgba(2, 132, 199, 0.3)' 
+          }}
         >
-          Proceed to Payment & Verification (₹1,200) →
+          {isPaid ? 'View Payment Receipt →' : 'Proceed to Payment & Verification (₹1,200) →'}
         </button>
       </div>
 

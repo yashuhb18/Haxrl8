@@ -117,7 +117,11 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
       if (p) isPaid = true;
     }
   } catch (e) {}
-  if (!isPaid && teamData?.payment_status === 'submitted') isPaid = true;
+  if (!isPaid && (teamData?.payment_status === 'submitted' || teamData?.payment_utr)) isPaid = true;
+  if (!isPaid && submissions && submissions.length > 0) {
+    const paidSub = submissions.find(s => s.pdf_url || (s.project_description && s.project_description.includes('Registration fee')) || s.status === 'Shortlisted');
+    if (paidSub) isPaid = true;
+  }
 
   const overallProgress = hasTeam ? (isPaid ? 100 : 60) : 25; 
   const currentStepIndex = isPaid ? 3 : (hasTeam ? 1 : 0);

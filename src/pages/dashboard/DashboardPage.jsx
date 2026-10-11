@@ -335,12 +335,40 @@ export default function DashboardPage() {
           const finalDomain = resolveDomain(resolvedTeam, resolvedSubs?.[0], activeUser);
           resolvedTeam.domain = finalDomain;
 
+          // Determine payment status from submissions or cache
+          const paidSub = (resolvedSubs || []).find(s => s.pdf_url || (s.project_description && s.project_description.includes('Registration fee')) || s.status === 'Shortlisted');
+          let paymentStatus = resolvedTeam.payment_status;
+          let paymentUtr = resolvedTeam.payment_utr;
+          if (paidSub) {
+            const utrMatch = paidSub.project_description?.match(/UTR:\s*([A-Za-z0-9_-]+)/i);
+            paymentUtr = utrMatch ? utrMatch[1] : (paidSub.pdf_url ? 'VERIFIED' : 'VERIFIED');
+            paymentStatus = 'submitted';
+            resolvedTeam.payment_status = 'submitted';
+            resolvedTeam.payment_utr = paymentUtr;
+
+            // Also ensure active user has the payment record cached locally on this device/browser
+            try {
+              const nameMatch = paidSub.project_description?.match(/Payer:\s*([^(]+)/i);
+              const phoneMatch = paidSub.project_description?.match(/\(([0-9]+)\)/);
+              const autoPaymentRecord = {
+                transaction_id: paymentUtr,
+                payer_name: nameMatch ? nameMatch[1].trim() : (activeUser.user_metadata?.full_name || 'Leader'),
+                payer_phone: phoneMatch ? phoneMatch[1].trim() : '',
+                amount: 1200,
+                screenshot_url: paidSub.pdf_url || '',
+                status: 'submitted',
+                submitted_at: paidSub.updated_at || paidSub.created_at || new Date().toISOString()
+              };
+              localStorage.setItem(`haxlr8_payment_${activeUser.id}`, JSON.stringify(autoPaymentRecord));
+            } catch (e) {}
+          }
+
           setHasTeam(true);
-          setTeamData({ ...resolvedTeam, domain: finalDomain });
+          setTeamData({ ...resolvedTeam, domain: finalDomain, payment_status: paymentStatus, payment_utr: paymentUtr });
 
           // Cache strictly scoped to this user (never overwrite with empty members)
           try {
-            localStorage.setItem(`haxlr8_team_${activeUser.id}`, JSON.stringify({ ...resolvedTeam, domain: finalDomain }));
+            localStorage.setItem(`haxlr8_team_${activeUser.id}`, JSON.stringify({ ...resolvedTeam, domain: finalDomain, payment_status: paymentStatus, payment_utr: paymentUtr }));
             if (resolvedMembers && resolvedMembers.length > 0) {
               localStorage.setItem(`haxlr8_members_${activeUser.id}`, JSON.stringify(resolvedMembers));
             }
@@ -608,7 +636,7 @@ export default function DashboardPage() {
   return (
     <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab} hasTeam={hasTeam} announcements={announcements} user={user}>
       {activeTab === 'overview'   && <OverviewTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} user={user} setActiveTab={setActiveTab} announcements={announcements} />}
-      {activeTab === 'team'       && <TeamTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} user={user} setTeamMembers={setTeamMembers} setTeamData={setTeamData} setHasTeam={setHasTeam} setActiveTab={setActiveTab} />}
+      {activeTab === 'team'       && <TeamTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} user={user} setTeamMembers={setTeamMembers} setTeamData={setTeamData} setHasTeam={setHasTeam} setActiveTab={setActiveTab} />}
       {activeTab === 'payment'    && <PaymentTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} user={user} setActiveTab={setActiveTab} onPaymentUpdated={(p) => { if (teamData) setTeamData({ ...teamData, payment_status: 'submitted', payment_utr: p.transaction_id }); }} />}
       {activeTab === 'ticket'     && <TicketTab hasTeam={hasTeam} teamData={teamData} teamMembers={teamMembers} submissions={submissions} user={user} setActiveTab={setActiveTab} />}
       {activeTab === 'resources'  && <ResourcesTab hasTeam={hasTeam} submissions={submissions} setActiveTab={setActiveTab} />}

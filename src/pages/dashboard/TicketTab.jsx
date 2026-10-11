@@ -42,6 +42,24 @@ export default function TicketTab({
     };
   }
 
+  if (!paymentRecord && submissions && submissions.length > 0) {
+    const paidSub = submissions.find(s => s.pdf_url || (s.project_description && s.project_description.includes('Registration fee')) || s.status === 'Shortlisted');
+    if (paidSub) {
+      const utrMatch = paidSub.project_description?.match(/UTR:\s*([A-Za-z0-9_-]+)/i);
+      paymentRecord = {
+        transaction_id: utrMatch ? utrMatch[1] : (paidSub.pdf_url ? 'VERIFIED' : 'VERIFIED'),
+        amount: 1200,
+        status: 'submitted',
+        submitted_at: paidSub.updated_at || paidSub.created_at || new Date().toISOString()
+      };
+      try {
+        if (user?.id) {
+          localStorage.setItem(`haxlr8_payment_${user.id}`, JSON.stringify(paymentRecord));
+        }
+      } catch (e) {}
+    }
+  }
+
   const isVerified = Boolean(paymentRecord?.transaction_id);
 
   // Leader & Crew

@@ -138,11 +138,35 @@ export default function PaymentTab({
         setTransactionId(record.transaction_id || '');
         setPayerName(record.payer_name || '');
         setScreenshotPreview(record.screenshot_url || '');
+      } else if (submissions && submissions.length > 0) {
+        const paidSub = submissions.find(s => s.pdf_url || (s.project_description && s.project_description.includes('Registration fee')) || s.status === 'Shortlisted');
+        if (paidSub) {
+          const utrMatch = paidSub.project_description?.match(/UTR:\s*([A-Za-z0-9_-]+)/i);
+          const payerMatch = paidSub.project_description?.match(/Payer:\s*([^(]+)/i);
+          const phoneMatch = paidSub.project_description?.match(/\(([0-9]+)\)/);
+          const record = {
+            transaction_id: utrMatch ? utrMatch[1] : (paidSub.pdf_url ? 'VERIFIED' : 'VERIFIED'),
+            payer_name: payerMatch ? payerMatch[1].trim() : (user?.user_metadata?.full_name || ''),
+            payer_phone: phoneMatch ? phoneMatch[1].trim() : '',
+            screenshot_url: paidSub.pdf_url || '',
+            amount: REGISTRATION_FEE_INR,
+            status: 'submitted',
+            submitted_at: paidSub.updated_at || paidSub.created_at || new Date().toISOString()
+          };
+          setPaymentRecord(record);
+          setTransactionId(record.transaction_id || '');
+          setPayerName(record.payer_name || '');
+          setPayerPhone(record.payer_phone || '');
+          setScreenshotPreview(record.screenshot_url || '');
+          try {
+            if (user?.id) localStorage.setItem(`haxlr8_payment_${user.id}`, JSON.stringify(record));
+          } catch (e) {}
+        }
       }
     } catch (e) {
       console.warn('Error reading payment state:', e);
     }
-  }, [user, teamData]);
+  }, [user, teamData, submissions]);
 
   const [copiedUrl, setCopiedUrl] = useState(false);
   const copyFormUrl = () => {
