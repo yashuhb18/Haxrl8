@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
 import { sanitizeInput } from '../../lib/security';
-import OfficialPPT from '../../assets/PPT/HAXLR8 3.0 Pitch Deck Template.pptx';
 import { sendSubmissionConfirmationEmail } from '../../lib/emailService';
 import { ensureUUID, isUUID } from '../../lib/syncService';
 import AmongUsCrewmate from '../../components/amongus/AmongUsCrewmate';
@@ -342,14 +341,10 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
                 Directives for Idea Paper Submission
               </div>
               <ul style={{ fontSize: 13.5, color: '#475569', margin: 0, paddingLeft: 18, lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <li>Download the official HAXLR8 3.0 PPT template using the download link below.</li>
-                <li>Fill out all slides with problem analysis, system architecture, and tech stack.</li>
+                <li>Prepare your presentation with problem analysis, system architecture, and tech stack.</li>
                 <li>Export the completed presentation as a <strong>PDF document</strong> (Max 3MB).</li>
                 <li>Submission locks firmly on <strong>October 28, 2026 at 11:59 PM IST</strong>.</li>
               </ul>
-              <a href={OfficialPPT} download="HAXLR8_3.0_Template.pptx" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#0284c7', color: '#ffffff', borderRadius: 12, fontSize: 13, fontWeight: 800, textDecoration: 'none', marginTop: 8, boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)' }}>
-                ↓ Download Official PPT Template
-              </a>
             </div>
 
             <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '14px 18px', background: '#f8fafc', borderRadius: 14, border: '1.5px solid #cbd5e1', width: 'fit-content' }}>
@@ -438,7 +433,6 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
               <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', display: 'flex', justifyContent: 'space-between', alignItems: 'center', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Presentation Deck (PDF)
-                <a href={OfficialPPT} download="HAXLR8_3.0_Template.pptx" style={{ fontSize: 11, color: '#0284c7', textDecoration: 'none', fontWeight: 800 }}>↓ PPT Template</a>
               </label>
               <input type="file" accept=".pdf" onChange={e => setForm({ ...form, pdf: e.target.files[0] })}
                 style={{ padding: '12px 14px', borderRadius: 12, border: fieldErrors.pdf ? '1.5px solid #dc2626' : '1.5px solid #cbd5e1', fontSize: 13, color: '#0f172a', background: '#fafafa' }} />

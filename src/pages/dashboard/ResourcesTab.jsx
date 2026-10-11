@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { fetchDocuments, getLocalDocuments, getOfficialRulebook, DEFAULT_DOCUMENTS } from '../../lib/documentsService';
 import { AmongUsKingCharacter } from '../../components/amongus/AmongUsCrewmate';
-import OfficialPPT from '../../assets/PPT/HAXLR8 3.0 Pitch Deck Template.pptx';
 
 const QUICK_LINKS = [
   { 
@@ -206,7 +205,7 @@ export default function ResourcesTab({ hasTeam, submissions }) {
             </div>
           </div>
           <span style={{ fontSize: 11, fontWeight: 800, color: '#0369a1', background: '#e0f2fe', padding: '4px 12px', borderRadius: 20, border: '1px solid #bae6fd' }}>
-            {documents.length} OFFICIAL ARTIFACTS AVAILABLE
+            {documents.filter(d => d.id !== 'doc_pptx_template' && d.category !== 'Template' && d.fileType !== 'pptx').length} OFFICIAL ARTIFACTS AVAILABLE
           </span>
         </div>
 
@@ -215,9 +214,10 @@ export default function ResourcesTab({ hasTeam, submissions }) {
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
           gap: 18
         }}>
-          {documents.map((doc) => {
+          {documents.filter(doc => doc.id !== 'doc_pptx_template' && doc.category !== 'Template' && doc.fileType !== 'pptx').map((doc) => {
             const isLock = doc.isLocked || doc.category === 'Problem Statements';
-            const isPptx = doc.fileType === 'pptx' || doc.category === 'Template';
+            const hasValidUrl = doc.fileUrl && doc.fileUrl !== '#' && !doc.fileUrl.startsWith('#') && doc.fileUrl.startsWith('http');
+            const isRulebookWithoutPdf = doc.category === 'Rulebook' && !hasValidUrl;
 
             return (
               <div
@@ -310,7 +310,7 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                   fontWeight: 600
                 }}>
                   <span>Size: <strong style={{ color: '#475569' }}>{doc.fileSize || 'Standard PDF'}</strong></span>
-                  <span>{isLock ? 'Release: Nov 2' : 'Verified CDN'}</span>
+                  <span>{isLock ? 'Release: Nov 2' : hasValidUrl ? 'Verified CDN' : 'Pending Upload'}</span>
                 </div>
 
                 {/* Primary Action Button */}
@@ -338,7 +338,7 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                   >
                     <Lock size={14} /> Locked Until Nov 2nd (12:00 PM)
                   </button>
-                ) : doc.fileUrl === '#rulebook-guide' || (doc.category === 'Rulebook' && doc.fileUrl?.startsWith('#')) ? (
+                ) : isRulebookWithoutPdf ? (
                   <button
                     onClick={() => setShowRulebook(true)}
                     style={{
@@ -360,37 +360,25 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                   >
                     <Eye size={14} /> View Official Rulebook
                   </button>
-                ) : isPptx ? (
-                  <a
-                    href={doc.fileUrl || OfficialPPT}
-                    download={doc.fileName || 'HAXLR8-3.0-Pitch-Template.pptx'}
-                    style={{
-                      width: '100%',
-                      padding: '11px 14px',
-                      borderRadius: 12,
-                      background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-                      border: 'none',
-                      color: '#ffffff',
-                      fontWeight: 800,
-                      fontSize: 12.5,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 6,
-                      textDecoration: 'none',
-                      boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)',
-                      boxSizing: 'border-box'
+                ) : hasValidUrl ? (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(doc.fileUrl);
+                        const blob = await response.blob();
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = doc.fileName || `${doc.title}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(blobUrl);
+                      } catch (err) {
+                        // Fallback: open in new tab
+                        window.open(doc.fileUrl, '_blank', 'noopener,noreferrer');
+                      }
                     }}
-                  >
-                    <Download size={14} /> Download Presentation Deck (.pptx)
-                  </a>
-                ) : (
-                  <a
-                    href={doc.fileUrl}
-                    download={doc.fileName}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     style={{
                       width: '100%',
                       padding: '11px 14px',
@@ -405,13 +393,32 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: 6,
-                      textDecoration: 'none',
                       boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)',
                       boxSizing: 'border-box'
                     }}
                   >
                     <Download size={14} /> Download {doc.category} (PDF)
-                  </a>
+                  </button>
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      padding: '11px 14px',
+                      borderRadius: 12,
+                      background: '#f8fafc',
+                      border: '1.5px solid #e2e8f0',
+                      color: '#64748b',
+                      fontWeight: 700,
+                      fontSize: 12.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    ⏳ Official PDF will be uploaded by the organizing committee shortly.
+                  </div>
                 )}
               </div>
             );
@@ -606,12 +613,24 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                 </ul>
               </div>
               <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafafa', flexWrap: 'wrap', gap: 12 }}>
-                {rulebookDoc?.fileUrl && rulebookDoc.fileUrl !== '#' && !rulebookDoc.fileUrl.startsWith('#') ? (
-                  <a
-                    href={rulebookDoc.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download={rulebookDoc.fileName || "HAXLR8-3.0-Official-Rulebook.pdf"}
+                {rulebookDoc?.fileUrl && rulebookDoc.fileUrl !== '#' && !rulebookDoc.fileUrl.startsWith('#') && rulebookDoc.fileUrl.startsWith('http') ? (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(rulebookDoc.fileUrl);
+                        const blob = await response.blob();
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = rulebookDoc.fileName || 'HAXLR8-3.0-Official-Rulebook.pdf';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(blobUrl);
+                      } catch (err) {
+                        window.open(rulebookDoc.fileUrl, '_blank', 'noopener,noreferrer');
+                      }
+                    }}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -622,12 +641,13 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                       color: '#ffffff',
                       fontWeight: 800,
                       fontSize: 13,
-                      textDecoration: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
                       boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)',
                     }}
                   >
                     <span>📥 Download Official PDF {rulebookDoc.fileSize && rulebookDoc.fileSize !== 'Official PDF' ? `(${rulebookDoc.fileSize})` : ''}</span>
-                  </a>
+                  </button>
                 ) : (
                   <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b' }}>
                     Official PDF will be published shortly by organizers.

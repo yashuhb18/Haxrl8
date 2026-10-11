@@ -1,6 +1,5 @@
 import { supabase } from './supabaseClient';
 import { getCloudinaryConfig, sha1Hex } from './cloudinaryService';
-import OfficialPPT from '../assets/PPT/HAXLR8 3.0 Pitch Deck Template.pptx';
 
 const DOCUMENTS_STORAGE_KEY = 'haxlr8_participant_documents';
 const ANNOUNCEMENT_TAG = 'DOCUMENTS_REGISTRY';
@@ -29,9 +28,9 @@ export const DEFAULT_DOCUMENTS = [
     category: 'Brochure',
     badge: 'EVENT BROCHURE',
     description: 'Official department brochure highlighting innovation domains, eligibility criteria, cash rewards (₹33,333 bounty), and student mentors.',
-    fileUrl: '#brochure',
-    fileName: 'HAXLR8-3.0-Event-Brochure.pdf',
-    fileSize: '3.4 MB',
+    fileUrl: null, // Set by Admin upload
+    fileName: 'Pending Admin Upload',
+    fileSize: 'Official PDF',
     fileType: 'pdf',
     unlockDate: null,
     isLocked: false,
@@ -39,23 +38,6 @@ export const DEFAULT_DOCUMENTS = [
     color: '#0284c7',
     bg: '#f0f9ff',
     border: '#bae6fd'
-  },
-  {
-    id: 'doc_pptx_template',
-    title: 'Official 24-Hour Pitch & Presentation Template',
-    category: 'Template',
-    badge: 'PITCH DECK PPTX',
-    description: 'Mandatory presentation format for jury evaluations. Contains slide layouts for problem, architecture, prototype demo, and roadmap.',
-    fileUrl: OfficialPPT,
-    fileName: 'HAXLR8-3.0-Pitch-Template.pptx',
-    fileSize: '2.9 MB',
-    fileType: 'pptx',
-    unlockDate: null,
-    isLocked: false,
-    uploadedAt: '2026-10-09T12:00:00.000Z',
-    color: '#16a34a',
-    bg: '#f0fdf4',
-    border: '#bbf7d0'
   },
   {
     id: 'doc_problem_statements',
@@ -78,9 +60,21 @@ export const DEFAULT_DOCUMENTS = [
 
 function sanitizeDocumentsList(docs) {
   if (!Array.isArray(docs)) return DEFAULT_DOCUMENTS;
-  return docs.map(d => {
+  // Filter out any PPT template documents
+  const filtered = docs.filter(d => d.id !== 'doc_pptx_template' && d.category !== 'Template');
+  if (filtered.length === 0) return DEFAULT_DOCUMENTS;
+  return filtered.map(d => {
     // Strip dummy generated rulebook PDF so admin can upload the real one
     if (d.id === 'doc_rulebook' && d.fileUrl === '/HAXLR8-3.0-Official-Rulebook.pdf') {
+      return {
+        ...d,
+        fileUrl: null,
+        fileName: 'Pending Admin Upload',
+        fileSize: 'Official PDF',
+      };
+    }
+    // Strip placeholder brochure URL
+    if (d.id === 'doc_brochure' && d.fileUrl === '#brochure') {
       return {
         ...d,
         fileUrl: null,

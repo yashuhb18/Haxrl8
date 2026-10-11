@@ -17,7 +17,6 @@ const CATEGORIES = [
   { id: 'Rulebook', label: 'Rulebook', color: '#ea580c', bg: '#fff7ed', border: '#fed7aa' },
   { id: 'Brochure', label: 'Brochure', color: '#0284c7', bg: '#f0f9ff', border: '#bae6fd' },
   { id: 'Problem Statements', label: 'Problem Statements', color: '#9333ea', bg: '#faf5ff', border: '#e9d5ff' },
-  { id: 'Template', label: 'Presentation Template', color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
   { id: 'Guidelines', label: 'Guidelines & Notices', color: '#e11d48', bg: '#ffe4e6', border: '#fecdd3' },
 ];
 
@@ -842,9 +841,13 @@ export default function AdminDocuments() {
                         <Download size={13} />
                         <span>Download / View</span>
                       </a>
-                    ) : (
+                    ) : doc.isLocked ? (
                       <span style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic' }}>
                         Release scheduled for Nov 2nd
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic' }}>
+                        Pending Admin Upload
                       </span>
                     )}
 
