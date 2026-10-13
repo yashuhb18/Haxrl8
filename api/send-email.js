@@ -37,7 +37,12 @@ export default async function handler(req, res) {
     } = req.body || {};
 
     const hostEmail = process.env.HOST_EMAIL || process.env.VITE_HOST_EMAIL || 'haxlr8ecemitm@gmail.com';
-    const hostPassword = process.env.HOST_EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD || 'qqucyshfxeckzqxl';
+    let hostPassword = (process.env.HOST_EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+    
+    // Automatically ignore stale revoked password from Vercel environment variables
+    if (!hostPassword || hostPassword === 'fbrnlnfiilorsdzk') {
+      hostPassword = 'qqucyshfxeckzqxl';
+    }
 
     const targetTo = to || recipientEmail || (isContactMessage ? hostEmail : null);
 
@@ -46,11 +51,11 @@ export default async function handler(req, res) {
     }
 
     // Configure Nodemailer for Gmail SMTP
-    const transporter = nodemailer.createTransport({
+    let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: hostEmail,
-        pass: hostPassword.replace(/\s+/g, '') // strip any accidental whitespace
+        pass: hostPassword
       }
     });
 
@@ -63,7 +68,22 @@ export default async function handler(req, res) {
       text: text || undefined
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    let info;
+    try {
+      info = await transporter.sendMail(mailOptions);
+    } catch (sendErr) {
+      if ((sendErr.code === 'EAUTH' || (sendErr.message && sendErr.message.includes('535'))) && hostPassword !== 'qqucyshfxeckzqxl') {
+        console.warn('Retrying dispatch with verified Google App Password...');
+        hostPassword = 'qqucyshfxeckzqxl';
+        transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user: hostEmail, pass: hostPassword }
+        });
+        info = await transporter.sendMail(mailOptions);
+      } else {
+        throw sendErr;
+      }
+    }
     console.log(`[HAXLR8 Email Success] Dispatched to ${targetTo}. Message ID: ${info.messageId}`);
 
     // If it's a contact message, ALSO send an automatic confirmation email to the participant
