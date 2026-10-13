@@ -4,9 +4,7 @@ const SQUADRONS_STORAGE_KEY = 'haxlr8_crew_squadrons_config';
 const SQUADRONS_TAG = 'CREW_SQUADRONS_CONFIG';
 
 export const DEFAULT_SQUADRONS_CONFIG = {
-  mode: 'auto', // 'auto' | 'custom' | 'boost'
-  customCount: 0,
-  boostOffset: 0,
+  boostOffset: 0, // Fake boost added ONLY to the user dashboard display count
   updatedAt: null,
   updatedBy: 'Admin',
 };
@@ -23,6 +21,7 @@ export function getLocalSquadronsConfig() {
         return {
           ...DEFAULT_SQUADRONS_CONFIG,
           ...parsed,
+          boostOffset: Number(parsed.boostOffset) || 0,
         };
       }
     }
@@ -40,6 +39,7 @@ export function setLocalSquadronsConfig(config) {
     const safeConfig = {
       ...DEFAULT_SQUADRONS_CONFIG,
       ...config,
+      boostOffset: Math.max(0, Number(config?.boostOffset) || 0),
       updatedAt: config?.updatedAt || new Date().toISOString(),
     };
     localStorage.setItem(SQUADRONS_STORAGE_KEY, JSON.stringify(safeConfig));
@@ -52,29 +52,23 @@ export function setLocalSquadronsConfig(config) {
 }
 
 /**
- * Resolves the final displayed number of crew squadrons
+ * Resolves the final displayed number of crew squadrons for the User Dashboard:
+ * Formula: Real Database Count + Fake Boost Offset = User Dashboard Display Count
+ *
+ * Example:
+ * If Real DB has 1 team, and boost is +11: User dashboard displays 12.
+ * When next real team registers (Real DB = 2): User dashboard automatically becomes 13!
+ * Admin dashboard always shows the genuine Real DB count (2).
+ *
  * @param {number} rawDbCount - Actual teams count from database
  * @param {object} config - Configuration object
  * @returns {number}
  */
 export function resolveDisplaySquadrons(rawDbCount = 0, config = null) {
   const cfg = config || getLocalSquadronsConfig();
-  const dbCount = Number(rawDbCount) || 0;
-
-  if (cfg.mode === 'custom' && typeof cfg.customCount === 'number') {
-    return Math.max(0, cfg.customCount);
-  }
-
-  if (cfg.mode === 'boost' && typeof cfg.boostOffset === 'number') {
-    return Math.max(0, dbCount + cfg.boostOffset);
-  }
-
-  // If customCount was manually set > 0, respect it if mode is not strictly auto
-  if (cfg.mode !== 'auto' && cfg.customCount > 0) {
-    return cfg.customCount;
-  }
-
-  return dbCount;
+  const dbCount = Math.max(0, Number(rawDbCount) || 0);
+  const boost = Math.max(0, Number(cfg.boostOffset) || 0);
+  return dbCount + boost;
 }
 
 /**
@@ -153,13 +147,14 @@ export async function saveSquadronsConfig(config) {
   const safeConfig = {
     ...DEFAULT_SQUADRONS_CONFIG,
     ...config,
+    boostOffset: Math.max(0, Number(config?.boostOffset) || 0),
     updatedAt: new Date().toISOString(),
   };
 
   // 1. Save locally first for instant UI response
   setLocalSquadronsConfig(safeConfig);
 
-  // 2. Persist to Supabase cloud
+  // 2. Persist to Supabase cloud registry
   try {
     const { data: existing } = await supabase
       .from('announcements')
@@ -196,7 +191,6 @@ export async function saveSquadronsConfig(config) {
     return { success: true, config: safeConfig };
   } catch (cloudErr) {
     console.warn('Cloud saveSquadronsConfig error (local cached):', cloudErr);
-    // Still succeeded locally
     return { success: true, config: safeConfig, warning: 'Saved locally. Cloud sync will retry on next connection.' };
   }
 }

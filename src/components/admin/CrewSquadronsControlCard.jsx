@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Sparkles, 
-  Save, 
   RotateCcw, 
   Plus, 
   Minus, 
@@ -10,7 +9,8 @@ import {
   AlertCircle,
   Eye,
   Sliders,
-  TrendingUp
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
 import { 
   fetchSquadronsConfig, 
@@ -22,37 +22,25 @@ import {
 
 export default function CrewSquadronsControlCard({ currentDbCount = 0, onConfigChange }) {
   const [config, setConfig] = useState(() => getLocalSquadronsConfig());
-  const [mode, setMode] = useState(config.mode || 'auto');
-  const [customValue, setCustomValue] = useState(
-    config.mode === 'custom' && typeof config.customCount === 'number' 
-      ? config.customCount 
-      : (config.mode === 'boost' ? currentDbCount + (config.boostOffset || 0) : currentDbCount)
-  );
-  const [boostOffset, setBoostOffset] = useState(config.boostOffset || 0);
+  const [boostOffset, setBoostOffset] = useState(() => Math.max(0, Number(getLocalSquadronsConfig().boostOffset) || 0));
+  const [targetInput, setTargetInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null); // { type: 'success' | 'error', message: string }
 
-  // Hydrate from cloud on mount
+  // Sync from cloud on mount and listen to realtime updates
   useEffect(() => {
     let isMounted = true;
     fetchSquadronsConfig().then(cloudCfg => {
       if (isMounted && cloudCfg) {
         setConfig(cloudCfg);
-        setMode(cloudCfg.mode || 'auto');
-        if (cloudCfg.mode === 'custom') {
-          setCustomValue(cloudCfg.customCount ?? currentDbCount);
-        } else if (cloudCfg.mode === 'boost') {
-          setBoostOffset(cloudCfg.boostOffset ?? 0);
-          setCustomValue(currentDbCount + (cloudCfg.boostOffset ?? 0));
-        } else {
-          setCustomValue(currentDbCount);
-        }
+        setBoostOffset(Math.max(0, Number(cloudCfg.boostOffset) || 0));
       }
     });
 
     const unsubscribe = subscribeToSquadronsConfig(newCfg => {
       if (isMounted && newCfg) {
         setConfig(newCfg);
+        setBoostOffset(Math.max(0, Number(newCfg.boostOffset) || 0));
       }
     });
 
@@ -60,112 +48,93 @@ export default function CrewSquadronsControlCard({ currentDbCount = 0, onConfigC
       isMounted = false;
       if (typeof unsubscribe === 'function') unsubscribe();
     };
-  }, [currentDbCount]);
+  }, []);
 
-  // Keep customValue aligned with currentDbCount if in auto mode and customValue was 0
-  useEffect(() => {
-    if (mode === 'auto') {
-      setCustomValue(currentDbCount);
-    }
-  }, [currentDbCount, mode]);
+  const totalUserDisplay = (currentDbCount || 0) + (boostOffset || 0);
 
-  const activeDisplayCount = resolveDisplaySquadrons(currentDbCount, config);
-
-  const handleIncrement = (amount) => {
-    setCustomValue(prev => {
-      const next = Math.max(0, (Number(prev) || 0) + amount);
-      if (mode === 'auto') {
-        setMode('custom');
-      }
-      return next;
-    });
-  };
-
-  const handleModeChange = (newMode) => {
-    setMode(newMode);
-    if (newMode === 'auto') {
-      setCustomValue(currentDbCount);
-    } else if (newMode === 'custom') {
-      if (customValue === currentDbCount) {
-        // keep current value as initial custom value
-      }
-    } else if (newMode === 'boost') {
-      setBoostOffset(Math.max(0, customValue - currentDbCount));
-    }
-  };
-
-  const handleSave = async () => {
+  // Directly apply boost delta (e.g. +10, +20, etc.)
+  const handleApplyDelta = async (delta) => {
     setIsSaving(true);
     setSaveStatus(null);
     try {
-      let updatedConfig = {};
-      const numVal = Math.max(0, parseInt(customValue, 10) || 0);
+      const nextBoost = Math.max(0, (boostOffset || 0) + delta);
+      setBoostOffset(nextBoost);
+      const updatedConfig = { boostOffset: nextBoost };
+      const res = await saveSquadronsConfig(updatedConfig);
+      setConfig(res.config);
 
-      if (mode === 'custom') {
-        updatedConfig = {
-          mode: 'custom',
-          customCount: numVal,
-          boostOffset: 0,
-        };
-      } else if (mode === 'boost') {
-        const offset = Math.max(0, numVal - currentDbCount);
-        updatedConfig = {
-          mode: 'boost',
-          customCount: numVal,
-          boostOffset: offset,
-        };
-      } else {
-        updatedConfig = {
-          mode: 'auto',
-          customCount: currentDbCount,
-          boostOffset: 0,
-        };
-      }
-
-      const result = await saveSquadronsConfig(updatedConfig);
-      setConfig(result.config);
+      const newTotal = (currentDbCount || 0) + nextBoost;
       setSaveStatus({
         type: 'success',
-        message: `Saved & Broadcasted! User dashboard now displays ${resolveDisplaySquadrons(currentDbCount, result.config)} Crew Squadrons.`
+        message: `Pushed ${delta > 0 ? `+${delta}` : delta} to User Dashboard! Participants now see ${newTotal} Crew Squadrons (Real DB: ${currentDbCount}).`
       });
 
       if (typeof onConfigChange === 'function') {
-        onConfigChange(result.config);
+        onConfigChange(res.config);
       }
-
-      setTimeout(() => {
-        setSaveStatus(null);
-      }, 5000);
+      setTimeout(() => setSaveStatus(null), 4000);
     } catch (err) {
       setSaveStatus({
         type: 'error',
-        message: 'Error saving config: ' + (err.message || 'Unknown error')
+        message: 'Error saving boost: ' + (err.message || 'Unknown error')
       });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleResetToLive = async () => {
+  // Set an exact target total (e.g., admin types 12 -> boostOffset becomes 12 - currentDbCount)
+  const handleApplyTargetTotal = async (targetTotal) => {
+    const target = parseInt(targetTotal, 10);
+    if (isNaN(target) || target < 0) return;
+
     setIsSaving(true);
+    setSaveStatus(null);
     try {
-      const resetConfig = {
-        mode: 'auto',
-        customCount: currentDbCount,
-        boostOffset: 0,
-      };
-      setMode('auto');
-      setCustomValue(currentDbCount);
-      const result = await saveSquadronsConfig(resetConfig);
-      setConfig(result.config);
+      const nextBoost = Math.max(0, target - (currentDbCount || 0));
+      setBoostOffset(nextBoost);
+      const updatedConfig = { boostOffset: nextBoost };
+      const res = await saveSquadronsConfig(updatedConfig);
+      setConfig(res.config);
+
       setSaveStatus({
         type: 'success',
-        message: `Reset to live database! User dashboard now reflects exact ${currentDbCount} teams.`
+        message: `Target set to ${target}! User Dashboard now displays ${target} Crew Squadrons (Real DB: ${currentDbCount}, Fake Boost: +${nextBoost}).`
       });
+
+      setTargetInput('');
       if (typeof onConfigChange === 'function') {
-        onConfigChange(result.config);
+        onConfigChange(res.config);
       }
-      setTimeout(() => setSaveStatus(null), 5000);
+      setTimeout(() => setSaveStatus(null), 4000);
+    } catch (err) {
+      setSaveStatus({
+        type: 'error',
+        message: 'Error setting target: ' + (err.message || 'Unknown error')
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Reset to 100% genuine database count
+  const handleReset = async () => {
+    setIsSaving(true);
+    setSaveStatus(null);
+    try {
+      setBoostOffset(0);
+      const res = await saveSquadronsConfig({ boostOffset: 0 });
+      setConfig(res.config);
+
+      setSaveStatus({
+        type: 'success',
+        message: `Boost reset to 0! User Dashboard now reflects the genuine real database (${currentDbCount} teams).`
+      });
+
+      if (typeof onConfigChange === 'function') {
+        onConfigChange(res.config);
+      }
+      setTimeout(() => setSaveStatus(null), 4000);
     } catch (err) {
       setSaveStatus({
         type: 'error',
@@ -212,7 +181,7 @@ export default function CrewSquadronsControlCard({ currentDbCount = 0, onConfigC
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', margin: 0 }}>
-                Crew Squadrons Telemetry Control
+                User Dashboard "Crew Squadrons" Boost Control
               </h3>
               <span
                 style={{
@@ -220,42 +189,62 @@ export default function CrewSquadronsControlCard({ currentDbCount = 0, onConfigC
                   fontWeight: 800,
                   padding: '2px 8px',
                   borderRadius: 100,
-                  background: config.mode === 'custom' ? '#fef3c7' : config.mode === 'boost' ? '#e0f2fe' : '#dcfce7',
-                  color: config.mode === 'custom' ? '#92400e' : config.mode === 'boost' ? '#0369a1' : '#15803d',
-                  border: '1px solid ' + (config.mode === 'custom' ? '#fde68a' : config.mode === 'boost' ? '#bae6fd' : '#86efac'),
+                  background: boostOffset > 0 ? '#fef3c7' : '#dcfce7',
+                  color: boostOffset > 0 ? '#92400e' : '#15803d',
+                  border: '1px solid ' + (boostOffset > 0 ? '#fde68a' : '#86efac'),
                   textTransform: 'uppercase',
                   letterSpacing: '0.04em',
                 }}
               >
-                {config.mode === 'custom' ? 'Custom Override' : config.mode === 'boost' ? 'Live + Boost' : 'Live DB Sync'}
+                {boostOffset > 0 ? `+${boostOffset} Boost Active` : 'Real DB (No Boost)'}
               </span>
             </div>
             <p style={{ fontSize: 12.5, color: '#64748b', margin: '3px 0 0 0' }}>
-              Control the number of <strong>Crew Squadrons</strong> displayed to participants on their user dashboard.
+              Add a numeric boost to the <strong>Crew Squadrons</strong> counter displayed to participants on their user dashboard. Admin dashboard always reflects 100% genuine database records.
             </p>
           </div>
         </div>
 
-        {/* Live Status Indicators */}
+        {/* Live Counters Breakdown */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+          {/* 1. Real DB Squads */}
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>Actual DB Squads</div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: '#334155' }}>{currentDbCount}</div>
-          </div>
-          <div style={{ width: 1, height: 28, background: '#e2e8f0' }} />
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
-              Live User Dashboard
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+              Real Database (Admin)
             </div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: '#15803d', lineHeight: 1 }}>
-              {activeDisplayCount}
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#0f172a' }}>
+              {currentDbCount} <span style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8' }}>squads</span>
+            </div>
+          </div>
+
+          <div style={{ fontSize: 18, fontWeight: 800, color: '#cbd5e1' }}>+</div>
+
+          {/* 2. Fake Added Boost */}
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#d97706', textTransform: 'uppercase' }}>
+              Fake Boost Offset
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#b45309' }}>
+              +{boostOffset}
+            </div>
+          </div>
+
+          <div style={{ fontSize: 18, fontWeight: 800, color: '#cbd5e1' }}>=</div>
+
+          {/* 3. Result on User Dashboard */}
+          <div style={{ textAlign: 'right', padding: '6px 14px', borderRadius: 12, background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#16a34a', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+              User Dashboard
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 900, color: '#15803d', lineHeight: 1 }}>
+              {totalUserDisplay}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Controls Grid */}
+      {/* Control Actions Row */}
       <div
         style={{
           background: '#f8fafc',
@@ -267,304 +256,211 @@ export default function CrewSquadronsControlCard({ currentDbCount = 0, onConfigC
           gap: 14,
         }}
       >
-        {/* Mode Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>
-            Display Mode:
-          </div>
-          <div style={{ display: 'inline-flex', background: '#e2e8f0', padding: 3, borderRadius: 10, gap: 4 }}>
-            <button
-              type="button"
-              onClick={() => handleModeChange('custom')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 8,
-                border: 'none',
-                background: mode === 'custom' ? '#ffffff' : 'transparent',
-                color: mode === 'custom' ? '#4f46e5' : '#64748b',
-                fontWeight: mode === 'custom' ? 800 : 600,
-                fontSize: 12,
-                cursor: 'pointer',
-                boxShadow: mode === 'custom' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              Exact Number (Custom)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleModeChange('boost')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 8,
-                border: 'none',
-                background: mode === 'boost' ? '#ffffff' : 'transparent',
-                color: mode === 'boost' ? '#0284c7' : '#64748b',
-                fontWeight: mode === 'boost' ? 800 : 600,
-                fontSize: 12,
-                cursor: 'pointer',
-                boxShadow: mode === 'boost' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              Live DB + Boost
-            </button>
-            <button
-              type="button"
-              onClick={() => handleModeChange('auto')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 8,
-                border: 'none',
-                background: mode === 'auto' ? '#ffffff' : 'transparent',
-                color: mode === 'auto' ? '#15803d' : '#64748b',
-                fontWeight: mode === 'auto' ? 800 : 600,
-                fontSize: 12,
-                cursor: 'pointer',
-                boxShadow: mode === 'auto' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              Auto (Exact Database)
-            </button>
-          </div>
-        </div>
-
-        {/* Counter Adjustment Row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
-          {/* Number Stepper */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#475569' }}>Target Count:</span>
-            
-            <button
-              type="button"
-              onClick={() => handleIncrement(-10)}
-              disabled={customValue <= 0 || mode === 'auto'}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                border: '1px solid #cbd5e1',
-                background: '#ffffff',
-                color: '#334155',
-                fontSize: 11,
-                fontWeight: 800,
-                cursor: customValue <= 0 || mode === 'auto' ? 'not-allowed' : 'pointer',
-                opacity: customValue <= 0 || mode === 'auto' ? 0.5 : 1,
-              }}
-              title="Decrease by 10"
-            >
-              -10
-            </button>
-            <button
-              type="button"
-              onClick={() => handleIncrement(-1)}
-              disabled={customValue <= 0 || mode === 'auto'}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                border: '1px solid #cbd5e1',
-                background: '#ffffff',
-                color: '#334155',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: customValue <= 0 || mode === 'auto' ? 'not-allowed' : 'pointer',
-                opacity: customValue <= 0 || mode === 'auto' ? 0.5 : 1,
-              }}
-              title="Decrease by 1"
-            >
-              <Minus size={14} />
-            </button>
-
-            {/* Direct Number Input */}
-            <input
-              type="number"
-              min="0"
-              value={customValue}
-              onChange={(e) => {
-                const val = Math.max(0, parseInt(e.target.value, 10) || 0);
-                setCustomValue(val);
-                if (mode === 'auto') setMode('custom');
-              }}
-              disabled={mode === 'auto'}
-              style={{
-                width: 80,
-                height: 36,
-                borderRadius: 8,
-                border: '2px solid #6366f1',
-                textAlign: 'center',
-                fontSize: 18,
-                fontWeight: 900,
-                color: '#1e1b4b',
-                background: mode === 'auto' ? '#f1f5f9' : '#ffffff',
-                cursor: mode === 'auto' ? 'not-allowed' : 'text',
-              }}
-            />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          {/* Quick One-Click Boost Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12.5, fontWeight: 800, color: '#334155' }}>
+              Push Fake Numbers:
+            </span>
 
             <button
               type="button"
-              onClick={() => handleIncrement(1)}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                border: '1px solid #6366f1',
-                background: '#ede9fe',
-                color: '#4f46e5',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-              }}
-              title="Increase by 1"
-            >
-              <Plus size={14} />
-            </button>
-            <button
-              type="button"
-              onClick={() => handleIncrement(5)}
-              style={{
-                padding: '0 8px',
-                height: 32,
-                borderRadius: 8,
-                border: '1px solid #6366f1',
-                background: '#ede9fe',
-                color: '#4f46e5',
-                fontSize: 11,
-                fontWeight: 800,
-                cursor: 'pointer',
-              }}
-              title="Increase by 5"
-            >
-              +5
-            </button>
-            <button
-              type="button"
-              onClick={() => handleIncrement(10)}
-              style={{
-                padding: '0 8px',
-                height: 32,
-                borderRadius: 8,
-                border: '1px solid #6366f1',
-                background: '#6366f1',
-                color: '#ffffff',
-                fontSize: 11,
-                fontWeight: 800,
-                cursor: 'pointer',
-              }}
-              title="Increase by 10"
-            >
-              +10
-            </button>
-            <button
-              type="button"
-              onClick={() => handleIncrement(25)}
-              style={{
-                padding: '0 8px',
-                height: 32,
-                borderRadius: 8,
-                border: '1px solid #4338ca',
-                background: '#4338ca',
-                color: '#ffffff',
-                fontSize: 11,
-                fontWeight: 800,
-                cursor: 'pointer',
-              }}
-              title="Increase by 25"
-            >
-              +25
-            </button>
-          </div>
-
-          {/* Quick Presets */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8' }}>Presets:</span>
-            {[15, 25, 40, 50, 75, 100].map(val => (
-              <button
-                key={val}
-                type="button"
-                onClick={() => {
-                  setCustomValue(val);
-                  setMode('custom');
-                }}
-                style={{
-                  padding: '3px 8px',
-                  borderRadius: 6,
-                  border: '1px solid #cbd5e1',
-                  background: customValue === val && mode === 'custom' ? '#dbeafe' : '#ffffff',
-                  color: customValue === val && mode === 'custom' ? '#1e40af' : '#475569',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                {val}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Buttons & Feedback */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, paddingTop: 6 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button
-              type="button"
-              onClick={handleSave}
+              onClick={() => handleApplyDelta(10)}
               disabled={isSaving}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 8,
-                padding: '9px 20px',
+                gap: 4,
+                padding: '8px 16px',
                 borderRadius: 10,
-                background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                background: '#6366f1',
                 color: '#ffffff',
                 border: 'none',
                 fontSize: 13,
-                fontWeight: 800,
+                fontWeight: 900,
                 cursor: isSaving ? 'not-allowed' : 'pointer',
-                boxShadow: '0 2px 10px rgba(22, 163, 74, 0.25)',
+                boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)',
                 transition: 'all 0.15s ease',
               }}
+              title="Add +10 to User Dashboard"
             >
-              <Save size={15} />
-              {isSaving ? 'Publishing...' : 'Publish to User Dashboard 🚀'}
+              <Plus size={14} strokeWidth={3} /> 10
             </button>
 
-            {mode !== 'auto' && (
+            <button
+              type="button"
+              onClick={() => handleApplyDelta(20)}
+              disabled={isSaving}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '8px 16px',
+                borderRadius: 10,
+                background: '#4f46e5',
+                color: '#ffffff',
+                border: 'none',
+                fontSize: 13,
+                fontWeight: 900,
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+                boxShadow: '0 2px 8px rgba(79, 70, 229, 0.25)',
+                transition: 'all 0.15s ease',
+              }}
+              title="Add +20 to User Dashboard"
+            >
+              <Plus size={14} strokeWidth={3} /> 20
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleApplyDelta(5)}
+              disabled={isSaving}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '8px 12px',
+                borderRadius: 10,
+                background: '#e0e7ff',
+                color: '#4338ca',
+                border: '1px solid #c7d2fe',
+                fontSize: 12.5,
+                fontWeight: 800,
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+              }}
+              title="Add +5 to User Dashboard"
+            >
+              <Plus size={12} strokeWidth={3} /> 5
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleApplyDelta(50)}
+              disabled={isSaving}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '8px 12px',
+                borderRadius: 10,
+                background: '#e0e7ff',
+                color: '#4338ca',
+                border: '1px solid #c7d2fe',
+                fontSize: 12.5,
+                fontWeight: 800,
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+              }}
+              title="Add +50 to User Dashboard"
+            >
+              <Plus size={12} strokeWidth={3} /> 50
+            </button>
+
+            {boostOffset > 0 && (
               <button
                 type="button"
-                onClick={handleResetToLive}
+                onClick={() => handleApplyDelta(-10)}
                 disabled={isSaving}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 6,
-                  padding: '9px 14px',
+                  gap: 3,
+                  padding: '8px 12px',
                   borderRadius: 10,
                   background: '#f1f5f9',
-                  color: '#475569',
+                  color: '#64748b',
                   border: '1px solid #cbd5e1',
                   fontSize: 12,
-                  fontWeight: 700,
+                  fontWeight: 800,
                   cursor: isSaving ? 'not-allowed' : 'pointer',
                 }}
-                title="Reset display to exact database count"
+                title="Subtract 10 from Boost"
               >
-                <RotateCcw size={13} />
-                Reset to Live DB
+                <Minus size={12} strokeWidth={3} /> 10
               </button>
             )}
           </div>
 
-          <div style={{ fontSize: 11.5, color: '#64748b', fontStyle: 'italic' }}>
-            {config.updatedAt ? `Last published: ${new Date(config.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Synchronized with Starfleet backend'}
+          {/* Set Exact Display Total (e.g. 12) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b' }}>Or Set Total:</span>
+            <input
+              type="number"
+              min="0"
+              placeholder={`e.g. 12`}
+              value={targetInput}
+              onChange={(e) => setTargetInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && targetInput !== '') {
+                  handleApplyTargetTotal(targetInput);
+                }
+              }}
+              style={{
+                width: 76,
+                padding: '7px 8px',
+                borderRadius: 8,
+                border: '1.5px solid #cbd5e1',
+                fontSize: 13,
+                fontWeight: 800,
+                textAlign: 'center',
+                outline: 'none',
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => handleApplyTargetTotal(targetInput)}
+              disabled={isSaving || targetInput === ''}
+              style={{
+                padding: '7px 14px',
+                borderRadius: 8,
+                background: targetInput === '' ? '#f1f5f9' : '#059669',
+                color: targetInput === '' ? '#94a3b8' : '#ffffff',
+                border: 'none',
+                fontSize: 12.5,
+                fontWeight: 800,
+                cursor: targetInput === '' ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Apply
+            </button>
           </div>
         </div>
 
-        {/* Status Message */}
+        {/* Reset and Auto-increment notice */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, paddingTop: 6, borderTop: '1px dashed #e2e8f0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748b' }}>
+            <Zap size={14} color="#f59e0b" />
+            <span>
+              <strong>Auto-Incrementing:</strong> When a new real user registers, the User Dashboard automatically increases (e.g. <strong>{totalUserDisplay} → {totalUserDisplay + 1}</strong>) while the Admin Dashboard displays the exact real database.
+            </span>
+          </div>
+
+          {boostOffset > 0 && (
+            <button
+              type="button"
+              onClick={handleReset}
+              disabled={isSaving}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '6px 12px',
+                borderRadius: 8,
+                background: '#ffffff',
+                color: '#dc2626',
+                border: '1px solid #fca5a5',
+                fontSize: 11.5,
+                fontWeight: 700,
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+              }}
+              title="Remove fake boost and show genuine database numbers"
+            >
+              <RotateCcw size={12} />
+              Reset Boost to 0
+            </button>
+          )}
+        </div>
+
+        {/* Real-time Status Alert */}
         {saveStatus && (
           <div
             style={{
