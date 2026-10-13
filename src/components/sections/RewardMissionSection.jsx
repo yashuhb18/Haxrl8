@@ -6,21 +6,21 @@ import { Award } from 'lucide-react';
 const PRIZE_TIERS = [
   {
     rank: 'WINNERS',
-    amount: '₹15,111',
+    amount: '₹20,000',
     badgeColor: '#eab308', // Gold
     badgeBorder: 'rgba(234, 179, 8, 0.4)',
     glow: 'rgba(234, 179, 8, 0.25)',
   },
   {
     rank: 'RUNNERS UP',
-    amount: '₹10,111',
+    amount: '₹12,000',
     badgeColor: '#0284c7', // Cyan / Blue
     badgeBorder: 'rgba(2, 132, 199, 0.4)',
     glow: 'rgba(2, 132, 199, 0.25)',
   },
   {
     rank: 'SECOND RUNNERS UP',
-    amount: '₹8,111',
+    amount: '₹8,000',
     badgeColor: '#ef4444', // Red
     badgeBorder: 'rgba(239, 68, 68, 0.4)',
     glow: 'rgba(239, 68, 68, 0.25)',
@@ -120,7 +120,7 @@ export default function RewardMissionSection() {
                   textShadow: '0 0 20px rgba(251, 191, 36, 0.5)',
                 }}
               >
-                ₹33,333
+                ₹40,000
               </div>
               <div
                 style={{

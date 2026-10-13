@@ -476,8 +476,8 @@ export default function AuthPage() {
             >
               <Trophy size={18} color="#d97706" style={{ flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: '11px', fontWeight: 900, color: '#92400e' }}>₹33,333 POOL</div>
-                <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>1st ₹15,111 • 2nd ₹10,111</div>
+                <div style={{ fontSize: '11px', fontWeight: 900, color: '#92400e' }}>₹40,000 POOL</div>
+                <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>1st ₹20,000 • 2nd ₹12,000</div>
               </div>
             </div>
 

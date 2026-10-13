@@ -187,7 +187,7 @@ export default function ScheduleTab() {
               Grand Offline Finale · 24-Hour Hackathon · MIT Mysore
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
-              {['09:00 AM Station Sync', 'Live Pitch Decks', '₹30,000 Bounty Ceremony'].map((t, i) => (
+              {['09:00 AM Station Sync', 'Live Pitch Decks', '₹40,000 Bounty Ceremony'].map((t, i) => (
                 <span key={i} style={{ fontSize: 11, fontWeight: 800, color: '#9f1239', background: '#ffe4e6', border: '1px solid #fecaca', padding: '5px 12px', borderRadius: 20 }}>
                   {t}
                 </span>

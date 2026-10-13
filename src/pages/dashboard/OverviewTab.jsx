@@ -130,7 +130,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
   const milestones = [
     { title: 'Registration & Squad Lock', dateStr: '2026-10-28T23:59:59', icon: '🚀', desc: 'Lock in 3–4 crew members & ₹1,200 fee' },
     { title: 'Flight Passes & Venue Briefing', dateStr: '2026-11-02T12:00:00', icon: '🎫', desc: 'Official checkpoint passes & instructions' },
-    { title: 'Grand Finale (MIT Mysore)', dateStr: '2026-11-06T09:00:00', icon: '🏆', desc: '24-hour hackathon & ₹30,000+ bounty' }
+    { title: 'Grand Finale (MIT Mysore)', dateStr: '2026-11-06T09:00:00', icon: '🏆', desc: '24-hour hackathon & ₹40,000 bounty' }
   ];
 
   const upcomingMilestones = milestones.filter(m => new Date(m.dateStr) > now);

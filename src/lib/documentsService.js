@@ -27,7 +27,7 @@ export const DEFAULT_DOCUMENTS = [
     title: 'HAXLR8 3.0 Event Brochure & Mission Dossier',
     category: 'Brochure',
     badge: 'EVENT BROCHURE',
-    description: 'Official department brochure highlighting innovation domains, eligibility criteria, cash rewards (₹33,333 bounty), and student mentors.',
+    description: 'Official department brochure highlighting innovation domains, eligibility criteria, cash rewards (₹40,000 bounty), and student mentors.',
     fileUrl: null, // Set by Admin upload
     fileName: 'Pending Admin Upload',
     fileSize: 'Official PDF',

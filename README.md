@@ -16,7 +16,7 @@ HAXLR8 3.0 is a 24-hour national-level prototyping hackathon organized by the **
 - **Organizing Body:** Department of Electronics & Communication Engineering & EMITERS
 - **Dates:** November 6 – 7, 2026
 - **Format:** 24-Hour Non-stop Prototyping Marathon
-- **Prize Pool:** ₹33,333 Cash Bounty
+- **Prize Pool:** ₹40,000 Cash Bounty
 - **Team Size:** 3 – 4 Members (Inter-college squads permitted)
 - **Official Contact:** `haxlr8ecemitm@gmail.com`
 

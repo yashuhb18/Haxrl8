@@ -9,42 +9,42 @@ const PRIZES = [
     place: '1st Prize',
     rankEmoji: '🥇',
     title: 'Grand Winners',
-    amount: '₹15,111',
+    amount: '₹20,000',
     color: '#f59e0b',
     cardBg: 'linear-gradient(180deg, #fef3c7 0%, #ffffff 100%)',
     border: '#fde68a',
     badge: 'Champion Crew',
     crewColor: 'yellow',
     crewHat: 'crown',
-    speech: 'Grand Champions! ₹15,111! 👑',
+    speech: 'Grand Champions! ₹20,000! 👑',
     isWinner: true,
   },
   {
     place: '2nd Prize',
     rankEmoji: '🥈',
     title: 'First Runners Up',
-    amount: '₹10,111',
+    amount: '₹12,000',
     color: '#0284c7',
     cardBg: 'linear-gradient(180deg, #e0f2fe 0%, #ffffff 100%)',
     border: '#bae6fd',
     badge: 'Co-Pilot Squad',
     crewColor: 'cyan',
     crewHat: 'cap',
-    speech: 'Co-Pilot Squad! ₹10,111! 🚀',
+    speech: 'Co-Pilot Squad! ₹12,000! 🚀',
     isWinner: false,
   },
   {
     place: '3rd Prize',
     rankEmoji: '🥉',
     title: 'Second Runners Up',
-    amount: '₹8,111',
+    amount: '₹8,000',
     color: '#f43f5e',
     cardBg: 'linear-gradient(180deg, #ffe4e6 0%, #ffffff 100%)',
     border: '#fecdd3',
     badge: 'Specialist Crew',
     crewColor: 'pink',
     crewHat: 'none',
-    speech: 'Specialist Crew! ₹8,111! 💖',
+    speech: 'Specialist Crew! ₹8,000! 💖',
     isWinner: false,
   },
 ];
@@ -82,7 +82,7 @@ export default function PlayfulPrizesSection() {
             }}
           >
             <Sparkles size={18} color="#d97706" />
-            <span>₹33,333 TOTAL PRIZE POOL</span>
+            <span>₹40,000 TOTAL PRIZE POOL</span>
           </div>
 
           <h2
@@ -148,7 +148,7 @@ export default function PlayfulPrizesSection() {
                 }}
               />
               <div style={{ position: 'absolute', bottom: '10px', right: '-10px' }}>
-                <AmongUsCrewmate color="yellow" hat="crown" size={76} speechText="Claim the ₹33,333 bounty! 👑" />
+                <AmongUsCrewmate color="yellow" hat="crown" size={76} speechText="Claim the ₹40,000 bounty! 👑" />
               </div>
             </div>
 

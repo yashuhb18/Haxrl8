@@ -23,7 +23,7 @@ export default function HomePage() {
       {/* 4. Flight Timeline (Dark purple space section with smooth wave transitions) */}
       <PlayfulTimelineSection />
 
-      {/* 5. Prizes Section (3D Golden Trophy + ₹30,000 Total Prize Pool) */}
+      {/* 5. Prizes Section (3D Golden Trophy + ₹40,000 Total Prize Pool) */}
       <PlayfulPrizesSection />
 
       {/* 6. Guidelines & Protocols (Sector 1 Essentials & Sector 2 Logistics) */}

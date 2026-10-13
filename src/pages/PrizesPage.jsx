@@ -56,7 +56,7 @@ export default function PrizesPage() {
     {
       rank: '01',
       title: 'Grand Champion',
-      amount: '₹15,111',
+      amount: '₹20,000',
       desc: 'Top honor for the most innovative, scalable, and well-executed solution overall.',
       suitColor: 'yellow',
       hat: 'crown',
@@ -69,7 +69,7 @@ export default function PrizesPage() {
     {
       rank: '02',
       title: 'First Runner Up',
-      amount: '₹10,111',
+      amount: '₹12,000',
       desc: 'Awarded for exceptional technical depth, prototype quality, and clear domain impact.',
       suitColor: 'cyan',
       hat: 'pilot',
@@ -82,7 +82,7 @@ export default function PrizesPage() {
     {
       rank: '03',
       title: 'Second Runner Up',
-      amount: '₹8,111',
+      amount: '₹8,000',
       desc: 'Recognizing ingenuity, creative architecture, and effective implementation.',
       suitColor: 'lime',
       hat: 'sprout',
@@ -95,7 +95,7 @@ export default function PrizesPage() {
   ];
 
   const outcomes = [
-    { icon: '💰', title: '₹33,333 Cash Bounty', desc: 'Direct cash awards distributed across the championship podium winners.' },
+    { icon: '💰', title: '₹40,000 Cash Bounty', desc: 'Direct cash awards distributed across the championship podium winners.' },
     { icon: '🏆', title: 'Championship Trophies', desc: 'Official winner trophies, medals, and merit plaques presented at MIT Mysore.' },
     { icon: '📜', title: 'Verified Certificates', desc: 'National-level certificates of achievement and participation recognized across universities.' },
     { icon: '🧠', title: 'Faculty & Industry Mentorship', desc: 'Direct review, feedback, and project incubation mentorship from senior faculty.' },
@@ -134,7 +134,7 @@ export default function PrizesPage() {
             }}
           >
             <Sparkles size={16} color="#d97706" />
-            <span>₹33,333 BOUNTY POOL</span>
+            <span>₹40,000 BOUNTY POOL</span>
           </div>
 
           <h1
@@ -159,7 +159,7 @@ export default function PrizesPage() {
               fontFamily: "'Plus Jakarta Sans', sans-serif",
             }}
           >
-            Compete with the brightest undergraduate minds in India and claim your share of the ₹33,333 prize pool at Maharaja Institute of Technology Mysore.
+            Compete with the brightest undergraduate minds in India and claim your share of the ₹40,000 prize pool at Maharaja Institute of Technology Mysore.
           </p>
         </div>
 

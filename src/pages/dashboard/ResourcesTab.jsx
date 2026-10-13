@@ -33,7 +33,7 @@ const QUICK_LINKS = [
   { 
     icon: '🏆', 
     label: 'Prize Bounty Breakdown', 
-    desc: 'Learn about the ₹30,000 cash prizes & track awards', 
+    desc: 'Learn about the ₹40,000 cash prizes & track awards', 
     tag: 'AWARDS', 
     href: '/prizes', 
     color: '#16a34a', 

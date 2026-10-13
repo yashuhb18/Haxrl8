@@ -213,7 +213,7 @@ export const InternshipTicket = () => {
                 letterSpacing: "-0.03em", transformStyle: "preserve-3d",
               }}
             >
-              Compete for the<br /><span style={{ color: "#38fedc", textShadow: "0 0 25px rgba(56,254,220,0.5)" }}>₹33,333</span> Bounty! 
+              Compete for the<br /><span style={{ color: "#38fedc", textShadow: "0 0 25px rgba(56,254,220,0.5)" }}>₹40,000</span> Bounty! 
             </motion.h3>
 
             {/* Description — pops out */}
@@ -288,7 +288,7 @@ export const InternshipTicket = () => {
                   <div style={{ color: "#38fedc", fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.1em" }}>VERIFIED</div>
                 </div>
                 <div style={{ fontFamily: "monospace", fontSize: "0.75rem", color: "#64748b", letterSpacing: "0.08em" }}>
-                  SKELD-2026-30K
+                  SKELD-2026-40K
                 </div>
               </div>
             </div>

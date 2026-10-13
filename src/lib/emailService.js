@@ -175,7 +175,7 @@ export function generateWelcomeEmailHtml({
       <div style="background-color: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 14px 18px; margin: 20px 0; font-size: 12.5px; color: #7c2d12; line-height: 1.55;">
         <strong>🗓️ Mission Milestones:</strong><br>
         • <strong>Nov 02:</strong> Problem Statements Released &amp; Flight Passes Dispatched<br>
-        • <strong>Nov 06–07:</strong> 24-Hour Offline Hackathon at MIT Mysore Campus (₹33,333+ Cash Bounty)
+        • <strong>Nov 06–07:</strong> 24-Hour Offline Hackathon at MIT Mysore Campus (₹40,000 Cash Bounty)
       </div>
 
       <!-- CTA Button -->
@@ -530,7 +530,7 @@ export function generateAccountWelcomeEmailHtml({ leaderName, recipientEmail }) 
         <strong>🗓️ Mission Milestones:</strong><br>
         • <strong>Oct 09:</strong> Registrations Open<br>
         • <strong>Oct 28:</strong> Registration &amp; Payment Lock<br>
-        • <strong>Nov 06–07:</strong> 24-Hour Offline Grand Finale at MIT Mysore Campus (₹30,000+ Prize Bounty)
+        • <strong>Nov 06–07:</strong> 24-Hour Offline Grand Finale at MIT Mysore Campus (₹40,000 Prize Bounty)
       </div>
 
       <div style="text-align: center; margin-top: 26px;">

@@ -213,7 +213,7 @@ export default function PlayfulHeroSection() {
                 }}
               >
                 <Trophy size={15} color="#d97706" strokeWidth={2.5} />
-                <span>₹33,333 PRIZE POOL</span>
+                <span>₹40,000 PRIZE POOL</span>
               </div>
 
               {/* Date Badge */}
