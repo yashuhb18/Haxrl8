@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     } = req.body || {};
 
     const hostEmail = process.env.HOST_EMAIL || process.env.VITE_HOST_EMAIL || 'haxlr8ecemitm@gmail.com';
-    const hostPassword = process.env.HOST_EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD || 'fbrnlnfiilorsdzk';
+    const hostPassword = process.env.HOST_EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD || 'qqucyshfxeckzqxl';
 
     const targetTo = to || recipientEmail || (isContactMessage ? hostEmail : null);
 
