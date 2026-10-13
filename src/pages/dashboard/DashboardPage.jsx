@@ -450,6 +450,15 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchDashboardData();
 
+    // Listen for cross-component announcement updates (e.g. deletion)
+    const handleAnnouncementsUpdate = (e) => {
+      const deletedId = e?.detail?.deletedId;
+      if (deletedId) {
+        setAnnouncements(prev => filterRealAnnouncements(prev.filter(a => String(a.id) !== String(deletedId))));
+      }
+    };
+    window.addEventListener('haxlr8_announcements_updated', handleAnnouncementsUpdate);
+
     // Listen for auth state changes (strictly re-fetch if user identity changed or on SIGNED_IN event)
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
@@ -467,6 +476,7 @@ export default function DashboardPage() {
     });
 
     return () => {
+      window.removeEventListener('haxlr8_announcements_updated', handleAnnouncementsUpdate);
       authListener?.subscription?.unsubscribe?.();
     };
   }, []);

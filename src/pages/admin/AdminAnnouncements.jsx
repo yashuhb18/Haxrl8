@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { Calendar, Bell, Search, ChevronDown, ChevronRight, ChevronLeft, Plus, Megaphone, Eye, Edit, Trash2, X } from 'lucide-react';
-import { filterRealAnnouncements } from '../../lib/announcementsService';
+import { filterRealAnnouncements, deleteAnnouncement } from '../../lib/announcementsService';
 
 const S = {
   bg: '#F8FAFC', card: '#FFFFFF', border: '#E5E7EB', primary: '#6C4EFF',
@@ -99,24 +99,8 @@ export default function AdminAnnouncements() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this announcement?')) {
-      try {
-        const { error } = await supabase.from('announcements').delete().eq('id', id);
-        if (error) {
-          // If hard delete is restricted by RLS, tag as DELETED_SYSTEM so it disappears permanently
-          await supabase.from('announcements').update({
-            title: '[DELETED_SYSTEM]',
-            tag: 'DELETED_SYSTEM',
-            message: ''
-          }).eq('id', id);
-        }
-      } catch (e) {
-        await supabase.from('announcements').update({
-          title: '[DELETED_SYSTEM]',
-          tag: 'DELETED_SYSTEM',
-          message: ''
-        }).eq('id', id);
-      }
+    if (window.confirm('Are you sure you want to permanently delete this announcement?')) {
+      await deleteAnnouncement(id);
       fetchData();
     }
   };

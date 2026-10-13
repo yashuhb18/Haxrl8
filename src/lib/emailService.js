@@ -943,7 +943,7 @@ export async function sendContactSupportMessage({ name, email, phone, message })
   try {
     const { supabase } = await import('./supabaseClient');
     await supabase.from('announcements').insert([{
-      title: `[CONTACT] ${cleanName} - ${cleanPhone || cleanEmail}`,
+      title: `[INTERNAL_CONTACT] ${cleanName} - ${cleanPhone || cleanEmail}`,
       message: cleanMsg,
       content: JSON.stringify({
         name: cleanName,
