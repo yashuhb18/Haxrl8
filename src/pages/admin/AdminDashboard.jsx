@@ -2,11 +2,11 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
-import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight, Mail, Send, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaphone, ChevronRight, Mail, Send, CheckCircle2, RefreshCw, Sliders } from 'lucide-react';
 import { getEmailDispatchLogs, HAXLR8_HOST_EMAIL } from '../../lib/emailService';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
 import { resolveDomain } from '../../lib/domainUtils';
-import CrewSquadronsControlCard from '../../components/admin/CrewSquadronsControlCard';
+import CrewSquadronsModal from '../../components/admin/CrewSquadronsModal';
 
 // Style constants
 const S = {
@@ -49,6 +49,7 @@ export default function AdminDashboard() {
   const [emailLogs, setEmailLogs] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [dataError, setDataError] = useState('');
+  const [showTelemetryModal, setShowTelemetryModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     setDataError('');
@@ -255,6 +256,20 @@ export default function AdminDashboard() {
               <RefreshCw size={14} style={{ animation: isRefreshing ? 'spin 0.8s linear infinite' : 'none', color: '#0284c7' }} />
               {isRefreshing ? 'Syncing...' : 'Sync & Refresh'}
             </button>
+            <button
+              onClick={() => setShowTelemetryModal(true)}
+              style={{
+                display:'flex', alignItems:'center', gap:6,
+                background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:10,
+                padding:'8px 12px', fontSize:12.5, fontWeight:700, color:'#475569',
+                cursor: 'pointer',
+                transition:'all 0.2s'
+              }}
+              title="Calibrate Public Counter"
+            >
+              <Sliders size={13} style={{ color: '#6366f1' }} />
+              <span>Counter Settings</span>
+            </button>
             <div 
               onClick={() => setShowEmail(!showEmail)}
               style={{ display:'flex', alignItems:'center', gap:10, borderLeft:'1px solid '+S.border, paddingLeft:14, cursor:'pointer' }}
@@ -277,9 +292,34 @@ export default function AdminDashboard() {
             {/* STAT CARDS */}
             <div className="admin-stat-cards-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:S.gap }}>
               {statCards.map((c, i) => (
-                <div key={i} style={{ background:S.card, border:'1px solid '+S.border, borderRadius:S.radius, padding:'20px 22px', boxShadow:'0 1px 3px rgba(0,0,0,.04)' }}>
-                  <div style={{ width:44, height:44, borderRadius:12, background:c.bg, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
-                    {[<Users size={20}/>, <Users size={20}/>, <FileText size={20}/>, <Shield size={20}/>][i]}
+                <div 
+                  key={i} 
+                  onClick={i === 0 ? () => setShowTelemetryModal(true) : undefined}
+                  style={{ 
+                    background:S.card, 
+                    border:'1px solid '+S.border, 
+                    borderRadius:S.radius, 
+                    padding:'20px 22px', 
+                    boxShadow:'0 1px 3px rgba(0,0,0,.04)',
+                    cursor: i === 0 ? 'pointer' : 'default',
+                    transition: 'all 0.2s',
+                    position: 'relative'
+                  }}
+                  title={i === 0 ? 'Click to calibrate public counter' : undefined}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                    <div style={{ width:44, height:44, borderRadius:12, background:c.bg, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      {[<Users size={20}/>, <Users size={20}/>, <FileText size={20}/>, <Shield size={20}/>][i]}
+                    </div>
+                    {i === 0 && (
+                      <span 
+                        style={{ fontSize: 11, color: '#64748b', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '3px 8px', borderRadius: 6, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                        title="Calibrate Public Counter"
+                      >
+                        <Sliders size={11} color="#6366f1" />
+                        <span>Settings</span>
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize:12, fontWeight:600, color:S.t2, marginBottom:4 }}>{c.title}</div>
                   <div style={{ fontSize:28, fontWeight:800, color:S.t1, marginBottom:6 }}>{c.value}</div>
@@ -287,9 +327,6 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
-
-            {/* CREW SQUADRONS TELEMETRY CONTROL */}
-            <CrewSquadronsControlCard currentDbCount={exactCounts.teams} onConfigChange={fetchData} />
 
             {/* CHARTS ROW */}
             <div className="admin-charts-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:S.gap, minHeight:380 }}>
@@ -489,6 +526,14 @@ export default function AdminDashboard() {
             }
           }
         `}</style>
+
+        {/* Public Telemetry Calibration Modal (Secret & Discreet) */}
+        <CrewSquadronsModal
+          isOpen={showTelemetryModal}
+          onClose={() => setShowTelemetryModal(false)}
+          currentDbCount={exactCounts.teams}
+          onConfigChange={fetchData}
+        />
     </>
   );
 }

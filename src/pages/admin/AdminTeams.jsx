@@ -4,7 +4,6 @@ import { supabase } from '../../lib/supabaseClient';
 import { isOrganizerAuthorized } from './adminAuth';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
 import { resolveDomain } from '../../lib/domainUtils';
-import CrewSquadronsControlCard from '../../components/admin/CrewSquadronsControlCard';
 import { Users, Flag, CheckSquare, Search, ChevronDown, Download, ChevronRight, MoreVertical, ChevronLeft, Trophy, Trash2, Eye, Receipt, X, ExternalLink, Image } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -309,9 +308,6 @@ export default function AdminTeams() {
                 </button>
               </div>
             </div>
-
-            {/* CREW SQUADRONS TELEMETRY CONTROL */}
-            <CrewSquadronsControlCard currentDbCount={totalTeamsDB} onConfigChange={fetchData} />
 
             <div style={{ background:S.card, border:'1px solid '+S.border, borderRadius:S.radius, boxShadow:'0 1px 3px rgba(0,0,0,.04)', display:'flex', flexDirection:'column' }}>
               
