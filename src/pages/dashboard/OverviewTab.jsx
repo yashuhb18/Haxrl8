@@ -6,6 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AmongUsCrewmate, { AmongUsKingCharacter } from '../../components/amongus/AmongUsCrewmate';
 import { filterRealAnnouncements } from '../../lib/announcementsService';
 import { fetchDocuments, getLocalDocuments, getOfficialRulebook, subscribeToDocuments } from '../../lib/documentsService';
+import { 
+  fetchSquadronsConfig, 
+  getLocalSquadronsConfig, 
+  resolveDisplaySquadrons, 
+  subscribeToSquadronsConfig 
+} from '../../lib/crewSquadronsService';
 
 const TIMELINE_STEPS = [
   { title: 'Registration', date: 'Oct 09' },
@@ -50,10 +56,33 @@ const CheckItem = ({ label, status }) => {
 
 export default function OverviewTab({ hasTeam, teamData, teamMembers, submissions, user, setActiveTab, announcements = [] }) {
   const [totalTeams, setTotalTeams] = useState(0);
+  const [squadronsConfig, setSquadronsConfig] = useState(() => getLocalSquadronsConfig());
   const [showRulebook, setShowRulebook] = useState(false);
   const [showNotification, setShowNotification] = useState(true);
   const [documents, setDocuments] = useState(() => getLocalDocuments());
   const rulebookDoc = getOfficialRulebook(documents);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchSquadronsConfig().then(cfg => {
+      if (isMounted && cfg) setSquadronsConfig(cfg);
+    });
+
+    const handleSquadronsUpdate = (e) => {
+      if (e.detail) setSquadronsConfig(e.detail);
+    };
+    window.addEventListener('haxlr8_squadrons_config_updated', handleSquadronsUpdate);
+
+    const unsubscribe = subscribeToSquadronsConfig((newCfg) => {
+      if (isMounted && newCfg) setSquadronsConfig(newCfg);
+    });
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('haxlr8_squadrons_config_updated', handleSquadronsUpdate);
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -142,6 +171,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
   const daysToNext = getDaysLeft(nextMilestone.dateStr);
+  const displaySquadrons = resolveDisplaySquadrons(totalTeams, squadronsConfig);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -220,7 +250,7 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
             <div style={{ width: 48, height: 48, borderRadius: 14, background: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 12px rgba(22, 163, 74, 0.15)' }}>⭐</div>
             <div>
-              <div style={{ fontSize: 26, fontWeight: 900, color: '#15803d', lineHeight: 1 }}>{totalTeams}</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: '#15803d', lineHeight: 1 }}>{displaySquadrons}</div>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#166534', marginTop: 4 }}>Crew Squadrons</div>
             </div>
           </div>

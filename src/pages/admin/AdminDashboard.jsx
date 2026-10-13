@@ -6,6 +6,7 @@ import { Users, Flag, FileText, CheckSquare, Shield, Search, ChevronDown, Megaph
 import { getEmailDispatchLogs, HAXLR8_HOST_EMAIL } from '../../lib/emailService';
 import { syncLocalDataToSupabase } from '../../lib/syncService';
 import { resolveDomain } from '../../lib/domainUtils';
+import CrewSquadronsControlCard from '../../components/admin/CrewSquadronsControlCard';
 
 // Style constants
 const S = {
@@ -286,6 +287,9 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+
+            {/* CREW SQUADRONS TELEMETRY CONTROL */}
+            <CrewSquadronsControlCard currentDbCount={exactCounts.teams} onConfigChange={fetchData} />
 
             {/* CHARTS ROW */}
             <div className="admin-charts-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:S.gap, minHeight:380 }}>
