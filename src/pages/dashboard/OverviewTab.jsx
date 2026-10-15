@@ -482,6 +482,9 @@ export default function OverviewTab({ hasTeam, teamData, teamMembers, submission
                 <li>Real-world Impact &amp; Scalability (25%)</li>
                 <li>Live Pitch &amp; Working Demonstration (25%)</li>
               </ul>
+
+              <h4 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px' }}>4. Solution Architecture (Hardware is Optional)</h4>
+              <p>Hardware is completely optional and never compulsory. Teams have full freedom to target the right real-world problem and architect the right solution—whether engineered at the core level (algorithms, embedded logic, system protocols, simulation) or software level (AI/ML models, cloud platforms, web/mobile applications, computer vision). Depth of problem-solving, real-world utility, and innovation are the primary evaluation criteria.</p>
             </div>
             <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafafa', gap: 12, flexWrap: 'wrap' }}>
               {rulebookDoc?.fileUrl && rulebookDoc.fileUrl !== '#' && !rulebookDoc.fileUrl.startsWith('#') ? (

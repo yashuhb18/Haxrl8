@@ -410,12 +410,13 @@ export default function SubmissionTab({ hasTeam, teamData, teamMembers, submissi
                 <label style={{ fontSize: 12, fontWeight: 800, color: '#ea580c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Category</label>
                 <select value={form.category} onChange={set('category')} style={{ padding: '12px 14px', borderRadius: 12, border: fieldErrors.category ? '1.5px solid #dc2626' : '1.5px solid #cbd5e1', fontSize: 14, outline: 'none', background: '#fafafa', color: form.category ? '#0f172a' : '#94a3b8' }}>
                   <option value="" disabled>Select Category...</option>
-                  <option value="Software">Software</option>
-                  <option value="Hardware">Hardware</option>
-                  <option value="IoT">IoT</option>
-                  <option value="AI/ML">AI/ML</option>
-                  <option value="Other">Other</option>
+                  <option value="Software">Software (Web / Mobile / Cloud)</option>
+                  <option value="Core Systems">Core Engineering / System Level</option>
+                  <option value="AI/ML">AI / Machine Learning / Vision</option>
+                  <option value="Hardware/IoT">Hardware / IoT (Optional Hybrid)</option>
+                  <option value="Other">Other Multi-disciplinary</option>
                 </select>
+                <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>💡 Hardware is never compulsory — choose pure software, core-level, or hybrid.</span>
                 {fieldErrors.category && <span style={{ fontSize: 11, color: '#dc2626', marginTop: 2, fontWeight: 700 }}>{fieldErrors.category}</span>}
               </div>
             </div>

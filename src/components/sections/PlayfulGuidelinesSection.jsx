@@ -203,6 +203,26 @@ export default function PlayfulGuidelinesSection() {
           >
             ✦ KEEP IT HONEST • BUILD WITH PASSION • ZERO BUGS ✦
           </div>
+
+          {/* Architecture Freedom Banner */}
+          <div
+            style={{
+              maxWidth: '840px',
+              margin: '24px auto 0',
+              background: '#f0fdf4',
+              border: '2px solid #86efac',
+              borderRadius: '20px',
+              padding: '16px 24px',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ fontSize: '13px', fontWeight: 900, color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
+              💡 Core or Software Solution Freedom • Hardware is Optional
+            </div>
+            <p style={{ fontSize: '13.5px', color: '#334155', margin: 0, lineHeight: 1.6, fontWeight: 500 }}>
+              Hardware is <strong>never compulsory</strong>. You have complete freedom to choose an authentic problem and craft the right solution—whether at the <strong>core engineering level</strong> (system architectures, protocols, embedded logic, simulation) or <strong>software level</strong> (AI/ML models, cloud platforms, web/mobile apps). Focus on solving the real problem uniquely!
+            </p>
+          </div>
         </div>
 
         {/* 2-Column Grid */}

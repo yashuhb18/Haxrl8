@@ -106,7 +106,7 @@ export default function LegalPage() {
                 <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <li><strong>Project Scope:</strong> Projects must align with the official domains: <strong>Agriculture</strong>, <strong>Healthcare</strong>, or <strong>Smart City</strong>.</li>
                   <li><strong>Development Window:</strong> Software application development must occur during the hackathon period. The use of completely pre-built projects is prohibited.</li>
-                  <li><strong>Hardware/IoT Exception:</strong> Teams building hardware solutions may procure, assemble, and test physical microcontrollers/sensors beforehand, but software integration and prototype testing must happen during the hackathon.</li>
+                  <li><strong>Core &amp; Software Solutions (Hardware is Optional):</strong> Hardware is never compulsory. Teams are free to develop pure software platforms, core-level algorithmic/system architectures, or optional hardware prototypes. For teams voluntarily building hardware, physical sensors/microcontrollers may be assembled beforehand, but firmware logic, system integration, and live testing must be conducted during the hackathon.</li>
                   <li><strong>AI Assistance:</strong> Use of modern developer tools and AI coding assistants is permitted to accelerate prototyping.</li>
                   <li><strong>Originality:</strong> Direct copies of existing public projects without substantial original contribution will be disqualified.</li>
                 </ul>
@@ -119,7 +119,7 @@ export default function LegalPage() {
                 <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', marginTop: '28px', marginBottom: '10px' }}>
                   5. Offline Finale at MIT Mysore
                 </h2>
-                <p>Shortlisted teams must attend the grand finale on November 6–7, 2026 at Maharaja Institute of Technology Mysore. Participants are responsible for their own devices and hardware equipment.</p>
+                <p>Shortlisted teams must attend the grand finale on November 6–7, 2026 at Maharaja Institute of Technology Mysore. Participants are responsible for their own personal laptops and optional project materials.</p>
               </>
             ) : (
               // PRIVACY POLICY

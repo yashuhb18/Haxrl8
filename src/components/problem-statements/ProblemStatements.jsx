@@ -569,10 +569,10 @@ export default function ProblemStatements() {
                         </div>
                       ))}
                     </div>
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px', padding: '6px 12px', background: 'rgba(250, 204, 21, 0.1)', border: '1px solid rgba(250, 204, 21, 0.25)', borderRadius: '8px', width: 'fit-content' }}>
-                      <span style={{ fontSize: '12px' }}>💡</span>
-                      <p style={{ fontSize: '11.5px', color: '#fde047', margin: 0, fontWeight: 600 }}>
-                        <strong>Open Innovation:</strong> You are fully free to choose your own problem statement as long as it aligns with this domain.
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px', padding: '8px 14px', background: 'rgba(250, 204, 21, 0.1)', border: '1px solid rgba(250, 204, 21, 0.25)', borderRadius: '10px', width: 'fit-content' }}>
+                      <span style={{ fontSize: '13px' }}>💡</span>
+                      <p style={{ fontSize: '11.5px', color: '#fde047', margin: 0, fontWeight: 600, lineHeight: 1.4 }}>
+                        <strong>Open Innovation &amp; Architecture Freedom:</strong> Hardware is never compulsory. Formulate your own problem statement and deliver the right solution at the core engineering or software level.
                       </p>
                     </div>
                   </div>

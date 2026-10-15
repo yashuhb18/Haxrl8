@@ -26,7 +26,11 @@ const FAQS = [
   },
   {
     q: 'What should we bring to MIT Mysore?',
-    a: 'Please bring your laptops, chargers, valid college student ID cards, and required components/hardware for your team project.',
+    a: 'Please bring your laptops, chargers, and valid college student ID cards. Hardware is completely optional—teams are free to build pure software, core-level, or hybrid solutions.',
+  },
+  {
+    q: 'Is hardware compulsory for our project?',
+    a: 'No, hardware is NOT compulsory! You have complete freedom to choose the right real-world problem and craft the right solution—whether at the core engineering level (system architectures, protocols, edge computing, simulations) or software level (AI/ML, mobile/web platforms, vision models, intelligent cloud APIs). Focus on solving the problem uniquely and effectively.',
   },
 ];
 

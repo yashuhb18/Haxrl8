@@ -17,8 +17,8 @@ const DOMAIN_CARDS = [
     img: agricultureImg,
     badgeBg: 'rgba(34, 197, 94, 0.15)',
     details: {
-      overview: 'Focuses on deploying cutting-edge IoT, computer vision, AI, and autonomous technologies to revolutionize modern agrarian systems and food supply chains.',
-      idealOutput: 'Hardware prototypes, computer vision models, or mobile/web applications integrating real-time telemetry.',
+      overview: 'Focuses on deploying cutting-edge algorithms, computer vision, AI, and smart systems to revolutionize modern agrarian systems and food supply chains.',
+      idealOutput: 'Core-level algorithms, AI vision models, intelligent web/mobile platforms, or smart telemetry systems solving real-world agrarian challenges.',
     },
   },
   {
@@ -33,7 +33,7 @@ const DOMAIN_CARDS = [
     badgeBg: 'rgba(2, 132, 199, 0.15)',
     details: {
       overview: 'Tackle pressing urban challenges by engineering resilient, connected, and energy-efficient municipal and transit systems for the next decade.',
-      idealOutput: 'Scalable cloud architectures, embedded edge devices, or spatial data analytics dashboards.',
+      idealOutput: 'Core system architectures, spatial data intelligence dashboards, urban mobility algorithms, or scalable cloud platforms optimizing municipal infrastructure.',
     },
   },
   {
@@ -48,7 +48,7 @@ const DOMAIN_CARDS = [
     badgeBg: 'rgba(239, 68, 68, 0.15)',
     details: {
       overview: 'Develop life-saving healthcare tools that expand accessibility, enhance diagnostic precision, and democratize clinical support for all communities.',
-      idealOutput: 'Clinically grounded software tools, medical IoT prototypes, or triage decision-support systems.',
+      idealOutput: 'Clinically grounded software tools, predictive health AI models, triage decision-support engines, or intelligent diagnostic platforms.',
     },
   },
 ];
@@ -356,6 +356,21 @@ export default function ChooseMissionSection() {
                 </div>
                 <div style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: 1.6 }}>
                   There are no sub-tracks for students—only the core domain is selected. The official problem statements for <strong>{selectedDomain.title}</strong> will be revealed on <strong>November 2, 2026</strong>.
+                </div>
+              </div>
+
+              <div style={{
+                background: 'rgba(2, 132, 199, 0.12)',
+                border: '1.5px solid rgba(56, 189, 248, 0.35)',
+                borderRadius: '14px',
+                padding: '16px 20px',
+                marginBottom: '24px'
+              }}>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
+                  💡 Core or Software Solution Freedom (Hardware is Optional)
+                </div>
+                <div style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: 1.6 }}>
+                  Hardware is <strong>never compulsory</strong>. Choose the right real-world problem and deliver the right solution—whether engineered at the <strong>core engineering level</strong> (embedded logic, system protocols, algorithmic models, simulations) or <strong>software level</strong> (full-stack web/mobile apps, AI/ML models, computer vision, cloud pipelines). Originality and technical impact are what matter most!
                 </div>
               </div>
 

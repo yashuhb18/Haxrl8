@@ -481,7 +481,7 @@ export default function TicketTab({
               gap: 8
             }}>
               <div>
-                ⚠️ Mandatory: Carry Original College Student ID &amp; Laptop hardware.
+                ⚠️ Mandatory: Carry Original College Student ID &amp; Laptop. (Hardware is completely optional; projects can be pure software, core systems, or hardware).
               </div>
               <div style={{ color: '#ea580c', fontWeight: 800 }}>
                 Direct Entry — No Round 1 / Round 2 Screening Required

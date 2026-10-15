@@ -454,6 +454,25 @@ export default function GuidelinesSection() {
             Before You Begin. <br className="hidden md:block" />
             <span style={{ color: "#94a3b8" }}>Flight rules and mission criteria.</span>
           </h2>
+
+          {/* Solution Architecture Directive Banner */}
+          <div style={{
+            marginTop: "28px",
+            padding: "16px 24px",
+            background: "rgba(15, 23, 42, 0.8)",
+            border: "1.5px solid rgba(56, 254, 220, 0.3)",
+            borderRadius: "16px",
+            textAlign: "center",
+            maxWidth: "840px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+          }}>
+            <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#38fedc", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "4px" }}>
+              💡 Core or Software Freedom • Hardware is Optional
+            </div>
+            <p style={{ fontSize: "0.92rem", color: "#94a3b8", margin: 0, lineHeight: 1.6 }}>
+              Hardware is <strong style={{ color: "#ffffff" }}>never compulsory</strong>. You have complete freedom to choose an authentic real-world problem and engineer an impactful solution—whether at the <strong style={{ color: "#ffffff" }}>core engineering level</strong> (system architectures, protocols, simulation) or <strong style={{ color: "#ffffff" }}>software level</strong> (AI/ML models, cloud platforms, web/mobile apps). Focus on solving the problem uniquely!
+            </p>
+          </div>
         </motion.div>
 
         {/* Two Columns */}

@@ -71,6 +71,18 @@ const FAQS = [
     question: "What amenities are provided during the 24-hour event?",
     answer: "Participants receive continuous high-speed Wi-Fi, power supply, meals, snacks, midnight refreshments, workspace, and rest areas at the MIT Mysore campus.",
   },
+  {
+    id: 12,
+    category: 'domains',
+    question: "Is hardware compulsory for our project?",
+    answer: "No, hardware is completely optional! Hardware is never compulsory for any domain. You have 100% freedom to identify the right real-world problem and engineer the most effective solution—whether at the core engineering level (embedded firmware, protocols, system architecture, simulation) or at the software level (full-stack web/mobile apps, AI/ML models, computer vision, data pipelines, or cloud services). What matters is bringing an authentic, unique, and well-executed solution to the problem.",
+  },
+  {
+    id: 13,
+    category: 'logistics',
+    question: "What should participants bring to MIT Mysore?",
+    answer: "Please bring your laptop, charger, original college student ID card, and any optional hardware/components only if your chosen solution requires them. High-speed Wi-Fi, power extensions, workstations, meals, and snacks are fully provided on campus.",
+  },
 ];
 
 export default function FaqSection() {

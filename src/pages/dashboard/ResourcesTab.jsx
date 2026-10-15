@@ -76,7 +76,11 @@ const FAQS = [
   },
   {
     q: "What should I bring to HAXLR8 3.0 at MIT Mysore?",
-    a: "Please bring your laptop, charger, required hardware/IoT sensors, student ID card, and enthusiasm. Refreshments, Wi-Fi, and workspace will be provided at Maharaja Institute of Technology Mysore.",
+    a: "Please bring your laptop, charger, student ID card, and enthusiasm! Hardware is completely optional—bring physical components only if your chosen solution requires them. Refreshments, high-speed Wi-Fi, power extensions, and workspace are fully provided at Maharaja Institute of Technology Mysore.",
+  },
+  {
+    q: "Is hardware compulsory for our project?",
+    a: "No, hardware is completely optional! Hardware is never compulsory for any domain. You have 100% freedom to identify the right real-world problem and engineer the most effective solution—whether at the core level (embedded firmware, protocols, system architecture, simulation) or at the software level (full-stack web/mobile apps, AI/ML models, computer vision, data pipelines, or cloud services). What matters is bringing an authentic, unique, and well-executed solution.",
   },
   {
     q: "Will the hackathon be in person or online?",
@@ -587,6 +591,9 @@ export default function ResourcesTab({ hasTeam, submissions }) {
                   <li>Real-world Impact &amp; Scalability (25%)</li>
                   <li>Live Pitch &amp; Working Demonstration (25%)</li>
                 </ul>
+
+                <h4 style={{ color: '#0f172a', fontWeight: 900, margin: '0 0 6px' }}>4. Solution Architecture (Hardware is Optional)</h4>
+                <p>Hardware is completely optional and never compulsory. Teams have full freedom to target the right real-world problem and architect the right solution—whether engineered at the core level (algorithms, embedded logic, system protocols, simulation) or software level (AI/ML models, cloud platforms, web/mobile applications, computer vision). Depth of problem-solving, real-world utility, and innovation are the primary evaluation criteria.</p>
               </div>
               <div style={{ padding: '16px 24px', borderTop: '1.5px solid #f1e7db', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fafafa', flexWrap: 'wrap', gap: 12 }}>
                 {rulebookDoc?.fileUrl && rulebookDoc.fileUrl !== '#' && !rulebookDoc.fileUrl.startsWith('#') && rulebookDoc.fileUrl.startsWith('http') ? (

@@ -7,7 +7,7 @@ const DOMAINS = [
     id: 'agriculture',
     title: 'Agriculture',
     subtitle: 'Smart Farming & AgriTech',
-    desc: 'Deploy IoT sensors, precision irrigation, and AI vision to revolutionize sustainable farming.',
+    desc: 'Deploy AI vision, smart irrigation algorithms, and crop intelligence platforms to revolutionize modern sustainable farming.',
     bg: '#f0fdf4', // Pastel Emerald
     border: '#86efac',
     textCol: '#15803d',
@@ -17,7 +17,7 @@ const DOMAINS = [
     id: 'healthcare',
     title: 'Healthcare',
     subtitle: 'MedTech & AI Diagnostics',
-    desc: 'Develop life-saving healthcare tools, AI diagnostics, and smart assistive technologies.',
+    desc: 'Engineer transformative health tools, clinical predictive AI, assistive platforms, and patient triage decision engines.',
     bg: '#fff1f2', // Pastel Crimson / Rose
     border: '#fecdd3',
     textCol: '#e11d48',
@@ -27,7 +27,7 @@ const DOMAINS = [
     id: 'smart-city',
     title: 'Smart City',
     subtitle: 'Urban Mobility & IoT Infrastructure',
-    desc: 'Engineer connected, resilient, and energy-efficient municipal and transit systems.',
+    desc: 'Architect resilient urban tech, intelligent mobility coordination, dynamic energy balancing, and civic software infrastructure.',
     bg: '#e0f2fe', // Pastel Tech Sky
     border: '#7dd3fc',
     textCol: '#0284c7',
@@ -347,6 +347,24 @@ export default function PlayfulDomainsSection() {
               <p style={{ margin: '0 0 24px 0', fontSize: '14.5px', color: '#475569', fontWeight: 500, lineHeight: 1.6 }}>
                 {selectedDomain.desc}
               </p>
+
+              {/* Core or Software Freedom Highlight */}
+              <div
+                style={{
+                  background: '#f0fdf4',
+                  border: '1.5px solid #86efac',
+                  borderRadius: '20px',
+                  padding: '18px 20px',
+                  marginBottom: '20px',
+                }}
+              >
+                <div style={{ fontSize: '12.5px', fontWeight: 900, color: '#15803d', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                  💡 Core or Software Freedom • Hardware is Optional
+                </div>
+                <p style={{ fontSize: '13px', color: '#334155', margin: 0, lineHeight: 1.6, fontWeight: 500 }}>
+                  Hardware is <strong>never compulsory</strong>. Teams have complete freedom to choose an authentic problem and craft an impactful solution—whether at the <strong>core engineering level</strong> (system architectures, protocols, simulation) or <strong>software level</strong> (AI/ML models, cloud platforms, web/mobile apps). What matters is bringing an authentic, unique, and well-engineered solution.
+                </p>
+              </div>
 
               {/* Problem Statements Reveal Block */}
               <div
